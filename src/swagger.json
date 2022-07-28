@@ -1,0 +1,129 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "",
+    "version": "1.x",
+    "title": "academy-project-server"
+  },
+  "basePath": "/",
+  "produces": [
+    "application/json"
+  ],
+  "securityDefinitions": {
+    "app-jwt": {
+      "type": "apiKey",
+      "in": "header",
+      "name": "Authorization"
+    }
+  },
+  "security": [
+    {
+      "app-jwt": []
+    }
+  ],
+  "paths": {
+    "/users/{id}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Retrieves user",
+        "description": "",
+        "operationId": "getUsers",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns user",
+            "schema": {
+              "x-oad-type": "object",
+              "type": "object"
+            },
+            "examples": {
+              "application/json": {
+                "id": 1,
+                "name": "Name 1"
+              }
+            },
+            "x-oad-type": "response"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "string",
+          "x-oad-type": "parameter"
+        }
+      ],
+      "x-hapi-options": {
+        "auth": {
+          "access": {
+            "scope": []
+          }
+        }
+      },
+      "x-oad-type": "operation"
+    },
+    "/users": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Creates user",
+        "description": "",
+        "operationId": "createUser",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "payload",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User created",
+            "schema": {
+              "type": "boolean"
+            },
+            "examples": {
+              "application/json": {
+                "id": 1,
+                "name": "Name 1"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    }
+  }
+}

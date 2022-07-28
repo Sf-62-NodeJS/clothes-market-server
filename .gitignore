@@ -1,0 +1,6 @@
+/node_modules
+/coverage
+/README.md
+/.env.production
+/.env
+/.idea
