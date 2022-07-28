@@ -1,5 +1,5 @@
-####Title:  <br /> provide here title.
+Title: provide here title.
 
-####Description: <br /> provide here general description of this pull request
+Description: provide here general description of this pull request
 
-####Ticket link: <br /> provide here ticket link
+Ticket link: provide here ticket link
