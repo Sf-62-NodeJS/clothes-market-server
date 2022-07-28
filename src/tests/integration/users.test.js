@@ -13,6 +13,10 @@ jest.mock('../../models', () => ({
   }
 }));
 
+jest.mock('mongoose', () => ({
+    connect: () => {}
+}))
+
 describe('Users integration tests', function () {
   it('should return user by id', async () => {
     const response = await request(app).get(
