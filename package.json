@@ -4,7 +4,7 @@
   "description": "",
   "main": "./src/index.js",
   "scripts": {
-    "test": "npm run lint && jest --coverage",
+    "test": "npm run lint && jest --coverage --forceExit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "start": "node ../clothes-market-server/src/index.js",
