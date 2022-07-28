@@ -51,6 +51,7 @@ app.listen(process.env.PORT, (err) => {
   }
 
   console.log(`Server started at http://localhost:${process.env.PORT}`);
+  console.log('Hello');
   console.log((`Open swagger ui at http://localhost:${process.env.PORT}/swagger`));
 });
 
