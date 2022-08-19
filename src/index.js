@@ -49,6 +49,7 @@ app.use(expressWinston.logger(loggerOptions));
 app.use(expressWinston.errorLogger(loggerOptions));
 
 // DB connect
+
 mongoose.connect(process.env.MONGO_URL, async (error) => {
   if (error) {
     console.error(error);

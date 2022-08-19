@@ -3,7 +3,13 @@ const { createUserPayloadValidator } = require('../../validators');
 describe('createUserPayloadValidator tests', () => {
   const requestStub = {
     body: {
-      name: 'Name'
+      name: 'Name',
+      surname: 'Surname',
+      middleName: 'Middlename',
+      hashedPassword: 'asd32rr4tsdf',
+      phoneNumber: '0898123456',
+      address: 'Address 15',
+      email: 'email@gmail.com'
     }
   };
   const nextFunctionMock = jest.fn();
