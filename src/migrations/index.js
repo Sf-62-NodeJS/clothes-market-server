@@ -1,1 +1,1 @@
-module.exports.up = require('./dbMigrationUp');
+module.exports.migrationUp = require('./migrationUp');

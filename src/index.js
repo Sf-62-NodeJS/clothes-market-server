@@ -50,7 +50,7 @@ app.use(expressWinston.errorLogger(loggerOptions));
 
 // DB connect
 mongoose.connect(process.env.MONGO_URL, () => {
-  dbMigrations.up();
+  dbMigrations.migrationUp();
 });
 
 // Routes
