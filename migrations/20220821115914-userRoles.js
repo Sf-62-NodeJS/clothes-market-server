@@ -10,11 +10,15 @@ module.exports = {
           { name: 'Super admin' }
         ]);
     } catch (error) {
-      console.log('Error with UserRoles Migration: ', error);
+      console.error('Error with UserRoles Migration: ', error);
     }
   },
 
   async down (db) {
-    await db.collection('userroles').deleteMany({});
+    try {
+      await db.collection('userroles').deleteMany({});
+    } catch (error) {
+      console.error('Error with UserRoles Migration: ', error);
+    }
   }
 };

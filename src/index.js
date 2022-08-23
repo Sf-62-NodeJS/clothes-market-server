@@ -10,7 +10,7 @@ const swaggerUi = require('swagger-ui-express');
 const swagger = require('./swagger.json');
 const { usersRouter } = require('./routers');
 const mongoose = require('mongoose');
-const dbMigrations = require('./migrations');
+const { database, up } = require('migrate-mongo');
 
 const loggerOptions = {
   transports:
@@ -49,8 +49,13 @@ app.use(expressWinston.logger(loggerOptions));
 app.use(expressWinston.errorLogger(loggerOptions));
 
 // DB connect
-mongoose.connect(process.env.MONGO_URL, () => {
-  dbMigrations.migrationUp();
+mongoose.connect(process.env.MONGO_URL, async (error) => {
+  if (error) {
+    console.error(error);
+  }
+
+  const { db } = await database.connect();
+  await up(db);
 });
 
 // Routes
@@ -59,7 +64,7 @@ app.disable('etag');
 
 app.listen(process.env.PORT, (err) => {
   if (err) {
-    console.log(err.message);
+    console.error(err.message);
   }
 
   console.log(`Server started at http://localhost:${process.env.PORT}`);
