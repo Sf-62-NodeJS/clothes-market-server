@@ -7,7 +7,8 @@ module.exports = {
     'migrations/*.js',
     '!src/routers/*',
     '!src/**/index.js',
-    '!src/models/*'
+    '!src/models/*',
+    '!src/services/*'
   ],
   // The directory where Jest should output its coverage files
   coverageDirectory: 'coverage',

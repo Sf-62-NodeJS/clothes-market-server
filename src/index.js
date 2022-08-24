@@ -11,6 +11,7 @@ const swagger = require('./swagger.json');
 const { usersRouter } = require('./routers');
 const mongoose = require('mongoose');
 const { database, up } = require('migrate-mongo');
+const productsRouter = require('./routers/products');
 
 const loggerOptions = {
   transports:
@@ -60,17 +61,20 @@ mongoose.connect(process.env.MONGO_URL, async (error) => {
 
 // Routes
 app.use('/users', usersRouter);
+app.use('/products', productsRouter);
 app.disable('etag');
 
-app.listen(process.env.PORT, (err) => {
-  if (err) {
-    console.error(err.message);
-  }
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(process.env.PORT, (err) => {
+    if (err) {
+      console.error(err.message);
+    }
 
-  console.log(`Server started at http://localhost:${process.env.PORT}`);
-  console.log(
-        `Open swagger ui at http://localhost:${process.env.PORT}/swagger`
-  );
-});
+    console.log(`Server started at http://localhost:${process.env.PORT}`);
+    console.log(
+            `Open swagger ui at http://localhost:${process.env.PORT}/swagger`
+    );
+  });
+}
 
 module.exports = app;
