@@ -25,10 +25,8 @@ const productSchema = new mongoose.Schema({
     }
   ],
   price: {
-    type: Number,
-    set: function () {
-      return this.parseFloat();
-    }
+    type: mongoose.Schema.Types.Number,
+    set: (price) => parseFloat(Number(price))
   }
 });
 

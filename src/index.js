@@ -8,10 +8,9 @@ const winston = require('winston');
 const app = express();
 const swaggerUi = require('swagger-ui-express');
 const swagger = require('./swagger.json');
-const { usersRouter } = require('./routers');
+const { usersRouter, productsRouter } = require('./routers');
 const mongoose = require('mongoose');
 const { database, up } = require('migrate-mongo');
-const productsRouter = require('./routers/products');
 
 const loggerOptions = {
   transports:

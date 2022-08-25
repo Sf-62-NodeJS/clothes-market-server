@@ -16,25 +16,23 @@ class ProductsService {
     return updateProduct ? res.json(updateProduct) : res.boom.notFound();
   }
 
-  async getProduct (req, res) {
-    const getProduct = await Product.findById(req.params.id).exec();
-
-    return getProduct ? res.json(getProduct) : res.boom.notFound();
-  }
-
   async getProducts (req, res) {
-    if (req.query.skip || req.query.take) {
-      const getProducts = await Product.find()
-        .skip(req.query.skip)
-        .limit(req.query.take)
-        .exec();
+    const { id, name, category, sizes, status, price } = req.query;
+    const query = {};
 
-      return getProducts ? res.json(getProducts) : res.boom.notFound();
-    } else {
-      const getProducts = await Product.find().exec();
+    if (id != null) query._id = id;
+    if (name != null) query.name = name;
+    if (category != null) query.category = category;
+    if (sizes != null) query.sizes = sizes;
+    if (status != null) query.status = status;
+    if (price != null) query.price = price;
 
-      return getProducts ? res.json(getProducts) : res.boom.notFound();
-    }
+    const getProducts = await Product.find(query)
+      .skip(+req.query.skip || 0)
+      .limit(+req.query.take || 50)
+      .exec();
+
+    return getProducts ? res.json(getProducts) : res.json([]);
   }
 
   async deleteProduct (req, res) {

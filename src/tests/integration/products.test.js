@@ -3,17 +3,6 @@ const request = require('supertest');
 
 jest.mock('../../models', () => ({
   Product: class Product {
-    static findById () {
-      return {
-        exec: () => ({
-          id: '15ad122xa3e',
-          name: 'N',
-          sizes: [],
-          comments: []
-        })
-      };
-    }
-
     save () {
       return {
         id: '16ad122xa2ae',
@@ -25,11 +14,19 @@ jest.mock('../../models', () => ({
 
     static find () {
       return {
-        exec: () => ({
-          id: '17ad122xa3e',
-          name: 'N',
-          sizes: [],
-          comments: []
+        skip: () => ({
+          limit: () => ({
+            exec: () => ({
+              id: '17ad122xa3e',
+              name: 'N',
+              imageUrl: 'https://www.com',
+              category: '17cat122xa3e',
+              sizes: ['17size122xa2ae', '17size222xa2ae'],
+              status: '17stat122xa2ae',
+              comments: ['17comm122xa2ae', '17comm222xa2ae'],
+              price: 2.0
+            })
+          })
         })
       };
     }
@@ -63,18 +60,6 @@ jest.mock('mongoose', () => ({
 }));
 
 describe('Products integration tests', function () {
-  it('should return product by id', async () => {
-    const response = await request(app).get('/products/15ad122xa3e');
-
-    expect(response.statusCode).toBe(200);
-    expect(response.body).toEqual({
-      id: '15ad122xa3e',
-      name: 'N',
-      sizes: [],
-      comments: []
-    });
-  });
-
   it('should create product', async () => {
     const response = await request(app)
       .post('/products')
@@ -96,8 +81,12 @@ describe('Products integration tests', function () {
     expect(response.body).toEqual({
       id: '17ad122xa3e',
       name: 'N',
-      sizes: [],
-      comments: []
+      imageUrl: 'https://www.com',
+      category: '17cat122xa3e',
+      sizes: ['17size122xa2ae', '17size222xa2ae'],
+      status: '17stat122xa2ae',
+      comments: ['17comm122xa2ae', '17comm222xa2ae'],
+      price: 2.0
     });
   });
 
@@ -116,7 +105,7 @@ describe('Products integration tests', function () {
   });
 
   it('should return deleted product by id', async () => {
-    const response = await request(app).delete('/products/14ad122xa3e');
+    const response = await request(app).delete('/products/19ad122xa3e');
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual({

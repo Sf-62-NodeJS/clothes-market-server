@@ -10,10 +10,6 @@ class ProductsController {
     return productsService.updateProduct(req, res);
   }
 
-  async getProduct (req, res) {
-    return productsService.getProduct(req, res);
-  }
-
   async getProducts (req, res) {
     return productsService.getProducts(req, res);
   }
