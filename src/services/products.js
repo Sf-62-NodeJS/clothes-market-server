@@ -17,17 +17,7 @@ class ProductsService {
   }
 
   async getProducts (req, res) {
-    const { id, name, category, sizes, status, price } = req.query;
-    const query = {};
-
-    if (id != null) query._id = id;
-    if (name != null) query.name = name;
-    if (category != null) query.category = category;
-    if (sizes != null) query.sizes = sizes;
-    if (status != null) query.status = status;
-    if (price != null) query.price = price;
-
-    const getProducts = await Product.find(query)
+    const getProducts = await Product.find(req.query)
       .skip(+req.query.skip || 0)
       .limit(+req.query.take || 50)
       .exec();
