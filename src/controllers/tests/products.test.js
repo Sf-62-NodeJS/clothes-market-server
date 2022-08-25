@@ -1,5 +1,4 @@
-const { ProductsService } = require('..');
-const { Product } = require('../../models');
+const ProductsController = require('../products');
 
 jest.mock('../../models', () => ({
   Product: class Product {
@@ -67,8 +66,8 @@ jest.mock('../../models', () => ({
   }
 }));
 
-describe('Products service tests', function () {
-  const productsService = new ProductsService();
+describe('productsController tests', function () {
+  const productsController = new ProductsController();
   const requestStub = {
     body: {
       name: 'Name',
@@ -91,7 +90,7 @@ describe('Products service tests', function () {
   };
 
   it('should create product', async () => {
-    const response = await productsService.createProduct(
+    const response = await productsController.createProduct(
       requestStub,
       responseStub
     );
@@ -109,7 +108,7 @@ describe('Products service tests', function () {
   });
 
   it('should return all products', async () => {
-    const response = await productsService.getProducts(
+    const response = await productsController.getProducts(
       requestStub,
       responseStub
     );
@@ -126,24 +125,8 @@ describe('Products service tests', function () {
     });
   });
 
-  it('should return an empty array from products', async () => {
-    Product.find = () => ({
-      skip: () => ({
-        limit: () => ({
-          exec: () => []
-        })
-      })
-    });
-    const response = await productsService.getProducts(
-      requestStub,
-      responseStub
-    );
-
-    expect(response).toEqual([]);
-  });
-
   it('should return updated product by id', async () => {
-    const response = await productsService.updateProduct(
+    const response = await productsController.updateProduct(
       requestStub,
       responseStub
     );
@@ -161,7 +144,7 @@ describe('Products service tests', function () {
   });
 
   it('should return deleted product by id', async () => {
-    const response = await productsService.deleteProduct(
+    const response = await productsController.deleteProduct(
       requestStub,
       responseStub
     );
