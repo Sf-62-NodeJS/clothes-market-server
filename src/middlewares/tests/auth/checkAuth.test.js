@@ -1,11 +1,12 @@
-require('dotenv').config();
-const userAuthenticateJWS = require('../../auth/checkAuth');
+const checkAuth = require('../../auth/checkAuth');
 const jwt = require('jsonwebtoken');
+
+jest.mock('jsonwebtoken');
 
 describe('checkAuth tests', () => {
   const requestStub = {
     headers: {
-      authorization: undefined
+      authorization: 'some token'
     }
   };
   const responseStub = {
@@ -15,24 +16,30 @@ describe('checkAuth tests', () => {
   };
   const nextFunctionMock = jest.fn();
 
-  const user = {
-    name: 'SomeName',
-    password: 'SomePassword'
-  };
+  it('should call next function on valid token', () => {
+    jwt.verify = jest.fn().mockImplementationOnce((token, secret, cb) => {
+      cb(null, {});
+    });
 
-  const accessToken = jwt.sign(user, process.env.JWT_SECRET);
+    checkAuth(requestStub, responseStub, nextFunctionMock);
 
-  requestStub.headers.authorization = accessToken;
-
-  it('should call next function on valid user', () => {
-    userAuthenticateJWS(requestStub, responseStub, nextFunctionMock);
     expect(nextFunctionMock).toHaveBeenCalled();
     expect(responseStub.boom.badRequest).not.toHaveBeenCalled();
   });
 
   it('should call badRequest function on invalid token', () => {
-    requestStub.headers.authorization = undefined;
-    userAuthenticateJWS(requestStub, responseStub, nextFunctionMock);
+    jwt.verify = jest.fn().mockImplementationOnce((token, secret, cb) => {
+      cb(new Error('some error'), {});
+    });
+
+    checkAuth(requestStub, responseStub, nextFunctionMock);
+
+    expect(responseStub.boom.badRequest).toHaveBeenCalled();
+  });
+
+  it('should call badRequest function when no token value has been passed', () => {
+    requestStub.headers.authorization = null;
+    checkAuth(requestStub, responseStub, nextFunctionMock);
 
     expect(responseStub.boom.badRequest).toHaveBeenCalled();
   });
