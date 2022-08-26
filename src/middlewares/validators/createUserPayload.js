@@ -2,31 +2,18 @@ const Joi = require('joi');
 
 const createUserPayloadValidator = (req, res, next) => {
   const schema = Joi.object({
-    name: Joi.string()
+    name: Joi.string().alphanum().min(2).max(45).trim(true).required(),
+
+    surname: Joi.string().alphanum().min(2).max(45).trim(true).required(),
+
+    middleName: Joi.string()
       .alphanum()
       .min(2)
-      .max(30)
+      .max(45)
       .trim(true)
-      .pattern(/^[a-zA-Z0-9]{3,30}$/)
       .required(),
 
-    surname: Joi.string()
-      .alphanum()
-      .min(2)
-      .max(30)
-      .trim(true)
-      .pattern(/^[a-zA-Z0-9]{3,30}$/)
-      .required(),
-
-    midlleName: Joi.string()
-      .alphanum()
-      .min(2)
-      .max(30)
-      .trim(true)
-      .pattern(/^[a-zA-Z0-9]{3,30}$/)
-      .required(),
-
-    hashedPassword: Joi.string().required(),
+    password: Joi.string().min(8).max(100).required(),
 
     phoneNumber: Joi.string()
       .trim(true)
@@ -34,9 +21,9 @@ const createUserPayloadValidator = (req, res, next) => {
       .pattern(/^[0-9]+$/)
       .required(),
 
-    address: Joi.string().trim(true).lowercase().required(),
+    address: Joi.string().trim(true).required(),
 
-    email: Joi.string().trim(true).lowercase().email().required()
+    email: Joi.string().trim(true).email().required()
   });
   const { error } = schema.validate(req.body);
 

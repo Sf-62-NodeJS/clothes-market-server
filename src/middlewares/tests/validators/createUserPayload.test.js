@@ -6,7 +6,7 @@ describe('createUserPayloadValidator tests', () => {
       name: 'Name',
       surname: 'Surname',
       middleName: 'Middlename',
-      hashedPassword: 'asd32rr4tsdf',
+      password: 'asd32rr4tsdf',
       phoneNumber: '0898123456',
       address: 'Address 15',
       email: 'email@gmail.com'

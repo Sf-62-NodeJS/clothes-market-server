@@ -1,5 +1,4 @@
-const app = require('../../index');
-const request = require('supertest');
+const { UsersService } = require('..');
 
 jest.mock('../../models', () => ({
   User: class User {
@@ -67,24 +66,35 @@ jest.mock('../../models', () => ({
   }
 }));
 
-jest.mock('mongoose', () => ({
-  connect: () => {}
-}));
+describe('Users service tests', function () {
+  const usersService = new UsersService();
+  const requestStub = {
+    body: {
+      name: 'Name'
+    },
+    params: {
+      id: '15ad122xa3e'
+    },
+    query: {
+      skip: 1,
+      take: 1
+    }
+  };
 
-describe('Users integration tests', function () {
+  const responseStub = {
+    boom: {
+      badRequest: jest.fn()
+    },
+    json: (payload) => payload
+  };
+
   it('should create user', async () => {
-    const response = await request(app).post('/users').send({
-      name: 'Name',
-      middleName: 'middlename',
-      surname: 'surname',
-      email: 'email@gmail.com',
-      password: 'dasasdasfdsad',
-      phoneNumber: '0897123456',
-      address: 'address 10'
-    });
+    const response = await usersService.createUser(
+      requestStub,
+      responseStub
+    );
 
-    expect(response.statusCode).toBe(200);
-    expect(response.body).toEqual({
+    expect(response).toEqual({
       id: '13ad122xa2ae',
       name: 'Name',
       middleName: 'middlename',
@@ -96,18 +106,10 @@ describe('Users integration tests', function () {
     });
   });
 
-  it('should delete user', async () => {
-    const response = await request(app).delete('/users/12ad122xa5e');
-
-    expect(response.statusCode).toBe(200);
-    expect(response.body).toEqual(true);
-  });
-
   it('should return all users', async () => {
-    const response = await request(app).get('/users/');
+    const response = await usersService.getUsers(requestStub, responseStub);
 
-    expect(response.statusCode).toBe(200);
-    expect(response.body).toEqual({
+    expect(response).toEqual({
       id: '12ad122xa7e',
       name: 'Nameabc',
       middleName: 'middlename',
@@ -119,30 +121,21 @@ describe('Users integration tests', function () {
     });
   });
 
-  it('should update user', async () => {
-    const response = await request(app)
-      .put('/users/12ad122xa9e')
-      .send({ name: 'Gosho' });
-
-    expect(response.statusCode).toBe(200);
-    expect(response.body).toEqual(true);
-  });
-
-  it('should return all users 2', async () => {
-    const response = await request(app).get(
-      '/users/?name=Gosho&email=pesho@gmail.com&status=active&role=user&_id=14324234sdfgs'
+  it('should return updated user', async () => {
+    const response = await usersService.updateUser(
+      requestStub,
+      responseStub
     );
 
-    expect(response.statusCode).toBe(200);
-    expect(response.body).toEqual({
-      id: '12ad122xa7e',
-      name: 'Nameabc',
-      middleName: 'middlename',
-      surname: 'surname',
-      email: 'email@gmail.com',
-      password: 'dasasdasfdsad',
-      phoneNumber: '0897123456',
-      address: 'address 10'
-    });
+    expect(response).toEqual(true);
+  });
+
+  it('should return deleted user', async () => {
+    const response = await usersService.deleteUser(
+      requestStub,
+      responseStub
+    );
+
+    expect(response).toEqual(true);
   });
 });
