@@ -3,7 +3,6 @@ require('dotenv').config();
 
 const userAuthenticateJWS = (req, res, next) => {
   const token = req.headers.authorization;
-  console.log(token);
   if (!token) {
     res.boom.badRequest('No token found.');
   }
