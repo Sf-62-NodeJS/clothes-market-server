@@ -14,17 +14,21 @@ class UsersService {
   }
 
   async getUsers (req, res) {
-    const { _id, name, email, status, role } = req.query;
+    const { _id, name, email, status, role, skip, take } =
+            (typeof req.query !== 'undefined' && req.query) || {};
     const query = {};
     if (_id != null) query._id = _id;
     if (name != null) query.name = name;
     if (email != null) query.email = email;
     if (status != null) query.status = status;
     if (role != null) query.role = role;
+    if (skip != null) query.skip = skip;
+    if (take != null) query.take = take;
+    console.log(query);
 
     const users = await User.find(query)
-      .skip(+req.query.skip || 0)
-      .limit(+req.query.take || 50)
+      .skip(+query.skip || 0)
+      .limit(+query.take || 50)
       .exec();
 
     return users ? res.json(users) : [];
