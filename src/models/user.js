@@ -6,11 +6,11 @@ const userSchema = new mongoose.Schema({
   middleName: String,
   password: String,
   phoneNumber: String,
-  address: {
+  address: String,
+  email: {
     type: String,
     immutable: true
   },
-  email: String,
   role: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'UserRoles'
