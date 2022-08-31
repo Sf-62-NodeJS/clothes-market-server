@@ -1,13 +1,16 @@
-const { UsersService } = require('../services');
+const { User } = require('../models');
 
-const usersService = new UsersService();
 class UsersController {
   async getUser (req, res) {
-    return usersService.getUser(req, res);
+    const user = await User.findById(req.params.id).exec();
+
+    return user ? res.json(user) : res.boom.notFound();
   }
 
   async createUser (req, res) {
-    return usersService.createUser(req, res);
+    const newUser = await new User(req.body).save();
+
+    return res.json(newUser);
   }
 }
 

@@ -1,12 +1,16 @@
 const ProductsController = require('../products');
 
+jest.mock('fs', () => ({
+  unlink: jest.fn()
+}));
+
 jest.mock('../../models', () => ({
   Product: class Product {
     save () {
       return {
         id: '16ad122xa2ae',
         name: 'Name',
-        imageUrl: 'https://www.com',
+        image: 'img.png',
         category: '16cat122xa2ae',
         sizes: ['16size122xa2ae', '16size222xa2ae'],
         status: '16stat122xa2ae',
@@ -22,7 +26,7 @@ jest.mock('../../models', () => ({
             exec: () => ({
               id: '17ad122xa3e',
               name: 'N',
-              imageUrl: 'https://www.com',
+              image: 'img.png',
               category: '17cat122xa3e',
               sizes: ['17size122xa2ae', '17size222xa2ae'],
               status: '17stat122xa2ae',
@@ -34,33 +38,21 @@ jest.mock('../../models', () => ({
       };
     }
 
+    static findById () {
+      return {
+        exec: () => ({ image: 'image.jpg' })
+      };
+    }
+
     static findByIdAndUpdate () {
       return {
-        exec: () => ({
-          id: '18ad122xa3e',
-          name: 'Name',
-          imageUrl: 'https://www.com',
-          category: '18cat122xa3e',
-          sizes: ['18size122xa2ae', '18size222xa2ae'],
-          status: '18stat122xa2ae',
-          comments: ['18comm122xa2ae', '18comm222xa2ae'],
-          price: 3.0
-        })
+        exec: () => true
       };
     }
 
     static findByIdAndDelete () {
       return {
-        exec: () => ({
-          id: '19ad122xa3e',
-          name: 'N',
-          imageUrl: 'https://www.com',
-          category: '19cat122xa3e',
-          sizes: ['19size122xa2ae', '19size222xa2ae'],
-          status: '19stat122xa2ae',
-          comments: ['19comm122xa2ae', '19comm222xa2ae'],
-          price: 2.0
-        })
+        exec: () => true
       };
     }
   }
@@ -79,6 +71,13 @@ describe('productsController tests', function () {
     query: {
       skip: 1,
       take: 1
+    },
+    files: {
+      image: {
+        name: 'test.jpg',
+        mimetype: 'image/jpeg',
+        mv: jest.fn()
+      }
     }
   };
 
@@ -98,7 +97,7 @@ describe('productsController tests', function () {
     expect(response).toEqual({
       id: '16ad122xa2ae',
       name: 'Name',
-      imageUrl: 'https://www.com',
+      image: 'img.png',
       category: '16cat122xa2ae',
       sizes: ['16size122xa2ae', '16size222xa2ae'],
       status: '16stat122xa2ae',
@@ -116,7 +115,7 @@ describe('productsController tests', function () {
     expect(response).toEqual({
       id: '17ad122xa3e',
       name: 'N',
-      imageUrl: 'https://www.com',
+      image: 'img.png',
       category: '17cat122xa3e',
       sizes: ['17size122xa2ae', '17size222xa2ae'],
       status: '17stat122xa2ae',
@@ -131,16 +130,7 @@ describe('productsController tests', function () {
       responseStub
     );
 
-    expect(response).toEqual({
-      id: '18ad122xa3e',
-      name: 'Name',
-      imageUrl: 'https://www.com',
-      category: '18cat122xa3e',
-      sizes: ['18size122xa2ae', '18size222xa2ae'],
-      status: '18stat122xa2ae',
-      comments: ['18comm122xa2ae', '18comm222xa2ae'],
-      price: 3.0
-    });
+    expect(response).toEqual(true);
   });
 
   it('should return deleted product by id', async () => {
@@ -149,15 +139,6 @@ describe('productsController tests', function () {
       responseStub
     );
 
-    expect(response).toEqual({
-      id: '19ad122xa3e',
-      name: 'N',
-      imageUrl: 'https://www.com',
-      category: '19cat122xa3e',
-      sizes: ['19size122xa2ae', '19size222xa2ae'],
-      status: '19stat122xa2ae',
-      comments: ['19comm122xa2ae', '19comm222xa2ae'],
-      price: 2.0
-    });
+    expect(response).toEqual(true);
   });
 });

@@ -1,5 +1,6 @@
 const app = require('../../index');
 const request = require('supertest');
+const path = require('path');
 
 jest.mock('../../models', () => ({
   Product: class Product {
@@ -19,7 +20,7 @@ jest.mock('../../models', () => ({
             exec: () => ({
               id: '17ad122xa3e',
               name: 'N',
-              imageUrl: 'https://www.com',
+              image: 'img.png',
               category: '17cat122xa3e',
               sizes: ['17size122xa2ae', '17size222xa2ae'],
               status: '17stat122xa2ae',
@@ -31,25 +32,21 @@ jest.mock('../../models', () => ({
       };
     }
 
+    static findById () {
+      return {
+        exec: () => ({ image: 'image.jpg' })
+      };
+    }
+
     static findByIdAndUpdate () {
       return {
-        exec: () => ({
-          id: '18ad122xa3e',
-          name: 'A',
-          sizes: [],
-          comments: []
-        })
+        exec: () => true
       };
     }
 
     static findByIdAndDelete () {
       return {
-        exec: () => ({
-          id: '19ad122xa3e',
-          name: 'A',
-          sizes: [],
-          comments: []
-        })
+        exec: () => true
       };
     }
   }
@@ -59,11 +56,19 @@ jest.mock('mongoose', () => ({
   connect: () => {}
 }));
 
+jest.mock('fs');
+
 describe('Products integration tests', function () {
   it('should create product', async () => {
     const response = await request(app)
-      .post('/products')
-      .send({ name: 'Name' });
+      .post('/products/create')
+      .type('form')
+      .field('name', 'Name')
+      .field('description', 'Description')
+      .field('category', '123456789123456789123456')
+      .field('sizes', '123456789123456789123456')
+      .field('price', 2.0)
+      .attach('image', path.join(__dirname, 'logo.png'));
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual({
@@ -75,13 +80,63 @@ describe('Products integration tests', function () {
   });
 
   it('should return all products', async () => {
-    const response = await request(app).get('/products/');
+    const response = await request(app).get('/products/get');
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual({
       id: '17ad122xa3e',
       name: 'N',
-      imageUrl: 'https://www.com',
+      image: 'img.png',
+      category: '17cat122xa3e',
+      sizes: ['17size122xa2ae', '17size222xa2ae'],
+      status: '17stat122xa2ae',
+      comments: ['17comm122xa2ae', '17comm222xa2ae'],
+      price: 2.0
+    });
+  });
+
+  it('should return all products within query', async () => {
+    const response = await request(app).get(
+      '/products/get/?_id=17ad122xa3e2323232332323&name=Name&category=17ad122xa3e2323232332323&sizes=17ad122xa3e2323232332323&status=17ad122xa3e2323232332323&minPrice=1&maxPrice=2'
+    );
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toEqual({
+      id: '17ad122xa3e',
+      name: 'N',
+      image: 'img.png',
+      category: '17cat122xa3e',
+      sizes: ['17size122xa2ae', '17size222xa2ae'],
+      status: '17stat122xa2ae',
+      comments: ['17comm122xa2ae', '17comm222xa2ae'],
+      price: 2.0
+    });
+  });
+
+  it('should return all products with price above 2', async () => {
+    const response = await request(app).get('/products/get/?minPrice=2');
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toEqual({
+      id: '17ad122xa3e',
+      name: 'N',
+      image: 'img.png',
+      category: '17cat122xa3e',
+      sizes: ['17size122xa2ae', '17size222xa2ae'],
+      status: '17stat122xa2ae',
+      comments: ['17comm122xa2ae', '17comm222xa2ae'],
+      price: 2.0
+    });
+  });
+
+  it('should return all products with price below 2', async () => {
+    const response = await request(app).get('/products/get/?maxPrice=2');
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toEqual({
+      id: '17ad122xa3e',
+      name: 'N',
+      image: 'img.png',
       category: '17cat122xa3e',
       sizes: ['17size122xa2ae', '17size222xa2ae'],
       status: '17stat122xa2ae',
@@ -92,27 +147,23 @@ describe('Products integration tests', function () {
 
   it('should return updated product by id', async () => {
     const response = await request(app)
-      .put('/products/18ad122xa3e')
-      .send({ name: 'A' });
+      .put('/products/update/18ad122xa3e')
+      .send({
+        name: 'Name',
+        description: 'Description',
+        price: 2.0
+      });
 
     expect(response.statusCode).toBe(200);
-    expect(response.body).toEqual({
-      id: '18ad122xa3e',
-      name: 'A',
-      sizes: [],
-      comments: []
-    });
+    expect(response.body).toEqual(true);
   });
 
   it('should return deleted product by id', async () => {
-    const response = await request(app).delete('/products/19ad122xa3e');
+    const response = await request(app).delete(
+      '/products/delete/19ad122xa3e'
+    );
 
     expect(response.statusCode).toBe(200);
-    expect(response.body).toEqual({
-      id: '19ad122xa3e',
-      name: 'A',
-      sizes: [],
-      comments: []
-    });
+    expect(response.body).toEqual(true);
   });
 });

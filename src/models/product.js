@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const productSchema = new mongoose.Schema({
   name: String,
   description: String,
-  imageUrl: String,
+  image: String,
   category: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Categories'
@@ -25,8 +25,7 @@ const productSchema = new mongoose.Schema({
     }
   ],
   price: {
-    type: mongoose.Schema.Types.Number,
-    set: (price) => parseFloat(Number(price))
+    type: mongoose.Schema.Types.Number
   }
 });
 
