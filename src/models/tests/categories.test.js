@@ -2,7 +2,7 @@
 
 const { Categories } = require('..');
 
-jest.mock('../../models', () => ({
+jest.mock('..', () => ({
   Categories: class Categories {
     static createCategory () {
       return {
