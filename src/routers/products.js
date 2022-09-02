@@ -7,16 +7,16 @@ const {
 
 const productsController = new ProductsController();
 productsRouter.post(
-  '/create/',
+  '/',
   createProductPayloadValidator,
   productsController.createProduct
 );
 productsRouter.put(
-  '/update/:id',
+  '/revision/:id',
   updateProductPayloadValidator,
   productsController.updateProduct
 );
-productsRouter.get('/get/', productsController.getProducts);
-productsRouter.delete('/delete/:id', productsController.deleteProduct);
+productsRouter.get('/stock/', productsController.getProducts);
+productsRouter.delete('/:id', productsController.deleteProduct);
 
 module.exports = productsRouter;

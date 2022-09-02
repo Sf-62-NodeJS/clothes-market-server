@@ -76,7 +76,7 @@ jest.mock(
 
 describe('Products integration tests', function () {
   it('should create product', async () => {
-    const response = await request(app).post('/products/create').send({
+    const response = await request(app).post('/products').send({
       name: 'Name',
       description: 'Description',
       category: '123456789123456789123456',
@@ -94,7 +94,7 @@ describe('Products integration tests', function () {
   });
 
   it('should return all products', async () => {
-    const response = await request(app).get('/products/get');
+    const response = await request(app).get('/products/stock');
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual({
@@ -111,7 +111,7 @@ describe('Products integration tests', function () {
 
   it('should return all products within query', async () => {
     const response = await request(app).get(
-      '/products/get/?_id=17ad122xa3e2323232332323&name=Name&category=17ad122xa3e2323232332323&sizes=17ad122xa3e2323232332323&status=17ad122xa3e2323232332323&minPrice=1&maxPrice=2'
+      '/products/stock/?_id=17ad122xa3e2323232332323&name=Name&category=17ad122xa3e2323232332323&sizes=17ad122xa3e2323232332323&status=17ad122xa3e2323232332323&minPrice=1&maxPrice=2'
     );
 
     expect(response.statusCode).toBe(200);
@@ -128,7 +128,7 @@ describe('Products integration tests', function () {
   });
 
   it('should return all products with price above 2', async () => {
-    const response = await request(app).get('/products/get/?minPrice=2');
+    const response = await request(app).get('/products/stock/?minPrice=2');
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual({
@@ -144,7 +144,7 @@ describe('Products integration tests', function () {
   });
 
   it('should return all products with price below 2', async () => {
-    const response = await request(app).get('/products/get/?maxPrice=2');
+    const response = await request(app).get('/products/stock/?maxPrice=2');
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual({
@@ -161,7 +161,7 @@ describe('Products integration tests', function () {
 
   it('should return updated product by id', async () => {
     const response = await request(app)
-      .put('/products/update/18ad122xa3e')
+      .put('/products/revision/18ad122xa3e')
       .send({
         name: 'Name',
         description: 'Description',
@@ -173,9 +173,7 @@ describe('Products integration tests', function () {
   });
 
   it('should return deleted product by id', async () => {
-    const response = await request(app).delete(
-      '/products/delete/19ad122xa3e'
-    );
+    const response = await request(app).delete('/products/19ad122xa3e');
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual(true);

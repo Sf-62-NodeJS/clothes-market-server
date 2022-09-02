@@ -125,7 +125,7 @@
         }
       }
     },
-    "/products/create": {
+    "/products": {
       "post": {
         "tags": [
           "Products"
@@ -193,7 +193,7 @@
         }
       }
     },
-    "/products/get": {
+    "/products/stock": {
       "get": {
         "tags": [
           "Products"
@@ -277,7 +277,7 @@
         }
       }
     },
-    "/products/update/{id}": {
+    "/products/revision/{id}": {
       "put": {
         "tags": [
           "Products"
@@ -349,7 +349,7 @@
         }
       }
     },
-    "/products/delete/{id}": {
+    "/products/{id}": {
       "delete": {
         "tags": [
           "Products"

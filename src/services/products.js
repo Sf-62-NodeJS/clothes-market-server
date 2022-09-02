@@ -4,99 +4,93 @@ const { productImageService } = require('../uploads');
 class ProductsService {
   async createProduct (req, res) {
     await productImageService.uploadImage(req);
-    const newProduct = await new Product(req.body).save();
+    const product = await new Product(req.body).save();
 
-    return res.json(newProduct);
+    return res.json(product);
   }
 
   async updateProduct (req, res) {
-    if (req.files) {
-      const checkImage = await Product.findById(req.params.id).exec();
+    const available = await Product.findById(req.params.id).exec();
 
-      if (checkImage.image.length !== 0) {
-        await productImageService.deleteImage(checkImage.image);
+    if (req.files && available) {
+      if (available.image.length !== 0) {
+        await productImageService.deleteImage(available.image);
       }
 
       await productImageService.uploadImage(req);
     }
 
-    const updateProduct = await Product.findByIdAndUpdate(
+    const product = await Product.findByIdAndUpdate(
       req.params.id,
       req.body
     ).exec();
 
-    return updateProduct ? res.json(true) : res.boom.notFound();
+    return product ? res.json(true) : res.boom.notFound();
   }
 
   async getProducts (req, res) {
     const { _id, name, category, sizes, status, minPrice, maxPrice } =
             (typeof req.query !== 'undefined' && req.query) || {};
     const query = {};
-    const regexNums = /^[0-9.]*$/gm;
-    const regexForId = /^[0-9a-zA-Z]*$/gm;
-    const lengthForId = 24;
 
-    if (
-      _id != null &&
-            _id.match(regexForId) &&
-            _id.length === lengthForId
-    ) {
+    if (_id != null) {
       query._id = _id;
     }
-    if (name != null) query.name = name;
-    if (
-      category != null &&
-            category.match(regexForId) &&
-            category.length === lengthForId
-    ) {
+    if (name != null) {
+      const manyWords = name.split(' ');
+      let regexBuilder = '';
+
+      if (manyWords.length > 1) {
+        for (const word of manyWords) {
+          regexBuilder === ''
+            ? (regexBuilder += `${word}`)
+            : (regexBuilder += `|${word}`);
+        }
+      } else {
+        regexBuilder = name;
+      }
+
+      const regex = new RegExp(regexBuilder, 'mig');
+      query.name = { $regex: regex };
+    }
+    if (category != null) {
       query.category = category;
     }
-    if (
-      sizes != null &&
-            sizes.match(regexForId) &&
-            sizes.length === lengthForId
-    ) {
+    if (sizes != null) {
       query.sizes = sizes;
     }
-    if (
-      status != null &&
-            status.match(regexForId) &&
-            status.length === lengthForId
-    ) {
+    if (status != null) {
       query.status = status;
     }
-    if (minPrice == null || maxPrice == null) {
-      if (minPrice != null && minPrice.match(regexNums)) {
-        query.price = { $gte: minPrice };
-      }
-      if (maxPrice != null && maxPrice.match(regexNums)) {
-        query.price = { $lte: maxPrice };
-      }
+    if (+Math.abs(minPrice)) {
+      query.price = { $gte: minPrice };
     }
-    if (
-      minPrice != null &&
-            maxPrice != null &&
-            minPrice.match(regexNums) &&
-            maxPrice.match(regexNums)
-    ) {
+    if (+Math.abs(maxPrice)) {
+      query.price = { $lte: maxPrice };
+    }
+
+    // I added the following condition to allow a user to search for products priced between amount
+    if (+Math.abs(minPrice) && +Math.abs(maxPrice)) {
       query.price = { $gte: minPrice, $lte: maxPrice };
     }
 
-    const getProducts = await Product.find(query)
+    const count = await Product.find(query).count;
+    const products = await Product.find(query)
       .skip(+req.query.skip || 0)
       .limit(+req.query.take || 50)
       .exec();
 
-    return getProducts ? res.json(getProducts) : res.json([]);
+    return {
+      total_size: count,
+      products: products ? res.json(products) : res.json([])
+    };
   }
 
   async deleteProduct (req, res) {
-    const deleteProduct = await Product.findByIdAndDelete(
-      req.params.id
-    ).exec();
+    const product = await Product.findByIdAndDelete(req.params.id).exec();
 
-    if (deleteProduct) {
-      await productImageService.deleteImage(deleteProduct.image);
+    if (product) {
+      await productImageService.deleteImage(product.image);
 
       return res.json(true);
     }

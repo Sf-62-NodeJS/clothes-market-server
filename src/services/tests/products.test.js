@@ -115,14 +115,17 @@ describe('Products service tests', function () {
     );
 
     expect(response).toEqual({
-      id: '17ad122xa3e',
-      name: 'N',
-      image: 'img.png',
-      category: '17cat122xa3e',
-      sizes: ['17size122xa2ae', '17size222xa2ae'],
-      status: '17stat122xa2ae',
-      comments: ['17comm122xa2ae', '17comm222xa2ae'],
-      price: 2.0
+      products: {
+        id: '17ad122xa3e',
+        name: 'N',
+        image: 'img.png',
+        category: '17cat122xa3e',
+        sizes: ['17size122xa2ae', '17size222xa2ae'],
+        status: '17stat122xa2ae',
+        comments: ['17comm122xa2ae', '17comm222xa2ae'],
+        price: 2.0
+      },
+      total_size: 1
     });
   });
 
