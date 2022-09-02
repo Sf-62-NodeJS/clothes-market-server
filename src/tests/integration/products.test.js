@@ -1,6 +1,5 @@
 const app = require('../../index');
 const request = require('supertest');
-const path = require('path');
 
 jest.mock('../../models', () => ({
   Product: class Product {
@@ -56,19 +55,34 @@ jest.mock('mongoose', () => ({
   connect: () => {}
 }));
 
-jest.mock('fs');
+jest.mock('fs', () => ({
+  ...jest.requireActual('fs'),
+  unlink: jest.fn()
+}));
+
+jest.mock(
+  'express-fileupload',
+  () => () =>
+    function (req, res, next) {
+      req.files = {
+        image: {
+          mv: jest.fn()
+        }
+      };
+
+      next();
+    }
+);
 
 describe('Products integration tests', function () {
   it('should create product', async () => {
-    const response = await request(app)
-      .post('/products/create')
-      .type('form')
-      .field('name', 'Name')
-      .field('description', 'Description')
-      .field('category', '123456789123456789123456')
-      .field('sizes', '123456789123456789123456')
-      .field('price', 2.0)
-      .attach('image', path.join(__dirname, 'logo.png'));
+    const response = await request(app).post('/products/create').send({
+      name: 'Name',
+      description: 'Description',
+      category: '123456789123456789123456',
+      sizes: '123456789123456789123456',
+      price: 2.0
+    });
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual({
