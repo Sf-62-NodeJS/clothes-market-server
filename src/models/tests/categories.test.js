@@ -57,7 +57,7 @@ describe('Categories tests', function () {
   });
 
   it('should get categories', async () => {
-    const response = await Categories.getCategories('Jackets', 'Shirts');
+    const response = await Categories.getCategories();
 
     expect(response).toEqual({
       id: '16ad122xa2ae',
