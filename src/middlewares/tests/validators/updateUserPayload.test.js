@@ -6,7 +6,6 @@ describe('updateUserPayloadValidator tests', () => {
       name: 'Name',
       surname: 'Surname',
       middleName: 'Middlename',
-      password: 'asd32rr4tsdf',
       phoneNumber: '0898123456',
       address: 'Address 15'
     }

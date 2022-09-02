@@ -7,6 +7,13 @@ const usersController = new UsersController();
 usersRouter.post('/', createUserPayloadValidator, usersController.createUser);
 usersRouter.put('/:id', updateUserPayloadValidator, usersController.updateUser);
 usersRouter.get('/', usersController.getUsers);
-usersRouter.delete('/:id', usersController.deleteUser);
+usersRouter.patch('/password/:id', usersController.updateUserPassword);
+usersRouter.post(
+  '/admin',
+  createUserPayloadValidator,
+  usersController.createAdmin
+);
+usersRouter.patch('/blocked/:id', usersController.blockUser);
+usersRouter.patch('/deleted/:id', usersController.deleteUser);
 
 module.exports = usersRouter;

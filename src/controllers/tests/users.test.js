@@ -2,6 +2,10 @@ const UsersController = require('../users');
 
 jest.mock('../../models', () => ({
   User: class User {
+    constructor () {
+      this.password = 'somepassword';
+    }
+
     save () {
       return {
         id: '13ad122xa2ae',
@@ -15,34 +19,20 @@ jest.mock('../../models', () => ({
       };
     }
 
-    static findByIdAndDelete () {
-      return {
-        exec: () => ({
-          id: '12ad122xa5e',
-          name: 'Name2',
-          middleName: 'middlenameeqwe',
-          surname: 'surnamewerwer',
-          email: 'email2@gmail.com',
-          password: 'dasadasdasfdsad',
-          phoneNumber: '0897183456',
-          address: 'address 15'
-        })
-      };
-    }
-
     static find () {
       return {
-        skip: () => ({
-          limit: () => ({
-            exec: () => ({
-              id: '12ad122xa7e',
-              name: 'Nameabc',
-              middleName: 'middlename',
-              surname: 'surname',
-              email: 'email@gmail.com',
-              password: 'dasasdasfdsad',
-              phoneNumber: '0897123456',
-              address: 'address 10'
+        select: () => ({
+          skip: () => ({
+            limit: () => ({
+              exec: () => ({
+                id: '12ad122xa7e',
+                name: 'Nameabc',
+                middleName: 'middlename',
+                surname: 'surname',
+                email: 'email@gmail.com',
+                phoneNumber: '0897123456',
+                address: 'address 10'
+              })
             })
           })
         })
@@ -57,13 +47,52 @@ jest.mock('../../models', () => ({
           middleName: 'middlename',
           surname: 'surname',
           email: 'email@gmail.com',
-          password: 'dasasdasfdsad',
           phoneNumber: '0897123456',
           address: 'address 10'
         })
       };
     }
+
+    static findOne () {
+      return {
+        exec: () => ({
+          id: '12ad172xa9e',
+          name: 'name4',
+          middleName: 'middlename4',
+          surname: 'surname4',
+          email: 'email4@gmail.com',
+          password: 'dasasasdasfdsad',
+          phoneNumber: '0897133456',
+          address: 'address 15'
+        })
+      };
+    }
+  },
+  UserRoles: class UserRoles {
+    static findOne () {
+      return {
+        exec: () => ({
+          id: '12ad122xa7b',
+          name: 'User'
+        })
+      };
+    }
+  },
+  UserStatuses: class UserStatuses {
+    static findOne () {
+      return {
+        exec: () => ({
+          id: '12ad122xa7z',
+          name: 'Active'
+        })
+      };
+    }
   }
+}));
+
+jest.mock('bcryptjs', () => ({
+  ...jest.requireActual('bcryptjs'),
+  compare: () => {}
 }));
 
 describe('usersController tests', () => {
@@ -87,25 +116,7 @@ describe('usersController tests', () => {
   it('should return created user', async () => {
     const user = await usersController.createUser(requestStub, responseStub);
 
-    expect(user).toEqual({
-      id: '13ad122xa2ae',
-      name: 'Name',
-      middleName: 'middlename',
-      surname: 'surname',
-      email: 'email@gmail.com',
-      password: 'dasasdasfdsad',
-      phoneNumber: '0897123456',
-      address: 'address 10'
-    });
-  });
-
-  it('should delete user', async () => {
-    const deletedUser = await usersController.deleteUser(
-      requestStub,
-      responseStub
-    );
-
-    expect(deletedUser).toEqual(true);
+    expect(user).toEqual(true);
   });
 
   it('should return all users', async () => {
@@ -117,7 +128,6 @@ describe('usersController tests', () => {
       middleName: 'middlename',
       surname: 'surname',
       email: 'email@gmail.com',
-      password: 'dasasdasfdsad',
       phoneNumber: '0897123456',
       address: 'address 10'
     });
@@ -130,5 +140,32 @@ describe('usersController tests', () => {
     );
 
     expect(updatedUser).toEqual(true);
+  });
+
+  it('should update password', async () => {
+    const updatedUser = await usersController.updateUserPassword(
+      requestStub,
+      responseStub
+    );
+
+    expect(updatedUser).toEqual(true);
+  });
+
+  it('should create admin', async () => {
+    const user = await usersController.createAdmin(requestStub, responseStub);
+
+    expect(user).toEqual(true);
+  });
+
+  it('should block user', async () => {
+    const user = await usersController.blockUser(requestStub, responseStub);
+
+    expect(user).toEqual(true);
+  });
+
+  it('should delete user', async () => {
+    const user = await usersController.deleteUser(requestStub, responseStub);
+
+    expect(user).toEqual(true);
   });
 });

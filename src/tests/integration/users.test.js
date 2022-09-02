@@ -3,9 +3,13 @@ const request = require('supertest');
 
 jest.mock('../../models', () => ({
   User: class User {
+    constructor () {
+      this.password = 'somepassword';
+    }
+
     save () {
       return {
-        id: '13ad122xa2ae',
+        id: '12ad172xa9e',
         name: 'Name',
         middleName: 'middlename',
         surname: 'surname',
@@ -16,34 +20,20 @@ jest.mock('../../models', () => ({
       };
     }
 
-    static findByIdAndDelete () {
-      return {
-        exec: () => ({
-          id: '12ad122xa5e',
-          name: 'Name2',
-          middleName: 'middlenameeqwe',
-          surname: 'surnamewerwer',
-          email: 'email2@gmail.com',
-          password: 'dasadasdasfdsad',
-          phoneNumber: '0897183456',
-          address: 'address 15'
-        })
-      };
-    }
-
     static find () {
       return {
-        skip: () => ({
-          limit: () => ({
-            exec: () => ({
-              id: '12ad122xa7e',
-              name: 'Nameabc',
-              middleName: 'middlename',
-              surname: 'surname',
-              email: 'email@gmail.com',
-              password: 'dasasdasfdsad',
-              phoneNumber: '0897123456',
-              address: 'address 10'
+        select: () => ({
+          skip: () => ({
+            limit: () => ({
+              exec: () => ({
+                id: '12ad122xa7e',
+                name: 'Nameabc',
+                middleName: 'middlename',
+                surname: 'surname',
+                email: 'email@gmail.com',
+                phoneNumber: '0897123456',
+                address: 'address 10'
+              })
             })
           })
         })
@@ -64,11 +54,51 @@ jest.mock('../../models', () => ({
         })
       };
     }
+
+    static findOne () {
+      return {
+        exec: () => ({
+          id: '12ad172xa9e',
+          name: 'name4',
+          middleName: 'middlename4',
+          surname: 'surname4',
+          email: 'email4@gmail.com',
+          password: 'dasasasdasadsad',
+          phoneNumber: '0897133456',
+          address: 'address 15'
+        })
+      };
+    }
+  },
+  UserRoles: class UserRoles {
+    static findOne () {
+      return {
+        exec: () => ({
+          id: '12ad122xa7b',
+          name: 'User'
+        })
+      };
+    }
+  },
+  UserStatuses: class UserStatuses {
+    static findOne () {
+      return {
+        exec: () => ({
+          id: '12ad122xa7z',
+          name: 'Active'
+        })
+      };
+    }
   }
 }));
 
 jest.mock('mongoose', () => ({
   connect: () => {}
+}));
+
+jest.mock('bcryptjs', () => ({
+  ...jest.requireActual('bcryptjs'),
+  compare: () => {}
 }));
 
 describe('Users integration tests', function () {
@@ -84,22 +114,6 @@ describe('Users integration tests', function () {
     });
 
     expect(response.statusCode).toBe(200);
-    expect(response.body).toEqual({
-      id: '13ad122xa2ae',
-      name: 'Name',
-      middleName: 'middlename',
-      surname: 'surname',
-      email: 'email@gmail.com',
-      password: 'dasasdasfdsad',
-      phoneNumber: '0897123456',
-      address: 'address 10'
-    });
-  });
-
-  it('should delete user', async () => {
-    const response = await request(app).delete('/users/12ad122xa5e');
-
-    expect(response.statusCode).toBe(200);
     expect(response.body).toEqual(true);
   });
 
@@ -113,7 +127,6 @@ describe('Users integration tests', function () {
       middleName: 'middlename',
       surname: 'surname',
       email: 'email@gmail.com',
-      password: 'dasasdasfdsad',
       phoneNumber: '0897123456',
       address: 'address 10'
     });
@@ -128,15 +141,18 @@ describe('Users integration tests', function () {
     expect(response.body).toEqual(true);
   });
 
-  it('should return all users 2', async () => {
-    const response = await request(app).get(
-      '/users/?name=Gosho&email=pesho@gmail.com&status=active&role=user&_id=14324234sdfgs'
-    );
+  it('should update user password', async () => {
+    const response = await request(app)
+      .patch('/users/password/12ad172xa9e')
+      .send({ oldpassword: 'somepassword', newPassword: 'dasasdasfdsad' });
 
     expect(response.statusCode).toBe(200);
-    expect(response.body).toEqual({
-      id: '12ad122xa7e',
-      name: 'Nameabc',
+    expect(response.body).toEqual(true);
+  });
+
+  it('should create admin', async () => {
+    const response = await request(app).post('/users/admin').send({
+      name: 'Name',
       middleName: 'middlename',
       surname: 'surname',
       email: 'email@gmail.com',
@@ -144,5 +160,22 @@ describe('Users integration tests', function () {
       phoneNumber: '0897123456',
       address: 'address 10'
     });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toEqual(true);
+  });
+
+  it('should block user', async () => {
+    const response = await request(app).patch('/users/blocked/12ad122xa9e');
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toEqual(true);
+  });
+
+  it('should delete user', async () => {
+    const response = await request(app).patch('/users/deleted/12ad122xa9e');
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toEqual(true);
   });
 });

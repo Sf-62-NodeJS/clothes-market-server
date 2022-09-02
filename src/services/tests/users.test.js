@@ -2,6 +2,10 @@ const { UsersService } = require('..');
 
 jest.mock('../../models', () => ({
   User: class User {
+    constructor () {
+      this.password = 'somepassword';
+    }
+
     save () {
       return {
         id: '13ad122xa2ae',
@@ -11,38 +15,27 @@ jest.mock('../../models', () => ({
         email: 'email@gmail.com',
         password: 'dasasdasfdsad',
         phoneNumber: '0897123456',
-        address: 'address 10'
-      };
-    }
-
-    static findByIdAndDelete () {
-      return {
-        exec: () => ({
-          id: '12ad122xa5e',
-          name: 'Name2',
-          middleName: 'middlenameeqwe',
-          surname: 'surnamewerwer',
-          email: 'email2@gmail.com',
-          password: 'dasadasdasfdsad',
-          phoneNumber: '0897183456',
-          address: 'address 15'
-        })
+        address: 'address 10',
+        role: '630f3ec97063d679867e502d',
+        status: '630f3eca7063d679867e502e'
       };
     }
 
     static find () {
       return {
-        skip: () => ({
-          limit: () => ({
-            exec: () => ({
-              id: '12ad122xa7e',
-              name: 'Nameabc',
-              middleName: 'middlename',
-              surname: 'surname',
-              email: 'email@gmail.com',
-              password: 'dasasdasfdsad',
-              phoneNumber: '0897123456',
-              address: 'address 10'
+        select: () => ({
+          skip: () => ({
+            limit: () => ({
+              exec: () => ({
+                id: '12ad122xa7e',
+                name: 'Nameabc',
+                middleName: 'middlename',
+                surname: 'surname',
+                email: 'email@gmail.com',
+                password: 'dasasdasfdsad',
+                phoneNumber: '0897123456',
+                address: 'address 10'
+              })
             })
           })
         })
@@ -63,7 +56,47 @@ jest.mock('../../models', () => ({
         })
       };
     }
+
+    static findOne () {
+      return {
+        exec: () => ({
+          id: '12ad172xa9e',
+          name: 'name4',
+          middleName: 'middlename4',
+          surname: 'surname4',
+          email: 'email4@gmail.com',
+          password: 'dasasasdasfdsad',
+          phoneNumber: '0897133456',
+          address: 'address 15'
+        })
+      };
+    }
+  },
+  UserRoles: class UserRoles {
+    static findOne () {
+      return {
+        exec: () => ({
+          id: '12ad122xa7b',
+          name: 'User'
+        })
+      };
+    }
+  },
+  UserStatuses: class UserStatuses {
+    static findOne () {
+      return {
+        exec: () => ({
+          id: '12ad122xa7b',
+          name: 'Active'
+        })
+      };
+    }
   }
+}));
+
+jest.mock('bcryptjs', () => ({
+  ...jest.requireActual('bcryptjs'),
+  compare: () => {}
 }));
 
 describe('Users service tests', function () {
@@ -89,21 +122,9 @@ describe('Users service tests', function () {
   };
 
   it('should create user', async () => {
-    const response = await usersService.createUser(
-      requestStub,
-      responseStub
-    );
+    const response = await usersService.createUser(requestStub, responseStub);
 
-    expect(response).toEqual({
-      id: '13ad122xa2ae',
-      name: 'Name',
-      middleName: 'middlename',
-      surname: 'surname',
-      email: 'email@gmail.com',
-      password: 'dasasdasfdsad',
-      phoneNumber: '0897123456',
-      address: 'address 10'
-    });
+    expect(response).toEqual(true);
   });
 
   it('should return all users', async () => {
@@ -121,8 +142,14 @@ describe('Users service tests', function () {
     });
   });
 
-  it('should return updated user', async () => {
-    const response = await usersService.updateUser(
+  it('should update user', async () => {
+    const response = await usersService.updateUser(requestStub, responseStub);
+
+    expect(response).toEqual(true);
+  });
+
+  it('should update password', async () => {
+    const response = await usersService.updateUserPassword(
       requestStub,
       responseStub
     );
@@ -130,11 +157,20 @@ describe('Users service tests', function () {
     expect(response).toEqual(true);
   });
 
-  it('should return deleted user', async () => {
-    const response = await usersService.deleteUser(
-      requestStub,
-      responseStub
-    );
+  it('should create admin', async () => {
+    const response = await usersService.createAdmin(requestStub, responseStub);
+
+    expect(response).toEqual(true);
+  });
+
+  it('should block user', async () => {
+    const response = await usersService.blockUser(requestStub, responseStub);
+
+    expect(response).toEqual(true);
+  });
+
+  it('should delete user', async () => {
+    const response = await usersService.deleteUser(requestStub, responseStub);
 
     expect(response).toEqual(true);
   });
