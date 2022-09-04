@@ -37,21 +37,7 @@ class ProductsService {
       query._id = _id;
     }
     if (name != null) {
-      const manyWords = name.split(' ');
-      let regexBuilder = '';
-
-      if (manyWords.length > 1) {
-        for (const word of manyWords) {
-          regexBuilder === ''
-            ? (regexBuilder += `${word}`)
-            : (regexBuilder += `|${word}`);
-        }
-      } else {
-        regexBuilder = name;
-      }
-
-      const regex = new RegExp(regexBuilder, 'mig');
-      query.name = { $regex: regex };
+      query.name = { $regex: name, $options: 'i' };
     }
     if (category != null) {
       query.category = category;
@@ -69,12 +55,11 @@ class ProductsService {
       query.price = { $lte: maxPrice };
     }
 
-    // I added the following condition to allow a user to search for products priced between amount
     if (+Math.abs(minPrice) && +Math.abs(maxPrice)) {
       query.price = { $gte: minPrice, $lte: maxPrice };
     }
 
-    const count = await Product.find(query).count;
+    const count = await Product.find(query).count();
     const products = await Product.find(query)
       .skip(+req.query.skip || 0)
       .limit(+req.query.take || 50)

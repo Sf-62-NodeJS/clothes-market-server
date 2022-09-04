@@ -14,6 +14,7 @@ jest.mock('../../models', () => ({
 
     static find () {
       return {
+        count: () => 1,
         skip: () => ({
           limit: () => ({
             exec: () => ({
@@ -94,7 +95,7 @@ describe('Products integration tests', function () {
   });
 
   it('should return all products', async () => {
-    const response = await request(app).get('/products/stock');
+    const response = await request(app).get('/products');
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual({
@@ -111,7 +112,7 @@ describe('Products integration tests', function () {
 
   it('should return all products within query', async () => {
     const response = await request(app).get(
-      '/products/stock/?_id=17ad122xa3e2323232332323&name=Name&category=17ad122xa3e2323232332323&sizes=17ad122xa3e2323232332323&status=17ad122xa3e2323232332323&minPrice=1&maxPrice=2'
+      '/products/?_id=17ad122xa3e2323232332323&name=Name&category=17ad122xa3e2323232332323&sizes=17ad122xa3e2323232332323&status=17ad122xa3e2323232332323&minPrice=1&maxPrice=2'
     );
 
     expect(response.statusCode).toBe(200);
@@ -128,7 +129,7 @@ describe('Products integration tests', function () {
   });
 
   it('should return all products with price above 2', async () => {
-    const response = await request(app).get('/products/stock/?minPrice=2');
+    const response = await request(app).get('/products/?minPrice=2');
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual({
@@ -144,7 +145,7 @@ describe('Products integration tests', function () {
   });
 
   it('should return all products with price below 2', async () => {
-    const response = await request(app).get('/products/stock/?maxPrice=2');
+    const response = await request(app).get('/products/?maxPrice=2');
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual({
@@ -160,13 +161,11 @@ describe('Products integration tests', function () {
   });
 
   it('should return updated product by id', async () => {
-    const response = await request(app)
-      .put('/products/revision/18ad122xa3e')
-      .send({
-        name: 'Name',
-        description: 'Description',
-        price: 2.0
-      });
+    const response = await request(app).put('/products/18ad122xa3e').send({
+      name: 'Name',
+      description: 'Description',
+      price: 2.0
+    });
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual(true);

@@ -12,11 +12,11 @@ productsRouter.post(
   productsController.createProduct
 );
 productsRouter.put(
-  '/revision/:id',
+  '/:id',
   updateProductPayloadValidator,
   productsController.updateProduct
 );
-productsRouter.get('/stock/', productsController.getProducts);
+productsRouter.get('/', productsController.getProducts);
 productsRouter.delete('/:id', productsController.deleteProduct);
 
 module.exports = productsRouter;

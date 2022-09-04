@@ -21,6 +21,7 @@ jest.mock('../../models', () => ({
 
     static find () {
       return {
+        count: () => 1,
         skip: () => ({
           limit: () => ({
             exec: () => ({
@@ -34,8 +35,7 @@ jest.mock('../../models', () => ({
               price: 2.0
             })
           })
-        }),
-        count: () => jest.fn().mockResolvedValue(1)
+        })
       };
     }
 

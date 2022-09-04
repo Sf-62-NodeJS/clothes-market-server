@@ -18,6 +18,7 @@ jest.mock('../../models', () => ({
 
     static find () {
       return {
+        count: () => 1,
         skip: () => ({
           limit: () => ({
             exec: () => ({
@@ -131,6 +132,7 @@ describe('Products service tests', function () {
 
   it('should return an empty array from products', async () => {
     Product.find = () => ({
+      count: () => 0,
       skip: () => ({
         limit: () => ({
           exec: () => []
@@ -142,7 +144,7 @@ describe('Products service tests', function () {
       responseStub
     );
 
-    expect(response).toEqual([]);
+    expect(response).toEqual({ products: [], total_size: 0 });
   });
 
   it('should return updated product by id', async () => {

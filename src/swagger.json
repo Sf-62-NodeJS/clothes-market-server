@@ -193,7 +193,7 @@
         }
       }
     },
-    "/products/stock": {
+    "/products/": {
       "get": {
         "tags": [
           "Products"
@@ -277,7 +277,7 @@
         }
       }
     },
-    "/products/revision/{id}": {
+    "/products/{id}/": {
       "put": {
         "tags": [
           "Products"
@@ -331,6 +331,12 @@
             "in": "formData",
             "required": false,
             "type": "number"
+          },
+          {
+            "name": "status",
+            "in": "formData",
+            "required": false,
+            "type": "string"
           }
         ],
         "responses": {
