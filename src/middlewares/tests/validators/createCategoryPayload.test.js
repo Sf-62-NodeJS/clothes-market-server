@@ -1,0 +1,29 @@
+const { createCategoryPayloadValidator } = require('../../validators');
+
+describe('createCategoryPayloadValidator tests', () => {
+  const requestStub = {
+    body: {
+      name: 'Name'
+    }
+  };
+  const nextFunctionMock = jest.fn();
+  const responseStub = {
+    boom: {
+      badRequest: jest.fn()
+    }
+  };
+
+  it('should call next function on valid payload', () => {
+    createCategoryPayloadValidator(requestStub, responseStub, nextFunctionMock);
+
+    expect(nextFunctionMock).toHaveBeenCalled();
+    expect(responseStub.boom.badRequest).not.toHaveBeenCalled();
+  });
+
+  it('should call badRequest function on invalid payload', () => {
+    requestStub.body.name = 'N';
+    createCategoryPayloadValidator(requestStub, responseStub, nextFunctionMock);
+
+    expect(responseStub.boom.badRequest).toHaveBeenCalled();
+  });
+});
