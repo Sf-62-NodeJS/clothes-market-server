@@ -5,45 +5,57 @@ const bcrypt = require('bcryptjs');
 
 class UsersService {
   async updateUserPassword (req, res) {
-    const { oldPassword, newPassword } = req.body;
-    const user = await User.findOne({ _id: req.params.id }).exec();
+    try {
+      const { oldPassword, newPassword } = req.body;
+      const user = await User.findOne({ _id: req.params.id }).exec();
 
-    bcrypt.compare(oldPassword, user.password, async function (err, isMatch) {
-      if (err) throw err;
+      bcrypt.compare(oldPassword, user.password, async function (err, isMatch) {
+        if (err) throw err;
 
-      if (isMatch && oldPassword !== newPassword) {
-        user.password = newPassword;
-        const salt = await bcrypt.genSalt(10);
-        user.password = await bcrypt.hash(user.password, salt);
-        await user.save();
-        return user ? res.json(true) : res.boom.notFound();
-      } else {
-        res.boom.badRequest();
-      }
-    });
+        if (isMatch && oldPassword !== newPassword) {
+          user.password = newPassword;
+          const salt = await bcrypt.genSalt(10);
+          user.password = await bcrypt.hash(user.password, salt);
+          await user.save();
+          return user ? res.json(true) : res.boom.notFound();
+        } else {
+          res.boom.badRequest();
+        }
+      });
+    } catch (err) {
+      res.boom.badRequest();
+    }
   }
 
   async getStatusActive (req, res) {
-    const activeStatus = await UserStatuses.findOne({ name: 'Active' });
-    return activeStatus;
+    const statusActive = await UserStatuses.findOne({ name: 'Active' });
+    return statusActive;
   }
 
   async getRoleUser (req, res) {
-    const userRole = await UserRoles.findOne({ name: 'User' });
-    return userRole;
+    const roleUser = await UserRoles.findOne({ name: 'User' });
+    return roleUser;
   }
 
   async createUser (req, res) {
-    const roleUser = await this.getRoleUser();
-    const statusActive = await this.getStatusActive();
-    const newUser = await new User(req.body);
-    newUser.role = roleUser._id;
-    newUser.status = statusActive._id;
-    const salt = await bcrypt.genSalt(10);
-    newUser.password = await bcrypt.hash(newUser.password, salt);
-    await newUser.save();
-
-    return newUser ? res.json(true) : res.boom.notFound();
+    try {
+      const roleUser = await this.getRoleUser();
+      const statusActive = await this.getStatusActive();
+      const newUser = await new User(req.body);
+      newUser.role = roleUser._id;
+      newUser.status = statusActive._id;
+      const salt = await bcrypt.genSalt(10);
+      newUser.password = await bcrypt.hash(newUser.password, salt);
+      const userExist = await User.findOne({ email: req.body.email });
+      if (!userExist) {
+        await newUser.save();
+        return newUser ? res.json(true) : res.boom.notFound();
+      } else {
+        res.boom.badRequest('user already exists');
+      }
+    } catch (err) {
+      res.boom.badRequest();
+    }
   }
 
   async getUsers (req, res) {
@@ -58,72 +70,96 @@ class UsersService {
     if (skip != null) query.skip = skip;
     if (take != null) query.take = take;
 
-    const users = await User.find(query)
-      .select('-password')
-      .skip(+query.skip || 0)
-      .limit(+query.take || 50)
-      .exec();
+    try {
+      const users = await User.find(query)
+        .select('-password')
+        .skip(+query.skip || 0)
+        .limit(+query.take || 50)
+        .exec();
 
-    return users ? res.json(users) : [];
+      return users ? res.json(users) : [];
+    } catch (err) {
+      return res.boom.badRequest();
+    }
   }
 
   async updateUser (req, res) {
-    const updated = await User.findByIdAndUpdate(req.params.id, req.body, {
-      new: true
-    }).exec();
-    return updated ? res.json(true) : res.boom.notFound();
+    try {
+      const updated = await User.findByIdAndUpdate(req.params.id, req.body, {
+        new: true
+      }).exec();
+      return updated ? res.json(true) : res.boom.notFound();
+    } catch (err) {
+      return res.boom.notFound();
+    }
   }
 
   async getRoleAdmin (req, res) {
-    const userRole = await UserRoles.findOne({ name: 'Admin' });
-    return userRole;
+    const roleAdmin = await UserRoles.findOne({ name: 'Admin' });
+    return roleAdmin;
   }
 
   async createAdmin (req, res) {
-    const roleAdmin = await this.getRoleAdmin();
-    const statusActive = await this.getStatusActive();
-    const newAdmin = await new User(req.body);
-    newAdmin.role = roleAdmin._id;
-    newAdmin.status = statusActive._id;
-    const salt = await bcrypt.genSalt(10);
-    newAdmin.password = await bcrypt.hash(newAdmin.password, salt);
-    await newAdmin.save();
-
-    return newAdmin ? res.json(true) : res.boom.notFound();
+    try {
+      const roleAdmin = await this.getRoleAdmin();
+      const statusActive = await this.getStatusActive();
+      const newAdmin = await new User(req.body);
+      newAdmin.role = roleAdmin._id;
+      newAdmin.status = statusActive._id;
+      const salt = await bcrypt.genSalt(10);
+      newAdmin.password = await bcrypt.hash(newAdmin.password, salt);
+      const userExist = await User.findOne({ email: req.body.email });
+      if (!userExist) {
+        await newAdmin.save();
+        return newAdmin ? res.json(true) : res.boom.notFound();
+      } else {
+        res.boom.badRequest('user already exists');
+      }
+    } catch (err) {
+      res.boom.badRequest();
+    }
   }
 
   async getStatusBlocked (req, res) {
-    const activeStatus = await UserStatuses.findOne({ name: 'Blocked' });
-    return activeStatus;
+    const statusBlocked = await UserStatuses.findOne({ name: 'Blocked' });
+    return statusBlocked;
   }
 
   async blockUser (req, res) {
-    const statusBlocked = await this.getStatusBlocked();
-    const user = await User.findByIdAndUpdate(
-      req.params.id,
-      { status: statusBlocked._id },
-      {
-        new: true
-      }
-    ).exec();
-    return user ? res.json(true) : res.boom.notFound();
+    try {
+      const statusBlocked = await this.getStatusBlocked();
+      const user = await User.findByIdAndUpdate(
+        req.params.id,
+        { status: statusBlocked._id },
+        {
+          new: true
+        }
+      ).exec();
+      return user ? res.json(true) : res.boom.notFound();
+    } catch (err) {
+      res.boom.notFound();
+    }
   }
 
   async getStatusDeleted (req, res) {
-    const activeStatus = await UserStatuses.findOne({ name: 'Deleted' });
-    return activeStatus;
+    const statusDeleted = await UserStatuses.findOne({ name: 'Deleted' });
+    return statusDeleted;
   }
 
   async deleteUser (req, res) {
-    const statusDeleted = await this.getStatusDeleted();
-    const user = await User.findByIdAndUpdate(
-      req.params.id,
-      { status: statusDeleted._id },
-      {
-        new: true
-      }
-    ).exec();
-    return user ? res.json(true) : res.boom.notFound();
+    try {
+      const statusDeleted = await this.getStatusDeleted();
+      const user = await User.findByIdAndUpdate(
+        req.params.id,
+        { status: statusDeleted._id },
+        {
+          new: true
+        }
+      ).exec();
+      return user ? res.json(true) : res.boom.notFound();
+    } catch (err) {
+      res.boom.notFound();
+    }
   }
 }
 module.exports = UsersService;

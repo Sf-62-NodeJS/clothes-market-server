@@ -11,7 +11,7 @@ const updateUserPayloadValidator = (req, res, next) => {
   const { error } = schema.validate(req.body);
 
   if (error) {
-    res.boom.badRequest(`Validation error: ${error.details[0].message}`);
+    return res.boom.badRequest(`Validation error: ${error.details[0].message}`);
   }
 
   next();

@@ -65,7 +65,7 @@ jest.mock('../../models', () => ({
           middleName: 'middlename4',
           surname: 'surname4',
           email: 'email4@gmail.com',
-          password: 'dasasasdasfdsad',
+          password: 'somepassword',
           phoneNumber: '0897133456',
           address: 'address 15'
         })
@@ -103,7 +103,13 @@ describe('Users service tests', function () {
   const usersService = new UsersService();
   const requestStub = {
     body: {
-      name: 'Name'
+      name: 'Name',
+      middleName: 'middlename',
+      surname: 'surname',
+      email: 'email@gmail.com',
+      password: 'somepassword',
+      phoneNumber: '0897123456',
+      address: 'address 10'
     },
     params: {
       id: '15ad122xa3e'

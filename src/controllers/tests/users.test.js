@@ -61,7 +61,7 @@ jest.mock('../../models', () => ({
           middleName: 'middlename4',
           surname: 'surname4',
           email: 'email4@gmail.com',
-          password: 'dasasasdasfdsad',
+          password: 'somepassword',
           phoneNumber: '0897133456',
           address: 'address 15'
         })

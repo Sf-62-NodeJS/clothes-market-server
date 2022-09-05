@@ -63,7 +63,7 @@ jest.mock('../../models', () => ({
           middleName: 'middlename4',
           surname: 'surname4',
           email: 'email4@gmail.com',
-          password: 'dasasasdasadsad',
+          password: 'somepassword',
           phoneNumber: '0897133456',
           address: 'address 15'
         })
@@ -107,7 +107,7 @@ describe('Users integration tests', function () {
       name: 'Name',
       middleName: 'middlename',
       surname: 'surname',
-      email: 'email@gmail.com',
+      email: 'email5@gmail.com',
       password: 'dasasdasfdsad',
       phoneNumber: '0897123456',
       address: 'address 10'
@@ -144,7 +144,7 @@ describe('Users integration tests', function () {
   it('should update user password', async () => {
     const response = await request(app)
       .patch('/users/password/12ad172xa9e')
-      .send({ oldpassword: 'somepassword', newPassword: 'dasasdasfdsad' });
+      .send({ oldPassword: 'somepassword', newPassword: 'dasasdasfdsad' });
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual(true);
