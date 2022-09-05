@@ -4,10 +4,7 @@ const request = require('supertest');
 jest.mock('../../models', () => ({
   Categories: class Categories {
     save () {
-      return {
-        id: '13ad122xa2ae',
-        name: 'Name'
-      };
+      return true;
     }
 
     static findByIdAndUpdate () {
@@ -58,7 +55,7 @@ describe('Categories integration tests', function () {
       .send({ name: 'Name' });
 
     expect(response.statusCode).toBe(200);
-    expect(response.body).toEqual({ id: '13ad122xa2ae', name: 'Name' });
+    expect(response.body).toEqual(true);
   });
 
   it('should update category', async () => {

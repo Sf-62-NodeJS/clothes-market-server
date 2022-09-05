@@ -1,6 +1,6 @@
 const Joi = require('joi');
 
-const createCategoryPayloadValidator = (req, res, next) => {
+const nameCategoryPayloadValidator = (req, res, next) => {
   const schema = Joi.object({
     name: Joi.string().min(2).max(30).required()
   });
@@ -13,4 +13,4 @@ const createCategoryPayloadValidator = (req, res, next) => {
   next();
 };
 
-module.exports = createCategoryPayloadValidator;
+module.exports = nameCategoryPayloadValidator;

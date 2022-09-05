@@ -3,10 +3,7 @@ const { CategoriesService } = require('..');
 jest.mock('../../models', () => ({
   Categories: class Categories {
     save () {
-      return {
-        id: '13ad122xa2ae',
-        name: 'Name'
-      };
+      return true;
     }
 
     static findByIdAndUpdate () {
@@ -67,10 +64,7 @@ describe('Categories service tests', function () {
       responseStub
     );
 
-    expect(response).toEqual({
-      id: '13ad122xa2ae',
-      name: 'Name'
-    });
+    expect(response).toEqual(true);
   });
 
   it('should update category', async () => {

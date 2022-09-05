@@ -1,26 +1,30 @@
 const { Categories } = require('../models');
 
 class CategoriesService {
-  async createCategory (req, res) {
-    const categoryExists = await Categories.findOne({
-      name: req.body.name
+  async checkCategory (name) {
+    const category = await Categories.findOne({
+      name
     }).exec();
 
-    if (categoryExists !== null) {
+    return category;
+  }
+
+  async createCategory (req, res) {
+    const exists = await this.checkCategory(req.body.name);
+
+    if (exists !== null) {
       return res.boom.badRequest(`Category ${req.body.name} already exists.`);
     }
 
     const category = await new Categories(req.body).save();
 
-    return res.json(category);
+    return category ? res.json(true) : res.json(false);
   }
 
   async updateCategory (req, res) {
-    const categoryExists = await Categories.findOne({
-      name: req.body.name
-    }).exec();
+    const exists = await this.checkCategory(req.body.name);
 
-    if (categoryExists !== null) {
+    if (exists !== null) {
       return res.boom.badRequest(`Category ${req.body.name} already exists.`);
     }
 

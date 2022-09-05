@@ -1,6 +1,6 @@
-const { updateCategoryPayloadValidator } = require('../../validators');
+const { nameCategoryPayloadValidator } = require('../../validators');
 
-describe('updateCategoryPayloadValidator tests', () => {
+describe('nameCategoryPayloadValidator tests', () => {
   const requestStub = {
     body: {
       name: 'Name'
@@ -14,7 +14,7 @@ describe('updateCategoryPayloadValidator tests', () => {
   };
 
   it('should call next function on valid payload', () => {
-    updateCategoryPayloadValidator(requestStub, responseStub, nextFunctionMock);
+    nameCategoryPayloadValidator(requestStub, responseStub, nextFunctionMock);
 
     expect(nextFunctionMock).toHaveBeenCalled();
     expect(responseStub.boom.badRequest).not.toHaveBeenCalled();
@@ -22,7 +22,7 @@ describe('updateCategoryPayloadValidator tests', () => {
 
   it('should call badRequest function on invalid payload', () => {
     requestStub.body.name = 'N';
-    updateCategoryPayloadValidator(requestStub, responseStub, nextFunctionMock);
+    nameCategoryPayloadValidator(requestStub, responseStub, nextFunctionMock);
 
     expect(responseStub.boom.badRequest).toHaveBeenCalled();
   });

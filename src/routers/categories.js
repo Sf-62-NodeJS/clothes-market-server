@@ -1,19 +1,16 @@
 const categoriesRouter = require('express').Router();
 const { CategoriesController } = require('../controllers');
-const {
-  createCategoryPayloadValidator,
-  updateCategoryPayloadValidator
-} = require('../middlewares/validators');
+const { nameCategoryPayloadValidator } = require('../middlewares/validators');
 
 const categoriesController = new CategoriesController();
 categoriesRouter.post(
   '/',
-  createCategoryPayloadValidator,
+  nameCategoryPayloadValidator,
   categoriesController.createCategory
 );
 categoriesRouter.put(
   '/:id',
-  updateCategoryPayloadValidator,
+  nameCategoryPayloadValidator,
   categoriesController.updateCategory
 );
 categoriesRouter.get('/', categoriesController.getCategories);
