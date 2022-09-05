@@ -6,9 +6,7 @@
     "title": "academy-project-server"
   },
   "basePath": "/",
-  "produces": [
-    "application/json"
-  ],
+  "produces": ["application/json"],
   "securityDefinitions": {
     "app-jwt": {
       "type": "apiKey",
@@ -24,18 +22,12 @@
   "paths": {
     "/users/{id}": {
       "get": {
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "summary": "Retrieves user",
         "description": "",
         "operationId": "getUsers",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
         "responses": {
           "200": {
             "description": "Returns user",
@@ -79,18 +71,12 @@
     },
     "/users": {
       "post": {
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "summary": "Creates user",
         "description": "",
         "operationId": "createUser",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
         "parameters": [
           {
             "name": "payload",
@@ -121,6 +107,45 @@
           },
           "500": {
             "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/size/": {
+      "post": {
+        "tags": ["Sizes"],
+        "summary": "Returnes a size by id",
+        "description": "",
+        "operationId": "create Size",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "sizeName",
+            "required": true,
+            "type": "object",
+            "properties": {
+              "name": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A Size object",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": "object",
+                "name": "string"
+              }
+            },
+            "examples": {
+              "application/json": {
+                "id": "1",
+                "name": "M"
+              }
+            }
           }
         }
       }
