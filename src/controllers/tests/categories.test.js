@@ -1,4 +1,5 @@
 const { CategoriesController } = require('../');
+const { Categories } = require('../../models');
 
 jest.mock('../../models', () => ({
   Categories: class Categories {
@@ -12,6 +13,12 @@ jest.mock('../../models', () => ({
     static findByIdAndUpdate () {
       return {
         exec: () => true
+      };
+    }
+
+    static findOne () {
+      return {
+        exec: () => null
       };
     }
 
@@ -49,7 +56,11 @@ describe('Categories controller tests', function () {
 
   const responseStub = {
     boom: {
-      badRequest: jest.fn()
+      badRequest: () => ({
+        statusCode: 400,
+        error: 'Bad request',
+        message: 'Category already exists.'
+      })
     },
     json: (payload) => payload
   };
@@ -66,13 +77,51 @@ describe('Categories controller tests', function () {
     });
   });
 
+  it('should return an error while trying to create a category', async () => {
+    Categories.findOne = () => ({
+      exec: () => 'some'
+    });
+
+    const response = await categoriesController.createCategory(
+      requestStub,
+      responseStub
+    );
+
+    expect(response).toEqual({
+      statusCode: 400,
+      error: 'Bad request',
+      message: 'Category already exists.'
+    });
+  });
+
   it('should update category', async () => {
+    Categories.findOne = () => ({
+      exec: () => null
+    });
+
     const response = await categoriesController.updateCategory(
       requestStub,
       responseStub
     );
 
     expect(response).toEqual(true);
+  });
+
+  it('should return an error while trying to update a category', async () => {
+    Categories.findOne = () => ({
+      exec: () => 'some'
+    });
+
+    const response = await categoriesController.updateCategory(
+      requestStub,
+      responseStub
+    );
+
+    expect(response).toEqual({
+      statusCode: 400,
+      error: 'Bad request',
+      message: 'Category already exists.'
+    });
   });
 
   it('should return all categories', async () => {

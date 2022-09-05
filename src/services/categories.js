@@ -2,12 +2,28 @@ const { Categories } = require('../models');
 
 class CategoriesService {
   async createCategory (req, res) {
+    const categoryExists = await Categories.findOne({
+      name: req.body.name
+    }).exec();
+
+    if (categoryExists !== null) {
+      return res.boom.badRequest(`Category ${req.body.name} already exists.`);
+    }
+
     const category = await new Categories(req.body).save();
 
     return res.json(category);
   }
 
   async updateCategory (req, res) {
+    const categoryExists = await Categories.findOne({
+      name: req.body.name
+    }).exec();
+
+    if (categoryExists !== null) {
+      return res.boom.badRequest(`Category ${req.body.name} already exists.`);
+    }
+
     const category = await Categories.findByIdAndUpdate(req.params.id, {
       name: req.body.name
     }).exec();
@@ -24,7 +40,7 @@ class CategoriesService {
       query.name = { $regex: req.query.name, $options: 'i' };
     }
 
-    const count = await Categories.find(query).count();
+    const count = Categories.find(query).count();
     const category = await Categories.find(query).exec();
 
     return {

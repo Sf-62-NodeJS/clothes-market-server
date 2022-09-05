@@ -16,6 +16,12 @@ jest.mock('../../models', () => ({
       };
     }
 
+    static findOne () {
+      return {
+        exec: () => null
+      };
+    }
+
     static find () {
       return {
         exec: () => ({
