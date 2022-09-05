@@ -111,12 +111,12 @@
         }
       }
     },
-    "/size/": {
+    "/sizes/": {
       "post": {
         "tags": ["Sizes"],
-        "summary": "Returnes a size by id",
+        "summary": "Creates Size",
         "description": "",
-        "operationId": "create Size",
+        "operationId": "createSize",
         "consumes": ["application/json"],
         "produces": ["application/json"],
         "parameters": [
@@ -124,28 +124,260 @@
             "in": "body",
             "name": "sizeName",
             "required": true,
-            "type": "object",
-            "properties": {
-              "name": "string"
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                }
+              }
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "A Size object",
+            "description": "Returns new Size",
             "schema": {
               "type": "object",
               "properties": {
-                "id": "object",
-                "name": "string"
+                "name": {
+                  "type": "string"
+                },
+                "_id": {
+                  "type": "string"
+                },
+                "__v": {
+                  "type": "integer"
+                }
               }
             },
             "examples": {
               "application/json": {
-                "id": "1",
                 "name": "M"
               }
             }
+          },
+          "400": {
+            "description": "Returns error message",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "statusCode": {
+                  "type": "integer"
+                },
+                "error": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "get": {
+        "tags": ["Sizes"],
+        "summary": "Get Size",
+        "description": "",
+        "operationId": "getSize",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "_id",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns Size",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "_id": {
+                  "type": "string"
+                },
+                "__v": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Returns error message",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "statusCode": {
+                  "type": "integer"
+                },
+                "error": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "statusCode": 404,
+                "error": "Not Found",
+                "message": "Not Found"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/sizes/{id}": {
+      "put": {
+        "tags": ["Sizes"],
+        "summary": "Update Size",
+        "description": "",
+        "operationId": "updateSize",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "sizeName",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns older Size",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "_id": {
+                  "type": "string"
+                },
+                "__v": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Returns error message",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "statusCode": {
+                  "type": "integer"
+                },
+                "error": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Sizes"],
+        "summary": "Update Size",
+        "description": "",
+        "operationId": "deleteSize",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns deleted Size",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "_id": {
+                  "type": "string"
+                },
+                "__v": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Returns error message",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "statusCode": {
+                  "type": "integer"
+                },
+                "error": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "statusCode": 404,
+                "error": "Not Found",
+                "message": "Not Found"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }

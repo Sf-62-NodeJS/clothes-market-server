@@ -75,17 +75,15 @@ describe('deleting Size test', () => {
   });
 });
 
-describe('getting Size test', () => {
-  it('successfully gets the product', async () => {
-    Sizes.findById = () => ({ name: 'M' });
-    await sizesService.getSize(requestStub, responseStub);
-    expect(responseStub.json).toHaveBeenCalled();
-    expect(responseStub.boom.notFound).not.toHaveBeenCalled();
-  });
+describe('getting Sizes', () => {
+  it('gets sizes when query given', async () => {
+    Sizes.find = jest.fn().mockReturnValue({
+      name: 'M',
+      _id: '121221'
+    });
 
-  it('fails when no Size is found', async () => {
-    Sizes.findById = () => null;
-    await sizesService.getSize(requestStub, responseStub);
-    expect(responseStub.boom.notFound).toHaveBeenCalled();
+    await sizesService.getSizes(requestStub, responseStub);
+
+    expect(responseStub.json).toHaveBeenCalled();
   });
 });

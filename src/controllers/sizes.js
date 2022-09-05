@@ -15,8 +15,8 @@ class SizesController {
     return sizesService.deleteSize(req, res);
   }
 
-  async getSize (req, res) {
-    return sizesService.getSize(req, res);
+  async getSizes (req, res) {
+    return sizesService.getSizes(req, res);
   }
 }
 

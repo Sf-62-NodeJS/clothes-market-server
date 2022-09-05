@@ -6,6 +6,6 @@ const sizesController = new SizesController();
 sizesRouter.post('/', sizesController.createSize);
 sizesRouter.put('/:id', sizesController.updateSize);
 sizesRouter.delete('/:id', sizesController.deleteSize);
-sizesRouter.get('/:id', sizesController.getSize);
+sizesRouter.get('/', sizesController.getSizes);
 
 module.exports = sizesRouter;

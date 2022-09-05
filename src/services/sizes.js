@@ -21,9 +21,14 @@ class SizesService {
     return size ? res.json(size) : res.boom.notFound();
   }
 
-  async getSize (req, res) {
-    const size = await Sizes.findById(req.params.id);
-    return size ? res.json(size) : res.boom.notFound();
+  async getSizes (req, res) {
+    const { _id, name } = (typeof req.query !== 'undefined' && req.query) || {};
+    const query = {};
+    if (_id != null) query._id = _id;
+    if (name != null) query.name = name;
+
+    const sizes = await Sizes.find(query);
+    return res.json(sizes);
   }
 }
 
