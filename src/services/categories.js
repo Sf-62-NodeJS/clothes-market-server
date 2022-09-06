@@ -36,7 +36,7 @@ class CategoriesService {
   }
 
   async getCategories (req, res) {
-    const { _id, name } = (typeof req.query !== 'undefined' && req.query) || {};
+    const { _id, name } = req.query;
     const query = {};
 
     if (_id != null) query._id = _id;
@@ -48,8 +48,8 @@ class CategoriesService {
     const category = await Categories.find(query).exec();
 
     return {
-      total_number: count,
-      categories: category ? res.json(category) : res.json([])
+      total_size: count,
+      list: category ? res.json(category) : res.json([])
     };
   }
 

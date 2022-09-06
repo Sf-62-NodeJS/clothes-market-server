@@ -1,22 +1,18 @@
 const { CategoriesService } = require('../services');
-const categoriesService = new CategoriesService();
 
 class CategoriesController {
-  async createCategory (req, res) {
-    return categoriesService.createCategory(req, res);
-  }
+  #categoriesService = new CategoriesService();
 
-  async updateCategory (req, res) {
-    return categoriesService.updateCategory(req, res);
-  }
+  createCategory = (req, res) =>
+    this.#categoriesService.createCategory(req, res);
 
-  async getCategories (req, res) {
-    return categoriesService.getCategories(req, res);
-  }
+  updateCategory = (req, res) =>
+    this.#categoriesService.updateCategory(req, res);
 
-  async deleteCategory (req, res) {
-    return categoriesService.deleteCategory(req, res);
-  }
+  getCategories = (req, res) => this.#categoriesService.getCategories(req, res);
+
+  deleteCategory = (req, res) =>
+    this.#categoriesService.deleteCategory(req, res);
 }
 
 module.exports = CategoriesController;

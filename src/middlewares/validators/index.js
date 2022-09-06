@@ -1,2 +1,2 @@
 module.exports.createUserPayloadValidator = require('./createUserPayload');
-module.exports.nameCategoryPayloadValidator = require('./nameCategoryPayload');
+module.exports.categoryPayloadValidator = require('./categoryPayload');

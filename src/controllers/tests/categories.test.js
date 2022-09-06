@@ -125,11 +125,11 @@ describe('Categories controller tests', function () {
     );
 
     expect(response).toEqual({
-      categories: {
+      list: {
         id: '13ad122xa2ae',
         name: 'Name'
       },
-      total_number: 1
+      total_size: 1
     });
   });
 

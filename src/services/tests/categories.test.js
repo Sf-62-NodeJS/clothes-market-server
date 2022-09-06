@@ -1,4 +1,5 @@
 const { CategoriesService } = require('..');
+const { Categories } = require('../../models');
 
 jest.mock('../../models', () => ({
   Categories: class Categories {
@@ -53,7 +54,8 @@ describe('Categories service tests', function () {
 
   const responseStub = {
     boom: {
-      badRequest: jest.fn()
+      badRequest: jest.fn(),
+      notFound: () => false
     },
     json: (payload) => payload
   };
@@ -76,6 +78,16 @@ describe('Categories service tests', function () {
     expect(response).toEqual(true);
   });
 
+  it('should not find a category to update', async () => {
+    Categories.findByIdAndUpdate = () => ({ exec: () => false });
+    const response = await categoriesService.updateCategory(
+      requestStub,
+      responseStub
+    );
+
+    expect(response).toEqual(false);
+  });
+
   it('should return all categories', async () => {
     const response = await categoriesService.getCategories(
       requestStub,
@@ -83,20 +95,37 @@ describe('Categories service tests', function () {
     );
 
     expect(response).toEqual({
-      categories: {
+      list: {
         id: '13ad122xa2ae',
         name: 'Name'
       },
-      total_number: 1
+      total_size: 1
+    });
+  });
+
+  it('should return no categories', async () => {
+    Categories.find = () => ({
+      count: () => 0,
+      exec: () => []
+    });
+    const response = await categoriesService.getCategories(
+      requestStub,
+      responseStub
+    );
+
+    expect(response).toEqual({
+      list: [],
+      total_size: 0
     });
   });
 
   it('should delete category', async () => {
+    Categories.findByIdAndDelete = () => ({ exec: () => false });
     const response = await categoriesService.deleteCategory(
       requestStub,
       responseStub
     );
 
-    expect(response).toEqual(true);
+    expect(response).toEqual(false);
   });
 });
