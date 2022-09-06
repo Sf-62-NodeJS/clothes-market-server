@@ -121,13 +121,9 @@ class UsersService {
   async createAdmin (req, res) {
     try {
       const roleAdmin = await this.getRoleAdmin();
-      const statusActive = await this.getStatusActive();
-      const newAdmin = await new User(req.body);
+      const newAdmin = await this.createBasicUser(req);
       newAdmin.role = roleAdmin._id;
-      newAdmin.status = statusActive._id;
-      const salt = await bcrypt.genSalt(10);
-      newAdmin.password = await bcrypt.hash(newAdmin.password, salt);
-      const userExist = await User.findOne({ email: req.body.email });
+      const userExist = await this.checkUserExists(req);
       if (!userExist) {
         await newAdmin.save();
         return newAdmin ? res.json(true) : res.boom.notFound();
