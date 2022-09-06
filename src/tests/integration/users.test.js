@@ -166,14 +166,14 @@ describe('Users integration tests', function () {
   });
 
   it('should block user', async () => {
-    const response = await request(app).patch('/users/blocked/12ad122xa9e');
+    const response = await request(app).patch('/users/block/12ad122xa9e');
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual(true);
   });
 
   it('should delete user', async () => {
-    const response = await request(app).patch('/users/deleted/12ad122xa9e');
+    const response = await request(app).patch('/users/delete/12ad122xa9e');
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual(true);

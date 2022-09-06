@@ -13,7 +13,7 @@ usersRouter.post(
   createUserPayloadValidator,
   usersController.createAdmin
 );
-usersRouter.patch('/blocked/:id', usersController.blockUser);
-usersRouter.patch('/deleted/:id', usersController.deleteUser);
+usersRouter.patch('/block/:id', usersController.blockUser);
+usersRouter.patch('/delete/:id', usersController.deleteUser);
 
 module.exports = usersRouter;
