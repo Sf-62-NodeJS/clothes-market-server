@@ -92,7 +92,7 @@ jest.mock('../../models', () => ({
 
 jest.mock('bcryptjs', () => ({
   ...jest.requireActual('bcryptjs'),
-  compare: () => {}
+  compare: () => true
 }));
 
 describe('usersController tests', () => {

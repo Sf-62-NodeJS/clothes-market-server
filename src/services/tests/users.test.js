@@ -96,7 +96,7 @@ jest.mock('../../models', () => ({
 
 jest.mock('bcryptjs', () => ({
   ...jest.requireActual('bcryptjs'),
-  compare: () => {}
+  compare: () => true
 }));
 
 describe('Users service tests', function () {

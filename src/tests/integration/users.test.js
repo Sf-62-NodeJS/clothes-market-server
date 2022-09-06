@@ -98,7 +98,7 @@ jest.mock('mongoose', () => ({
 
 jest.mock('bcryptjs', () => ({
   ...jest.requireActual('bcryptjs'),
-  compare: () => {}
+  compare: () => true
 }));
 
 describe('Users integration tests', function () {

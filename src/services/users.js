@@ -9,44 +9,58 @@ class UsersService {
       const { oldPassword, newPassword } = req.body;
       const user = await User.findOne({ _id: req.params.id }).exec();
 
-      bcrypt.compare(oldPassword, user.password, async function (err, isMatch) {
-        if (err) throw err;
-
-        if (isMatch && oldPassword !== newPassword) {
-          user.password = newPassword;
-          const salt = await bcrypt.genSalt(10);
-          user.password = await bcrypt.hash(user.password, salt);
-          await user.save();
-          return user ? res.json(true) : res.boom.notFound();
-        } else {
-          res.boom.badRequest();
+      return bcrypt.compare(
+        oldPassword,
+        user.password,
+        async function (err, isMatch) {
+          if (err) throw err;
+          if (!isMatch) return res.boom.badRequest('wrong old password');
+          if (oldPassword !== newPassword) {
+            user.password = newPassword;
+            const salt = await bcrypt.genSalt(10);
+            user.password = await bcrypt.hash(user.password, salt);
+            await user.save();
+            return user ? res.json(true) : res.boom.notFound();
+          } else {
+            res.boom.badRequest('new password cannot be the same as old');
+          }
         }
-      });
+      );
     } catch (err) {
-      res.boom.badRequest();
+      res.boom.notFound();
     }
   }
 
-  async getStatusActive (req, res) {
+  async getStatusActive () {
     const statusActive = await UserStatuses.findOne({ name: 'Active' });
     return statusActive;
   }
 
-  async getRoleUser (req, res) {
+  async getRoleUser () {
     const roleUser = await UserRoles.findOne({ name: 'User' });
     return roleUser;
+  }
+
+  async createBasicUser (req, res) {
+    const statusActive = await this.getStatusActive();
+    const newUser = await new User(req.body);
+    newUser.status = statusActive._id;
+    const salt = await bcrypt.genSalt(10);
+    newUser.password = await bcrypt.hash(newUser.password, salt);
+    return newUser;
+  }
+
+  async checkUserExists (req, res) {
+    const userExist = await User.findOne({ email: req.body.email });
+    return userExist;
   }
 
   async createUser (req, res) {
     try {
       const roleUser = await this.getRoleUser();
-      const statusActive = await this.getStatusActive();
-      const newUser = await new User(req.body);
+      const newUser = await this.createBasicUser(req);
       newUser.role = roleUser._id;
-      newUser.status = statusActive._id;
-      const salt = await bcrypt.genSalt(10);
-      newUser.password = await bcrypt.hash(newUser.password, salt);
-      const userExist = await User.findOne({ email: req.body.email });
+      const userExist = await this.checkUserExists(req);
       if (!userExist) {
         await newUser.save();
         return newUser ? res.json(true) : res.boom.notFound();
@@ -77,7 +91,12 @@ class UsersService {
         .limit(+query.take || 50)
         .exec();
 
-      return users ? res.json(users) : [];
+      const count = User.find(query).count();
+
+      return {
+        total_number: count,
+        allusers: users ? res.json(users) : res.json([])
+      };
     } catch (err) {
       return res.boom.badRequest();
     }
@@ -94,7 +113,7 @@ class UsersService {
     }
   }
 
-  async getRoleAdmin (req, res) {
+  async getRoleAdmin () {
     const roleAdmin = await UserRoles.findOne({ name: 'Admin' });
     return roleAdmin;
   }
@@ -120,28 +139,38 @@ class UsersService {
     }
   }
 
-  async getStatusBlocked (req, res) {
+  async getStatusBlocked () {
     const statusBlocked = await UserStatuses.findOne({ name: 'Blocked' });
     return statusBlocked;
+  }
+
+  async getCurrentStatus (req, res) {
+    const user = await User.findOne({ _id: req.params.id });
+    return user.status;
   }
 
   async blockUser (req, res) {
     try {
       const statusBlocked = await this.getStatusBlocked();
-      const user = await User.findByIdAndUpdate(
-        req.params.id,
-        { status: statusBlocked._id },
-        {
-          new: true
-        }
-      ).exec();
-      return user ? res.json(true) : res.boom.notFound();
+      const currentStatus = await this.getCurrentStatus(req);
+      if (statusBlocked._id.toString() !== currentStatus.toString()) {
+        const user = await User.findByIdAndUpdate(
+          req.params.id,
+          { status: statusBlocked._id },
+          {
+            new: true
+          }
+        ).exec();
+        return user ? res.json(true) : res.boom.notFound();
+      } else {
+        return res.boom.badRequest('user already blocked');
+      }
     } catch (err) {
       res.boom.notFound();
     }
   }
 
-  async getStatusDeleted (req, res) {
+  async getStatusDeleted () {
     const statusDeleted = await UserStatuses.findOne({ name: 'Deleted' });
     return statusDeleted;
   }
@@ -149,14 +178,19 @@ class UsersService {
   async deleteUser (req, res) {
     try {
       const statusDeleted = await this.getStatusDeleted();
-      const user = await User.findByIdAndUpdate(
-        req.params.id,
-        { status: statusDeleted._id },
-        {
-          new: true
-        }
-      ).exec();
-      return user ? res.json(true) : res.boom.notFound();
+      const currentStatus = await this.getCurrentStatus(req);
+      if (statusDeleted._id.toString() !== currentStatus.toString()) {
+        const user = await User.findByIdAndUpdate(
+          req.params.id,
+          { status: statusDeleted._id },
+          {
+            new: true
+          }
+        ).exec();
+        return user ? res.json(true) : res.boom.notFound();
+      } else {
+        return res.boom.badRequest('user already deleted');
+      }
     } catch (err) {
       res.boom.notFound();
     }
