@@ -1,10 +1,19 @@
 const app = require('../../index');
 const request = require('supertest');
+const { User } = require('../../models');
+const { UserStatuses } = require('../../models');
+const { UserRoles } = require('../../models');
 
 jest.mock('../../models', () => ({
   User: class User {
     constructor () {
+      this.name = 'Name';
+      this.middleName = 'middlename';
+      this.surname = 'surname';
+      this.email = 'email@gmail.com';
       this.password = 'somepassword';
+      this.phoneNumber = '0897123456';
+      this.address = 'address 10';
     }
 
     save () {
@@ -36,6 +45,9 @@ jest.mock('../../models', () => ({
               })
             })
           })
+        }),
+        countDocuments: () => ({
+          exec: () => 1
         })
       };
     }
@@ -58,14 +70,15 @@ jest.mock('../../models', () => ({
     static findOne () {
       return {
         exec: () => ({
-          id: '12ad172xa9e',
+          _id: '12ad172xa9e',
           name: 'name4',
           middleName: 'middlename4',
           surname: 'surname4',
           email: 'email4@gmail.com',
           password: 'somepassword',
           phoneNumber: '0897133456',
-          address: 'address 15'
+          address: 'address 15',
+          status: '52ad122xa7z'
         })
       };
     }
@@ -74,7 +87,7 @@ jest.mock('../../models', () => ({
     static findOne () {
       return {
         exec: () => ({
-          id: '12ad122xa7b',
+          _id: '12ad122xa7b',
           name: 'User'
         })
       };
@@ -84,7 +97,7 @@ jest.mock('../../models', () => ({
     static findOne () {
       return {
         exec: () => ({
-          id: '12ad122xa7z',
+          _id: '12ad122xa7z',
           name: 'Active'
         })
       };
@@ -103,6 +116,15 @@ jest.mock('bcryptjs', () => ({
 
 describe('Users integration tests', function () {
   it('should create user', async () => {
+    User.findOne = () => null;
+    UserRoles.findOne = () => {
+      return {
+        exec: () => ({
+          _id: '12ad122xa7b',
+          name: 'User'
+        })
+      };
+    };
     const response = await request(app).post('/users').send({
       name: 'Name',
       middleName: 'middlename',
@@ -132,7 +154,39 @@ describe('Users integration tests', function () {
     });
   });
 
+  it('should return all users with query params', async () => {
+    const response = await request(app).get(
+      '/users/?_id=234235sfsfeq234&name=Name&email=email@yahoo.com&status=214sf43524d&role=234segf53452&skip=1&take=50'
+    );
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toEqual({
+      id: '12ad122xa7e',
+      name: 'Nameabc',
+      middleName: 'middlename',
+      surname: 'surname',
+      email: 'email@gmail.com',
+      phoneNumber: '0897123456',
+      address: 'address 10'
+    });
+  });
+
   it('should update user', async () => {
+    User.findOne = () => {
+      return {
+        exec: () => ({
+          _id: '12ad172xa9e',
+          name: 'name4',
+          middleName: 'middlename4',
+          surname: 'surname4',
+          email: 'email4@gmail.com',
+          password: 'somepassword',
+          phoneNumber: '0897133456',
+          address: 'address 15',
+          status: '12ad122xa7z'
+        })
+      };
+    };
     const response = await request(app)
       .put('/users/12ad122xa9e')
       .send({ name: 'Gosho' });
@@ -142,6 +196,34 @@ describe('Users integration tests', function () {
   });
 
   it('should update user password', async () => {
+    User.findOne = () => {
+      return {
+        exec: () => ({
+          _id: '12ad172xa9e',
+          name: 'name4',
+          middleName: 'middlename4',
+          surname: 'surname4',
+          email: 'email4@gmail.com',
+          password: 'somepassword',
+          phoneNumber: '0897133456',
+          address: 'address 15',
+          status: '12ad122xa7z'
+        })
+      };
+    };
+    User.findOneAndUpdate = () => {
+      return {
+        _id: '12ad172xa9e',
+        name: 'name4',
+        middleName: 'middlename4',
+        surname: 'surname4',
+        email: 'email4@gmail.com',
+        password: 'dasasdasfdsad',
+        phoneNumber: '0897133456',
+        address: 'address 15',
+        status: '12ad122xa7z'
+      };
+    };
     const response = await request(app)
       .patch('/users/password/12ad172xa9e')
       .send({ oldPassword: 'somepassword', newPassword: 'dasasdasfdsad' });
@@ -151,6 +233,15 @@ describe('Users integration tests', function () {
   });
 
   it('should create admin', async () => {
+    User.findOne = () => null;
+    UserRoles.findOne = () => {
+      return {
+        exec: () => ({
+          _id: '12ad122xa7k',
+          name: 'Admin'
+        })
+      };
+    };
     const response = await request(app).post('/users/admin').send({
       name: 'Name',
       middleName: 'middlename',
@@ -166,6 +257,29 @@ describe('Users integration tests', function () {
   });
 
   it('should block user', async () => {
+    User.findOne = () => {
+      return {
+        exec: () => ({
+          _id: '12ad172xa9e',
+          name: 'name4',
+          middleName: 'middlename4',
+          surname: 'surname4',
+          email: 'email4@gmail.com',
+          password: 'somepassword',
+          phoneNumber: '0897133456',
+          address: 'address 15',
+          status: '52ad122xa7z'
+        })
+      };
+    };
+    UserStatuses.findOne = () => {
+      return {
+        exec: () => ({
+          _id: '12ad122xa7w',
+          name: 'Blocked'
+        })
+      };
+    };
     const response = await request(app).patch('/users/block/12ad122xa9e');
 
     expect(response.statusCode).toBe(200);
@@ -173,6 +287,29 @@ describe('Users integration tests', function () {
   });
 
   it('should delete user', async () => {
+    User.findOne = () => {
+      return {
+        exec: () => ({
+          _id: '12ad172xa9e',
+          name: 'name4',
+          middleName: 'middlename4',
+          surname: 'surname4',
+          email: 'email4@gmail.com',
+          password: 'somepassword',
+          phoneNumber: '0897133456',
+          address: 'address 15',
+          status: '52ad122xa7z'
+        })
+      };
+    };
+    UserStatuses.findOne = () => {
+      return {
+        exec: () => ({
+          _id: '12ad122xa7q',
+          name: 'Deleted'
+        })
+      };
+    };
     const response = await request(app).patch('/users/delete/12ad122xa9e');
 
     expect(response.statusCode).toBe(200);

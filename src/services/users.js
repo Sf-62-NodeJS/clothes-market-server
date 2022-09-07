@@ -57,7 +57,7 @@ class UsersService {
         .limit(+query.take || 50)
         .exec();
 
-      const count = User.find(query).count();
+      const count = await User.find(query).countDocuments().exec();
 
       return {
         total_size: count,
@@ -92,27 +92,27 @@ class UsersService {
       if (currentStatus.toString() === statusActive._id.toString()) {
         const { oldPassword, newPassword } = req.body;
         const user = await User.findOne({ _id: req.params.id }).exec();
-        return bcrypt.compare(
+        const isMatchPasswords = await bcrypt.compare(
           oldPassword,
-          user.password,
-          async function (err, isMatch) {
-            if (err) throw err;
-            if (!isMatch) return res.boom.badRequest('wrong old password');
-            if (oldPassword !== newPassword) {
-              user.password = newPassword;
-              const salt = await bcrypt.genSalt(10);
-              user.password = await bcrypt.hash(user.password, salt);
-              await user.save();
-              return user ? res.json(true) : res.boom.notFound();
-            } else {
-              res.boom.badRequest('new password cannot be the same as old');
-            }
-          }
+          user.password
         );
-      } else {
-        res.boom.badRequest('user is not active');
+        if (!isMatchPasswords) {
+          return res.boom.badRequest('wrong old password');
+        }
+        if (isMatchPasswords && oldPassword !== newPassword) {
+          user.password = newPassword;
+          const salt = await bcrypt.genSalt(10);
+          user.password = await bcrypt.hash(user.password, salt);
+          const updatedUserPassword = await User.findOneAndUpdate(
+            { _id: req.params.id },
+            user
+          );
+          return updatedUserPassword ? res.json(true) : res.boom.notFound();
+        } else {
+          res.boom.badRequest('new password cannot be the same as old');
+        }
       }
-    } catch (err) {
+    } catch {
       res.boom.notFound();
     }
   }
@@ -174,17 +174,17 @@ class UsersService {
   }
 
   async getStatus (statusName) {
-    const status = await UserStatuses.findOne({ name: statusName });
+    const status = await UserStatuses.findOne({ name: statusName }).exec();
     return status;
   }
 
   async getRole (roleName) {
-    const role = await UserRoles.findOne({ name: roleName });
+    const role = await UserRoles.findOne({ name: roleName }).exec();
     return role;
   }
 
   async getCurrentStatus (req, res) {
-    const user = await User.findOne({ _id: req.params.id });
+    const user = await User.findOne({ _id: req.params.id }).exec();
     return user.status;
   }
 }
