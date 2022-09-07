@@ -17,7 +17,7 @@ jest.mock('../../models', () => ({
 
     save () {
       return {
-        id: '13ad122xa2ae',
+        id: '12ad172xa9e',
         name: 'Name',
         middleName: 'middlename',
         surname: 'surname',
@@ -113,16 +113,17 @@ describe('Users service tests', function () {
   const usersService = new UsersService();
   const requestStub = {
     body: {
-      name: 'Name',
-      middleName: 'middlename',
-      surname: 'surname',
-      email: 'email@gmail.com',
-      password: 'somepassword',
-      phoneNumber: '0897123456',
-      address: 'address 10'
+      name: 'name4',
+      middleName: 'middlename4',
+      surname: 'surname4',
+      email: 'email4@gmail.com',
+      password: 'dasasdasfdsad',
+      phoneNumber: '0897133456',
+      address: 'address 15',
+      status: '12ad122xa7z'
     },
     params: {
-      id: '15ad122xa3e'
+      id: '12ad172xa9e'
     },
     query: {
       skip: 1,
@@ -189,15 +190,6 @@ describe('Users service tests', function () {
 
     expect(response).toEqual(true);
   });
-
-  /* it('should update password', async () => {
-    const response = await usersService.updateUserPassword(
-      requestStub,
-      responseStub
-    );
-
-    expect(response).toEqual(true);
-  }); */
 
   it('should create admin', async () => {
     User.findOne = () => null;

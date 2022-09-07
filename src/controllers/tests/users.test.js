@@ -182,15 +182,6 @@ describe('usersController tests', () => {
     expect(updatedUser).toEqual(true);
   });
 
-  /* it('should update password', async () => {
-    const updatedUser = await usersController.updateUserPassword(
-      requestStub,
-      responseStub
-    );
-
-    expect(updatedUser).toEqual(true);
-  }); */
-
   it('should create admin', async () => {
     User.findOne = () => null;
     UserRoles.findOne = () => {
