@@ -106,7 +106,7 @@ describe('Categories service tests', function () {
   it('should return no categories', async () => {
     Categories.find = () => ({
       count: () => 0,
-      exec: () => []
+      exec: () => null
     });
     const response = await categoriesService.getCategories(
       requestStub,
