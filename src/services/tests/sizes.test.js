@@ -12,14 +12,16 @@ jest.mock('../../models', () => ({
     }
   }
 }));
+Sizes.find = jest.fn();
 
 const requestStub = {
   body: {
     name: 'M'
   },
   params: {
-    id: '12312124'
-  }
+    id: '123'
+  },
+  query: {}
 };
 const responseStub = {
   boom: {
@@ -48,15 +50,44 @@ describe('creating Size test', () => {
 describe('updating Size test', () => {
   it('successfully updates Size', async () => {
     Sizes.findByIdAndUpdate = () => ({ name: 'M' });
+    Sizes.findOne = () => null;
     await sizesService.updateSize(requestStub, responseStub);
     expect(responseStub.json).toHaveBeenCalled();
     expect(responseStub.boom.notFound).not.toHaveBeenCalled();
   });
 
   it('fails when no Size is found', async () => {
-    Sizes.findByIdAndUpdate = () => 0;
+    Sizes.findByIdAndUpdate = () => null;
+    Sizes.findOne = () => null;
+
     await sizesService.updateSize(requestStub, responseStub);
     expect(responseStub.boom.notFound).toHaveBeenCalled();
+  });
+
+  it('fails when Size already exists', async () => {
+    Sizes.findByIdAndUpdate = () => null;
+    Sizes.findOne = () => ({
+      name: 'M',
+      _id: 'someid'
+    });
+
+    await sizesService.updateSize(requestStub, responseStub);
+    expect(responseStub.boom.badRequest).toBeCalledWith(
+      'Sizes should be unique'
+    );
+  });
+
+  it('fails when trying to change Size name with its own name', async () => {
+    Sizes.findByIdAndUpdate = () => null;
+    Sizes.findOne = () => ({
+      name: 'M',
+      _id: '123'
+    });
+
+    await sizesService.updateSize(requestStub, responseStub);
+    expect(responseStub.boom.badRequest).toBeCalledWith(
+      'Size is alredy set to that value'
+    );
   });
 });
 
@@ -76,14 +107,41 @@ describe('deleting Size test', () => {
 });
 
 describe('getting Sizes', () => {
-  it('gets sizes when query given', async () => {
-    Sizes.find = jest.fn().mockReturnValue({
-      name: 'M',
-      _id: '121221'
-    });
+  it('gets sizes when query is not given', async () => {
+    const findSpy = jest.spyOn(Sizes, 'find');
+    findSpy.mockReturnValue({ length: 1 });
 
     await sizesService.getSizes(requestStub, responseStub);
 
+    expect(findSpy).toBeCalledWith({});
+    expect(responseStub.boom.notFound).not.toHaveBeenCalled();
+  });
+
+  it('gets sizes when query is given', async () => {
+    requestStub.query = {
+      _id: '123',
+      name: 'M'
+    };
+    const findSpy = jest.spyOn(Sizes, 'find');
+    findSpy.mockReturnValue({ length: 1 });
+    await sizesService.getSizes(requestStub, responseStub);
+
+    expect(findSpy).toBeCalledWith(
+      expect.objectContaining({
+        _id: '123',
+        name: 'M'
+      })
+    );
     expect(responseStub.json).toHaveBeenCalled();
+    expect(responseStub.boom.notFound).not.toHaveBeenCalled();
+  });
+
+  it('returns not found when no Sizes found', async () => {
+    const findSpy = jest.spyOn(Sizes, 'find');
+    findSpy.mockReturnValue({ length: 0 });
+
+    await sizesService.getSizes(requestStub, responseStub);
+
+    expect(responseStub.boom.notFound).toHaveBeenCalled();
   });
 });

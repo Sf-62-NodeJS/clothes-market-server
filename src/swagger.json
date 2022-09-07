@@ -312,6 +312,20 @@
                   "type": "string"
                 }
               }
+            },
+            "examples": {
+              "application/json": [
+                {
+                  "statusCode": 400,
+                  "error": "Bad Request",
+                  "message": "Size is alredy set to that value"
+                },
+                {
+                  "statusCode": 400,
+                  "error": "Bad Request",
+                  "message": "Sizes should be unique"
+                }
+              ]
             }
           },
           "500": {

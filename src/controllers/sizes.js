@@ -1,23 +1,15 @@
 const { SizesService } = require('../services/');
 
-const sizesService = new SizesService();
-
 class SizesController {
-  async createSize (req, res) {
-    return sizesService.createSize(req, res);
-  }
+  #sizesService = new SizesService();
 
-  async updateSize (req, res) {
-    return sizesService.updateSize(req, res);
-  }
+  createSize = (req, res) => this.#sizesService.createSize(req, res);
 
-  async deleteSize (req, res) {
-    return sizesService.deleteSize(req, res);
-  }
+  updateSize = (req, res) => this.#sizesService.updateSize(req, res);
 
-  async getSizes (req, res) {
-    return sizesService.getSizes(req, res);
-  }
+  deleteSize = (req, res) => this.#sizesService.deleteSize(req, res);
+
+  getSizes = (req, res) => this.#sizesService.getSizes(req, res);
 }
 
 module.exports = SizesController;
