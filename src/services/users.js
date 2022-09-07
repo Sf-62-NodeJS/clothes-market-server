@@ -103,7 +103,7 @@ class UsersService {
           user.password = newPassword;
           const salt = await bcrypt.genSalt(10);
           user.password = await bcrypt.hash(user.password, salt);
-          const updatedUserPassword = await User.findOneAndUpdate(
+          const updatedUserPassword = User.findOneAndUpdate(
             { _id: req.params.id },
             user
           );
@@ -161,7 +161,7 @@ class UsersService {
 
   async createBasicUser (req, res) {
     const statusActive = await this.getStatus('Active');
-    const newUser = await new User(req.body);
+    const newUser = new User(req.body);
     newUser.status = statusActive._id;
     const salt = await bcrypt.genSalt(10);
     newUser.password = await bcrypt.hash(newUser.password, salt);
@@ -169,7 +169,7 @@ class UsersService {
   }
 
   async checkUserExists (req, res) {
-    const userExist = await User.findOne({ email: req.body.email });
+    const userExist = User.findOne({ email: req.body.email });
     return userExist;
   }
 
