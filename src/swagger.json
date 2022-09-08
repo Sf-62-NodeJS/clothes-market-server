@@ -394,6 +394,194 @@
           }
         }
       }
+    },
+    "/categories": {
+      "post": {
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Creates category",
+        "description": "",
+        "operationId": "createCategory",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "payload",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Category created",
+            "schema": {
+              "type": "boolean"
+            },
+            "examples": {
+              "application/json": {
+                "id": 1,
+                "name": "Name 1"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/categories/": {
+      "get": {
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Gets category/es",
+        "description": "",
+        "operationId": "getCategories",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get category",
+            "schema": {
+              "type": "boolean"
+            },
+            "examples": {
+              "application/json": {
+                "id": 1,
+                "name": "Name 1"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/categories/{id}/": {
+      "put": {
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Updates category",
+        "description": "",
+        "operationId": "updateCategory",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "payload",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+          ],
+        "responses": {
+          "200": {
+            "description": "Category updated",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          "404": {
+            "description": "Category not found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/categories/{id}": {
+      "delete": {
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Deletes category",
+        "description": "",
+        "operationId": "deleteCategory",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Category deleted",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          "404": {
+            "description": "Category not found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
     }
   }
 }
