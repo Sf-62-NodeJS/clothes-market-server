@@ -24,7 +24,7 @@ class CategoriesService {
   async updateCategory (req, res) {
     const exists = await this.checkCategory(req.body.name);
 
-    if (exists !== null) {
+    if (exists) {
       return res.boom.badRequest(`Category ${req.body.name} already exists.`);
     }
 
