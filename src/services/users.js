@@ -108,8 +108,8 @@ class UsersService {
       const user = await User.findOne({ _id: req.params.id }).exec();
       const currentStatus = user.status;
       if (
-        (statusBlocked._id.toString() !== currentStatus.toString()) !==
-        statusDeleted._id.toString()
+        statusBlocked._id.toString() !== currentStatus.toString() &&
+        statusDeleted._id.toString() !== currentStatus.toString()
       ) {
         const user = await User.findByIdAndUpdate(
           req.params.id,
@@ -160,7 +160,7 @@ class UsersService {
       newUser.status = statusActive._id;
       const salt = await bcrypt.genSalt(10);
       newUser.password = await bcrypt.hash(newUser.password, salt);
-      const userExist = await User.findOne({ email: req.body.email });
+      const userExist = User.findOne({ email: req.body.email });
 
       if (!userExist) {
         const roleUser = await UserRoles.findOne({ name: userRole }).exec();
