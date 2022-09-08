@@ -335,6 +335,7 @@
           {
             "name": "status",
             "in": "formData",
+            "description": "You can use Available or Not available.",
             "required": false,
             "type": "string"
           }

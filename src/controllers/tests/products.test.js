@@ -56,6 +56,11 @@ jest.mock('../../models', () => ({
         exec: () => true
       };
     }
+  },
+  ProductStatuses: class ProductStatuses {
+    static findOne () {
+      return { _id: '123asdasd' };
+    }
   }
 }));
 

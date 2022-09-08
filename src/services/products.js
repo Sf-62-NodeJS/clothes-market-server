@@ -1,9 +1,19 @@
-const { Product } = require('../models');
+const { Product, ProductStatuses } = require('../models');
 const { productImageService } = require('../uploads');
 
 class ProductsService {
+  async setStatus (statusName) {
+    const result = await ProductStatuses.findOne({
+      name: { $regex: statusName, $options: 'i' }
+    });
+
+    return result._id;
+  }
+
   async createProduct (req, res) {
     await productImageService.uploadImage(req);
+    req.body.status = await this.setStatus('Available');
+
     const product = await new Product(req.body).save();
 
     return res.json(product);
@@ -20,6 +30,11 @@ class ProductsService {
       await productImageService.uploadImage(req);
     }
 
+    if (req.body.status) {
+      req.body.status = await this.setStatus(req.body.status);
+      console.log(req.body.status);
+    }
+
     const product = await Product.findByIdAndUpdate(
       req.params.id,
       req.body
@@ -30,22 +45,22 @@ class ProductsService {
 
   async getProducts (req, res) {
     const { _id, name, category, sizes, status, minPrice, maxPrice } =
-            (typeof req.query !== 'undefined' && req.query) || {};
+      req.query;
     const query = {};
 
-    if (_id != null) {
+    if (_id) {
       query._id = _id;
     }
-    if (name != null) {
+    if (name) {
       query.name = { $regex: name, $options: 'i' };
     }
-    if (category != null) {
+    if (category) {
       query.category = category;
     }
-    if (sizes != null) {
+    if (sizes) {
       query.sizes = sizes;
     }
-    if (status != null) {
+    if (status) {
       query.status = status;
     }
     if (+Math.abs(minPrice)) {

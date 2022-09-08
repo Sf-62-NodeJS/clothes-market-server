@@ -1,22 +1,14 @@
 const { ProductsService } = require('../services');
-
-const productsService = new ProductsService();
 class ProductsController {
-  async createProduct (req, res) {
-    return productsService.createProduct(req, res);
-  }
+  #productsService = new ProductsService();
 
-  async updateProduct (req, res) {
-    return productsService.updateProduct(req, res);
-  }
+  createProduct = (req, res) => this.#productsService.createProduct(req, res);
 
-  async getProducts (req, res) {
-    return productsService.getProducts(req, res);
-  }
+  updateProduct = (req, res) => this.#productsService.updateProduct(req, res);
 
-  async deleteProduct (req, res) {
-    return productsService.deleteProduct(req, res);
-  }
+  getProducts = (req, res) => this.#productsService.getProducts(req, res);
+
+  deleteProduct = (req, res) => this.#productsService.deleteProduct(req, res);
 }
 
 module.exports = ProductsController;

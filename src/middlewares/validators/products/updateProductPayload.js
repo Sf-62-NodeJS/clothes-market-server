@@ -6,6 +6,7 @@ const updateProductPayloadValidator = (req, res, next) => {
     description: Joi.string().min(2).max(30),
     category: Joi.string().alphanum().min(24),
     sizes: Joi.string().alphanum().min(24),
+    status: Joi.string().min(9).max(13),
     price: Joi.number()
   });
   const { error } = schema.validate(req.body);
