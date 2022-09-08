@@ -1,19 +1,32 @@
-const { Product, ProductStatuses } = require('../models');
+const { Product, ProductStatuses, Categories } = require('../models');
 const { productImageService } = require('../uploads');
 
 class ProductsService {
   async setStatus (statusName) {
-    const result = ProductStatuses.findOne({
+    const status = await ProductStatuses.findOne({
       name: { $regex: statusName, $options: 'i' }
-    });
+    }).exec();
 
-    return result._id;
+    return status._id;
+  }
+
+  async setCategory (categoryName) {
+    const category = await Categories.findOne({
+      name: { $regex: categoryName, $options: 'i' }
+    }).exec();
+
+    return category ? category._id : null;
   }
 
   async createProduct (req, res) {
-    await productImageService.uploadImage(req);
+    const category = await this.setCategory(req.body.category);
+    if (!category) {
+      return res.boom.notFound(`Category ${req.body.category} doesn't exist.`);
+    }
+    req.body.category = category;
     req.body.status = await this.setStatus('Available');
 
+    await productImageService.uploadImage(req);
     const product = await new Product(req.body).save();
 
     return res.json(product);
@@ -32,7 +45,6 @@ class ProductsService {
 
     if (req.body.status) {
       req.body.status = await this.setStatus(req.body.status);
-      console.log(req.body.status);
     }
 
     const product = await Product.findByIdAndUpdate(

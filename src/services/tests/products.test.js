@@ -1,5 +1,5 @@
 const { ProductsService } = require('..');
-const { Product } = require('../../models');
+const { Product, Categories } = require('../../models');
 
 jest.mock('../../models', () => ({
   Product: class Product {
@@ -56,7 +56,12 @@ jest.mock('../../models', () => ({
   },
   ProductStatuses: class ProductStatuses {
     static findOne () {
-      return { _id: '123asdasd' };
+      return { exec: () => ({ _id: '123asdasd' }) };
+    }
+  },
+  Categories: class Categories {
+    static findOne () {
+      return { exec: () => ({ _id: '123asdasd' }) };
     }
   }
 }));
@@ -114,6 +119,16 @@ describe('Products service tests', function () {
     });
   });
 
+  it('should return that category does not exist', async () => {
+    Categories.findOne = () => ({ exec: () => null });
+    const response = await productsService.createProduct(
+      requestStub,
+      responseStub
+    );
+
+    expect(response).toBeFalsy();
+  });
+
   it('should return all products', async () => {
     const response = await productsService.getProducts(
       requestStub,
@@ -140,7 +155,7 @@ describe('Products service tests', function () {
       count: () => 0,
       skip: () => ({
         limit: () => ({
-          exec: () => []
+          exec: () => null
         })
       })
     });
