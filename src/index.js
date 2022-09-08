@@ -8,18 +8,18 @@ const winston = require('winston');
 const app = express();
 const swaggerUi = require('swagger-ui-express');
 const swagger = require('./swagger.json');
-const { usersRouter } = require('./routers');
+const { usersRouter, categoriesRouter } = require('./routers');
 const mongoose = require('mongoose');
 const { database, up } = require('migrate-mongo');
 
 const loggerOptions = {
   transports:
-        process.env.NODE_ENV === 'production'
-          ? [
-              new winston.transports.Console(),
-              new winston.transports.File({ filename: 'stdout.log' })
-            ]
-          : [new winston.transports.Console()],
+    process.env.NODE_ENV === 'production'
+      ? [
+          new winston.transports.Console(),
+          new winston.transports.File({ filename: 'stdout.log' })
+        ]
+      : [new winston.transports.Console()],
   format: winston.format.combine(
     winston.format.colorize(),
     winston.format.json()
@@ -60,17 +60,20 @@ mongoose.connect(process.env.MONGO_URL, async (error) => {
 
 // Routes
 app.use('/users', usersRouter);
+app.use('/categories', categoriesRouter);
 app.disable('etag');
 
-app.listen(process.env.PORT, (err) => {
-  if (err) {
-    console.error(err.message);
-  }
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(process.env.PORT || 5000, (err) => {
+    if (err) {
+      console.error(err.message);
+    }
 
-  console.log(`Server started at http://localhost:${process.env.PORT}`);
-  console.log(
-        `Open swagger ui at http://localhost:${process.env.PORT}/swagger`
-  );
-});
+    console.log(`Server started at http://localhost:${process.env.PORT}`);
+    console.log(
+      `Open swagger ui at http://localhost:${process.env.PORT}/swagger`
+    );
+  });
+}
 
 module.exports = app;
