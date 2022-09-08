@@ -119,7 +119,7 @@ describe('Products service tests', function () {
     });
   });
 
-  it('should return that category does not exist', async () => {
+  it('should return that category does not exist on create product', async () => {
     Categories.findOne = () => ({ exec: () => null });
     const response = await productsService.createProduct(
       requestStub,
@@ -168,12 +168,23 @@ describe('Products service tests', function () {
   });
 
   it('should return updated product by id', async () => {
+    Categories.findOne = () => ({ exec: () => ({ _id: '123asdasd' }) });
     const response = await productsService.updateProduct(
       requestStub,
       responseStub
     );
 
     expect(response).toEqual(true);
+  });
+
+  it('should return that category does not exist on update product', async () => {
+    Categories.findOne = () => ({ exec: () => null });
+    const response = await productsService.updateProduct(
+      requestStub,
+      responseStub
+    );
+
+    expect(response).toBeFalsy();
   });
 
   it('should return deleted product by id', async () => {

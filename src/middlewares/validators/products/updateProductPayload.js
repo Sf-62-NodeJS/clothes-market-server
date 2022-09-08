@@ -4,7 +4,7 @@ const updateProductPayloadValidator = (req, res, next) => {
   const schema = Joi.object({
     name: Joi.string().min(2).max(30),
     description: Joi.string().min(2).max(30),
-    category: Joi.string().alphanum().min(24),
+    category: Joi.string(),
     sizes: Joi.string().alphanum().min(24),
     status: Joi.string().min(9).max(13),
     price: Joi.number()

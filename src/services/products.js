@@ -20,9 +20,11 @@ class ProductsService {
 
   async createProduct (req, res) {
     const category = await this.setCategory(req.body.category);
+
     if (!category) {
       return res.boom.notFound(`Category ${req.body.category} doesn't exist.`);
     }
+
     req.body.category = category;
     req.body.status = await this.setStatus('Available');
 
@@ -35,16 +37,30 @@ class ProductsService {
   async updateProduct (req, res) {
     const available = await Product.findById(req.params.id).exec();
 
-    if (req.files && available) {
-      if (available.image.length !== 0) {
-        await productImageService.deleteImage(available.image);
+    if (available) {
+      if (req.body.category) {
+        const category = await this.setCategory(req.body.category);
+
+        if (!category) {
+          return res.boom.notFound(
+            `Category ${req.body.category} doesn't exist.`
+          );
+        }
+
+        req.body.category = category;
       }
 
-      await productImageService.uploadImage(req);
-    }
+      if (req.files) {
+        if (available.image.length !== 0) {
+          await productImageService.deleteImage(available.image);
+        }
 
-    if (req.body.status) {
-      req.body.status = await this.setStatus(req.body.status);
+        await productImageService.uploadImage(req);
+      }
+
+      if (req.body.status) {
+        req.body.status = await this.setStatus(req.body.status);
+      }
     }
 
     const product = await Product.findByIdAndUpdate(
