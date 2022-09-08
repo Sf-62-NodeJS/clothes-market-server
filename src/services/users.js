@@ -109,7 +109,7 @@ class UsersService {
       const currentStatus = user.status;
       if (
         (statusBlocked._id.toString() !== currentStatus.toString()) !==
-        statusDeleted._id.toString
+        statusDeleted._id.toString()
       ) {
         const user = await User.findByIdAndUpdate(
           req.params.id,
