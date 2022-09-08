@@ -87,13 +87,16 @@ jest.mock(
 
 describe('Products integration tests', function () {
   it('should create product', async () => {
-    const response = await request(app).post('/products').send({
-      name: 'Name',
-      description: 'Description',
-      category: '123456789123456789123456',
-      sizes: '123456789123456789123456',
-      price: 2.0
-    });
+    const response = await request(app)
+      .post('/products')
+      .set('role', 'Admin')
+      .send({
+        name: 'Name',
+        description: 'Description',
+        category: '123456789123456789123456',
+        sizes: '123456789123456789123456',
+        price: 2.0
+      });
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual({
@@ -171,18 +174,23 @@ describe('Products integration tests', function () {
   });
 
   it('should return updated product by id', async () => {
-    const response = await request(app).put('/products/18ad122xa3e').send({
-      name: 'Name',
-      description: 'Description',
-      price: 2.0
-    });
+    const response = await request(app)
+      .put('/products/18ad122xa3e')
+      .set('role', 'Admin')
+      .send({
+        name: 'Name',
+        description: 'Description',
+        price: 2.0
+      });
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual(true);
   });
 
   it('should return deleted product by id', async () => {
-    const response = await request(app).delete('/products/19ad122xa3e');
+    const response = await request(app)
+      .delete('/products/19ad122xa3e')
+      .set('role', 'Admin');
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual(true);
