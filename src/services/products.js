@@ -3,7 +3,7 @@ const { productImageService } = require('../uploads');
 
 class ProductsService {
   async setStatus (statusName) {
-    const result = await ProductStatuses.findOne({
+    const result = ProductStatuses.findOne({
       name: { $regex: statusName, $options: 'i' }
     });
 
@@ -74,7 +74,7 @@ class ProductsService {
       query.price = { $gte: minPrice, $lte: maxPrice };
     }
 
-    const count = await Product.find(query).count();
+    const count = Product.find(query).count();
     const products = await Product.find(query)
       .skip(+req.query.skip || 0)
       .limit(+req.query.take || 50)
@@ -82,7 +82,7 @@ class ProductsService {
 
     return {
       total_size: count,
-      products: products ? res.json(products) : res.json([])
+      list: products ? res.json(products) : res.json([])
     };
   }
 

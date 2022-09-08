@@ -119,7 +119,7 @@ describe('productsController tests', function () {
     );
 
     expect(response).toEqual({
-      products: {
+      list: {
         id: '17ad122xa3e',
         name: 'N',
         image: 'img.png',

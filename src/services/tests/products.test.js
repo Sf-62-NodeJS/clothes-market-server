@@ -121,7 +121,7 @@ describe('Products service tests', function () {
     );
 
     expect(response).toEqual({
-      products: {
+      list: {
         id: '17ad122xa3e',
         name: 'N',
         image: 'img.png',
@@ -149,7 +149,7 @@ describe('Products service tests', function () {
       responseStub
     );
 
-    expect(response).toEqual({ products: [], total_size: 0 });
+    expect(response).toEqual({ list: [], total_size: 0 });
   });
 
   it('should return updated product by id', async () => {
