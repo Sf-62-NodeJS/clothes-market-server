@@ -8,7 +8,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "start": "node ../clothes-market-server/src/index.js",
-    "start:dev": "set NODE_ENV=development & node ../clothes-market-server/src/index.js",
+    "start:dev": "NODE_ENV=development node ../clothes-market-server/src/index.js",
     "start:prod": "NODE_ENV=production node ../clothes-market-server/src/index.js",
     "docker:compose": "docker pull node && docker pull mongo && docker-compose -f ../clothes-market-server/docker-compose.yml up --build"
   },

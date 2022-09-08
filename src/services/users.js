@@ -5,50 +5,24 @@ const bcrypt = require('bcryptjs');
 
 class UsersService {
   async createUser (req, res) {
-    try {
-      const userExist = await this.checkUserExists(req);
-      if (!userExist) {
-        const roleUser = await this.getRole('User');
-        const newUser = await this.createBasicUser(req);
-        newUser.role = roleUser._id;
-        await newUser.save();
-        return newUser ? res.json(true) : res.boom.notFound();
-      } else {
-        res.boom.badRequest('user already exists');
-      }
-    } catch (err) {
-      res.boom.badRequest();
-    }
+    await this.#createBaseUser(req, res, 'User');
   }
 
   async createAdmin (req, res) {
-    try {
-      const userExist = await this.checkUserExists(req);
-      if (!userExist) {
-        const roleAdmin = await this.getRole('Admin');
-        const newAdmin = await this.createBasicUser(req);
-        newAdmin.role = roleAdmin._id;
-        await newAdmin.save();
-        return newAdmin ? res.json(true) : res.boom.notFound();
-      } else {
-        res.boom.badRequest('user already exists');
-      }
-    } catch (err) {
-      res.boom.badRequest();
-    }
+    await this.#createBaseUser(req, res, 'Admin');
   }
 
   async getUsers (req, res) {
-    const { _id, name, email, status, role, skip, take } =
-      (typeof req.query !== 'undefined' && req.query) || {};
+    const { _id, name, email, status, role, skip, take } = req.query;
+
     const query = {};
-    if (_id != null) query._id = _id;
-    if (name != null) query.name = name;
-    if (email != null) query.email = email;
-    if (status != null) query.status = status;
-    if (role != null) query.role = role;
-    if (skip != null) query.skip = skip;
-    if (take != null) query.take = take;
+    if (_id) query._id = _id;
+    if (name) query.name = name;
+    if (email) query.email = email;
+    if (status) query.status = status;
+    if (role) query.role = role;
+    if (skip) query.skip = skip;
+    if (take) query.take = take;
 
     try {
       const users = await User.find(query)
@@ -70,8 +44,11 @@ class UsersService {
 
   async updateUser (req, res) {
     try {
-      const currentStatus = await this.getCurrentStatus(req);
-      const statusActive = await this.getStatus('Active');
+      const user = await User.findOne({ _id: req.params.id }).exec();
+      const currentStatus = user.status;
+      const statusActive = await UserStatuses.findOne({
+        name: 'Active'
+      }).exec();
       if (currentStatus.toString() === statusActive._id.toString()) {
         const updated = await User.findByIdAndUpdate(req.params.id, req.body, {
           new: true
@@ -87,8 +64,11 @@ class UsersService {
 
   async updateUserPassword (req, res) {
     try {
-      const currentStatus = await this.getCurrentStatus(req);
-      const statusActive = await this.getStatus('Active');
+      const user = await User.findOne({ _id: req.params.id }).exec();
+      const currentStatus = user.status;
+      const statusActive = await UserStatuses.findOne({
+        name: 'Active'
+      }).exec();
       if (currentStatus.toString() === statusActive._id.toString()) {
         const { oldPassword, newPassword } = req.body;
         const user = await User.findOne({ _id: req.params.id }).exec();
@@ -119,9 +99,18 @@ class UsersService {
 
   async blockUser (req, res) {
     try {
-      const statusBlocked = await this.getStatus('Blocked');
-      const currentStatus = await this.getCurrentStatus(req);
-      if (statusBlocked._id.toString() !== currentStatus.toString()) {
+      const statusBlocked = await UserStatuses.findOne({
+        name: 'Blocked'
+      }).exec();
+      const statusDeleted = await UserStatuses.findOne({
+        name: 'Deleted'
+      }).exec();
+      const user = await User.findOne({ _id: req.params.id }).exec();
+      const currentStatus = user.status;
+      if (
+        (statusBlocked._id.toString() !== currentStatus.toString()) !==
+        statusDeleted._id.toString
+      ) {
         const user = await User.findByIdAndUpdate(
           req.params.id,
           { status: statusBlocked._id },
@@ -140,8 +129,11 @@ class UsersService {
 
   async deleteUser (req, res) {
     try {
-      const statusDeleted = await this.getStatus('Deleted');
-      const currentStatus = await this.getCurrentStatus(req);
+      const statusDeleted = await UserStatuses.findOne({
+        name: 'Deleted'
+      }).exec();
+      const user = await User.findOne({ _id: req.params.id }).exec();
+      const currentStatus = user.status;
       if (statusDeleted._id.toString() !== currentStatus.toString()) {
         const user = await User.findByIdAndUpdate(
           req.params.id,
@@ -159,33 +151,28 @@ class UsersService {
     }
   }
 
-  async createBasicUser (req, res) {
-    const statusActive = await this.getStatus('Active');
-    const newUser = new User(req.body);
-    newUser.status = statusActive._id;
-    const salt = await bcrypt.genSalt(10);
-    newUser.password = await bcrypt.hash(newUser.password, salt);
-    return newUser;
-  }
+  async #createBaseUser (req, res, userRole) {
+    try {
+      const statusActive = await UserStatuses.findOne({
+        name: 'Active'
+      }).exec();
+      const newUser = new User(req.body);
+      newUser.status = statusActive._id;
+      const salt = await bcrypt.genSalt(10);
+      newUser.password = await bcrypt.hash(newUser.password, salt);
+      const userExist = await User.findOne({ email: req.body.email });
 
-  async checkUserExists (req, res) {
-    const userExist = User.findOne({ email: req.body.email });
-    return userExist;
-  }
-
-  async getStatus (statusName) {
-    const status = await UserStatuses.findOne({ name: statusName }).exec();
-    return status;
-  }
-
-  async getRole (roleName) {
-    const role = await UserRoles.findOne({ name: roleName }).exec();
-    return role;
-  }
-
-  async getCurrentStatus (req, res) {
-    const user = await User.findOne({ _id: req.params.id }).exec();
-    return user.status;
+      if (!userExist) {
+        const roleUser = await UserRoles.findOne({ name: userRole }).exec();
+        newUser.role = roleUser._id;
+        await newUser.save();
+        return newUser ? res.json(true) : res.boom.notFound();
+      } else {
+        res.boom.badRequest('user already exists');
+      }
+    } catch (err) {
+      res.boom.badRequest();
+    }
   }
 }
 module.exports = UsersService;
