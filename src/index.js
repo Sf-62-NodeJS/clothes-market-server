@@ -8,7 +8,12 @@ const winston = require('winston');
 const app = express();
 const swaggerUi = require('swagger-ui-express');
 const swagger = require('./swagger.json');
-const { usersRouter, productsRouter, categoriesRouter } = require('./routers');
+const {
+  usersRouter,
+  productsRouter,
+  categoriesRouter,
+  commentsRouter
+} = require('./routers');
 const mongoose = require('mongoose');
 const { database, up } = require('migrate-mongo');
 const fileUpload = require('express-fileupload');
@@ -64,6 +69,7 @@ mongoose.connect(process.env.MONGO_URL, async (error) => {
 app.use('/users', usersRouter);
 app.use('/products', productsRouter);
 app.use('/categories', categoriesRouter);
+app.use('/comments', commentsRouter);
 app.disable('etag');
 
 if (process.env.NODE_ENV !== 'test') {
