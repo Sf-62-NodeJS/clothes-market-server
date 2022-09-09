@@ -74,8 +74,10 @@ describe('Products service tests', function () {
   const productsService = new ProductsService();
   const requestStub = {
     headers: {
-      role: 'Admin',
       authorization: 'some token'
+    },
+    userInfo: {
+      role: 'Admin'
     },
     body: {
       name: 'Name',
@@ -181,7 +183,22 @@ describe('Products service tests', function () {
     expect(response).toEqual(true);
   });
 
+  it('should return product not exist when update', async () => {
+    Product.findById = () => ({
+      exec: () => false
+    });
+    const response = await productsService.updateProduct(
+      requestStub,
+      responseStub
+    );
+
+    expect(response).toBeFalsy();
+  });
+
   it('should return that category does not exist on update product', async () => {
+    Product.findById = () => ({
+      exec: () => true
+    });
     Categories.findOne = () => ({ exec: () => null });
     const response = await productsService.updateProduct(
       requestStub,

@@ -51,7 +51,7 @@ class ProductsService {
       }
 
       if (req.files) {
-        if (available.image.length !== 0) {
+        if (available.image.length) {
           await productImageService.deleteImage(available.image);
         }
 
@@ -61,6 +61,8 @@ class ProductsService {
       if (req.body.status) {
         req.body.status = await this.setStatus(req.body.status);
       }
+    } else {
+      return res.boom.notFound('Product not found');
     }
 
     const product = await Product.findByIdAndUpdate(

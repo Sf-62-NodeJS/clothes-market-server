@@ -2,13 +2,13 @@ const verifyRole = require('../../auth/verifyRole');
 
 describe('verifyRole tests', () => {
   const requestStub = {
-    headers: {
+    userInfo: {
       role: 'User'
     }
   };
 
   const requestStubFalse = {
-    headers: {
+    userInfo: {
       some: 'false'
     }
   };

@@ -41,8 +41,10 @@ describe('Categories service tests', function () {
   const categoriesService = new CategoriesService();
   const requestStub = {
     headers: {
-      role: 'Admin',
       authorization: 'some token'
+    },
+    userInfo: {
+      role: 'Admin'
     },
     body: {
       name: 'Name'

@@ -52,7 +52,6 @@ describe('Categories integration tests', function () {
   it('should create category', async () => {
     const response = await request(app)
       .post('/categories')
-      .set('role', 'Admin')
       .send({ name: 'Name' });
 
     expect(response.statusCode).toBe(200);
@@ -60,21 +59,16 @@ describe('Categories integration tests', function () {
   });
 
   it('should update category', async () => {
-    const response = await request(app)
-      .put('/categories/13ad122xa2ae')
-      .set('role', 'Admin')
-      .send({
-        name: 'Name'
-      });
+    const response = await request(app).put('/categories/13ad122xa2ae').send({
+      name: 'Name'
+    });
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual(true);
   });
 
   it('should delete category', async () => {
-    const response = await request(app)
-      .delete('/categories/13ad122xa2ae')
-      .set('role', 'Admin');
+    const response = await request(app).delete('/categories/13ad122xa2ae');
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual(true);

@@ -4,17 +4,19 @@ const {
   createProductPayloadValidator,
   updateProductPayloadValidator
 } = require('../middlewares/validators');
-const { verifyRole } = require('../middlewares/auth');
+const { checkAuth, verifyRole } = require('../middlewares/auth');
 
 const productsController = new ProductsController();
 productsRouter.post(
   '/',
+  checkAuth,
   verifyRole('Admin', 'Super admin'),
   createProductPayloadValidator,
   productsController.createProduct
 );
 productsRouter.put(
   '/:id',
+  checkAuth,
   verifyRole('Admin', 'Super admin'),
   updateProductPayloadValidator,
   productsController.updateProduct
@@ -22,6 +24,7 @@ productsRouter.put(
 productsRouter.get('/', productsController.getProducts);
 productsRouter.delete(
   '/:id',
+  checkAuth,
   verifyRole('Admin', 'Super admin'),
   productsController.deleteProduct
 );
