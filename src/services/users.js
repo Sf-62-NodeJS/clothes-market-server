@@ -59,7 +59,7 @@ class UsersService {
         res.boom.badRequest('user is not active');
       }
     } catch (err) {
-      return res.boom.notFound();
+      return res.boom.badRequest();
     }
   }
 
@@ -95,7 +95,7 @@ class UsersService {
         }
       }
     } catch {
-      res.boom.notFound();
+      res.boom.badRequest();
     }
   }
 
@@ -123,7 +123,7 @@ class UsersService {
         return res.boom.badRequest('user already blocked');
       }
     } catch (err) {
-      res.boom.notFound();
+      res.boom.badRequest();
     }
   }
 
@@ -148,7 +148,7 @@ class UsersService {
         return res.boom.badRequest('user already deleted');
       }
     } catch (err) {
-      res.boom.notFound();
+      res.boom.badRequest();
     }
   }
 
