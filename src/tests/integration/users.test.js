@@ -115,14 +115,80 @@ jest.mock('bcryptjs', () => ({
 }));
 
 describe('Users integration tests', function () {
-  it('should create user', async () => {
-    User.findOne = () => null;
+  it('should create user if user is deleted', async () => {
+    User.find = () => {
+      return {
+        exec: () => [
+          {
+            _id: '12ad122xa7babc',
+            email: 'email123@gmail.com',
+            status: '12ad122xa7b'
+          }
+        ]
+      };
+    };
     UserRoles.findOne = () => {
       return {
         exec: () => ({
           _id: '12ad122xa7b',
           name: 'User'
         })
+      };
+    };
+    UserStatuses.find = () => {
+      return {
+        exec: () => [
+          {
+            _id: '12ad122xa7w',
+            name: 'Active'
+          },
+          {
+            _id: '12ad122xa7b',
+            name: 'Deleted'
+          }
+        ]
+      };
+    };
+    const response = await request(app).post('/users').send({
+      name: 'Name',
+      middleName: 'middlename',
+      surname: 'surname',
+      email: 'email5@gmail.com',
+      password: 'dasasdasfdsad',
+      phoneNumber: '0897123456',
+      address: 'address 10'
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toEqual(true);
+  });
+
+  it('should create user', async () => {
+    User.find = () => {
+      return {
+        exec: () => []
+      };
+    };
+    UserRoles.findOne = () => {
+      return {
+        exec: () => ({
+          _id: '12ad122xa7b',
+          name: 'User'
+        })
+      };
+    };
+    UserStatuses.find = () => {
+      return {
+        exec: () => [
+          {
+            _id: '12ad122xa7w',
+            name: 'Active'
+          },
+          {
+            _id: '12ad122xa7b',
+            name: 'Deleted'
+          }
+        ]
       };
     };
     const response = await request(app).post('/users').send({
@@ -140,6 +206,28 @@ describe('Users integration tests', function () {
   });
 
   it('should return all users', async () => {
+    User.find = () => {
+      return {
+        select: () => ({
+          skip: () => ({
+            limit: () => ({
+              exec: () => ({
+                id: '12ad122xa7e',
+                name: 'Nameabc',
+                middleName: 'middlename',
+                surname: 'surname',
+                email: 'email@gmail.com',
+                phoneNumber: '0897123456',
+                address: 'address 10'
+              })
+            })
+          })
+        }),
+        countDocuments: () => ({
+          exec: () => 1
+        })
+      };
+    };
     const response = await request(app).get('/users/');
 
     expect(response.statusCode).toBe(200);
@@ -155,6 +243,28 @@ describe('Users integration tests', function () {
   });
 
   it('should return all users with query params', async () => {
+    User.find = () => {
+      return {
+        select: () => ({
+          skip: () => ({
+            limit: () => ({
+              exec: () => ({
+                id: '12ad122xa7e',
+                name: 'Nameabc',
+                middleName: 'middlename',
+                surname: 'surname',
+                email: 'email@gmail.com',
+                phoneNumber: '0897123456',
+                address: 'address 10'
+              })
+            })
+          })
+        }),
+        countDocuments: () => ({
+          exec: () => 1
+        })
+      };
+    };
     const response = await request(app).get(
       '/users/?_id=234235sfsfeq234&name=Name&email=email@yahoo.com&status=214sf43524d&role=234segf53452&skip=1&take=50'
     );
@@ -233,13 +343,31 @@ describe('Users integration tests', function () {
   });
 
   it('should create admin', async () => {
-    User.findOne = () => null;
+    User.find = () => {
+      return {
+        exec: () => []
+      };
+    };
     UserRoles.findOne = () => {
       return {
         exec: () => ({
           _id: '12ad122xa7k',
           name: 'Admin'
         })
+      };
+    };
+    UserStatuses.find = () => {
+      return {
+        exec: () => [
+          {
+            _id: '12ad122xa7w',
+            name: 'Active'
+          },
+          {
+            _id: '12ad122xa7b',
+            name: 'Deleted'
+          }
+        ]
       };
     };
     const response = await request(app).post('/users/admin').send({
@@ -272,12 +400,18 @@ describe('Users integration tests', function () {
         })
       };
     };
-    UserStatuses.findOne = () => {
+    UserStatuses.find = () => {
       return {
-        exec: () => ({
-          _id: '12ad122xa7w',
-          name: 'Blocked'
-        })
+        exec: () => [
+          {
+            _id: '12ad122xa7w',
+            name: 'Blocked'
+          },
+          {
+            _id: '12ad122xa7b',
+            name: 'Deleted'
+          }
+        ]
       };
     };
     const response = await request(app).patch('/users/block/12ad122xa9e');

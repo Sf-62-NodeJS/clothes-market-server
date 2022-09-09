@@ -45,6 +45,7 @@ class UsersService {
   async updateUser (req, res) {
     try {
       const user = await User.findOne({ _id: req.params.id }).exec();
+      if (!user) return res.boom.notFound();
       const currentStatus = user.status;
       const statusActive = await UserStatuses.findOne({
         name: 'Active'
@@ -65,6 +66,7 @@ class UsersService {
   async updateUserPassword (req, res) {
     try {
       const user = await User.findOne({ _id: req.params.id }).exec();
+      if (!user) return res.boom.notFound();
       const currentStatus = user.status;
       const statusActive = await UserStatuses.findOne({
         name: 'Active'
@@ -99,13 +101,11 @@ class UsersService {
 
   async blockUser (req, res) {
     try {
-      const statusBlocked = await UserStatuses.findOne({
-        name: 'Blocked'
-      }).exec();
-      const statusDeleted = await UserStatuses.findOne({
-        name: 'Deleted'
-      }).exec();
+      const statuses = await UserStatuses.find().exec();
+      const statusBlocked = statuses.find(({ name }) => name === 'Blocked');
+      const statusDeleted = statuses.find(({ name }) => name === 'Deleted');
       const user = await User.findOne({ _id: req.params.id }).exec();
+      if (!user) return res.boom.notFound();
       const currentStatus = user.status;
       if (
         statusBlocked._id.toString() !== currentStatus.toString() &&
@@ -133,6 +133,7 @@ class UsersService {
         name: 'Deleted'
       }).exec();
       const user = await User.findOne({ _id: req.params.id }).exec();
+      if (!user) return res.boom.notFound();
       const currentStatus = user.status;
       if (statusDeleted._id.toString() !== currentStatus.toString()) {
         const user = await User.findByIdAndUpdate(
@@ -153,16 +154,23 @@ class UsersService {
 
   async #createBaseUser (req, res, userRole) {
     try {
-      const statusActive = await UserStatuses.findOne({
-        name: 'Active'
-      }).exec();
-      const newUser = new User(req.body);
-      newUser.status = statusActive._id;
-      const salt = await bcrypt.genSalt(10);
-      newUser.password = await bcrypt.hash(newUser.password, salt);
-      const userExist = User.findOne({ email: req.body.email });
+      const statuses = await UserStatuses.find().exec();
+      const statusActive = statuses.find(({ name }) => name === 'Active');
+      const statusDeleted = statuses.find(({ name }) => name === 'Deleted');
 
-      if (!userExist) {
+      const users = await User.find({ email: req.body.email }).exec();
+      const activeUser = users.find(
+        (user) => user.status.toString() === statusActive._id.toString()
+      );
+      const deletedUser = users.find(
+        (user) => user.status.toString() === statusDeleted._id.toString()
+      );
+
+      if (!users.length || (deletedUser && !activeUser)) {
+        const newUser = new User(req.body);
+        newUser.status = statusActive._id;
+        const salt = await bcrypt.genSalt(10);
+        newUser.password = await bcrypt.hash(newUser.password, salt);
         const roleUser = await UserRoles.findOne({ name: userRole }).exec();
         newUser.role = roleUser._id;
         await newUser.save();

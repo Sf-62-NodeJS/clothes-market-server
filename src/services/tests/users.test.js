@@ -1,7 +1,6 @@
 const { UsersService } = require('..');
 const { User } = require('../../models');
 const { UserStatuses } = require('../../models');
-// const { UserRoles } = require('../../models');
 
 jest.mock('../../models', () => ({
   User: class User {
@@ -143,21 +142,6 @@ describe('Users service tests', function () {
     json: (payload) => payload
   };
 
-  /* it('should create user', async () => {
-    User.findOne = () => null;
-    UserRoles.findOne = () => {
-      return {
-        exec: () => ({
-          _id: '12ad122xa7b',
-          name: 'User'
-        })
-      };
-    };
-    const response = await usersService.createUser(requestStub, responseStub);
-
-    expect(response).toEqual(true);
-  }); */
-
   it('should return all users', async () => {
     const response = await usersService.getUsers(requestStub, responseStub);
 
@@ -196,21 +180,6 @@ describe('Users service tests', function () {
     expect(response).toEqual(true);
   });
 
-  /* it('should create admin', async () => {
-    User.findOne = () => null;
-    UserRoles.findOne = () => {
-      return {
-        exec: () => ({
-          _id: '12ad122xa7k',
-          name: 'Admin'
-        })
-      };
-    };
-    const response = await usersService.createAdmin(requestStub, responseStub);
-
-    expect(response).toEqual(true);
-  }); */
-
   it('should block user', async () => {
     User.findOne = () => {
       return {
@@ -227,12 +196,18 @@ describe('Users service tests', function () {
         })
       };
     };
-    UserStatuses.findOne = () => {
+    UserStatuses.find = () => {
       return {
-        exec: () => ({
-          _id: '12ad122xa7w',
-          name: 'Blocked'
-        })
+        exec: () => [
+          {
+            _id: '12ad122xa7w',
+            name: 'Blocked'
+          },
+          {
+            _id: '12ad122xa7b',
+            name: 'Deleted'
+          }
+        ]
       };
     };
     const response = await usersService.blockUser(requestStub, responseStub);
