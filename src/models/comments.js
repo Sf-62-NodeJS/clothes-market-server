@@ -5,7 +5,7 @@ const commentsSchema = new mongoose.Schema({
   replyComments: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Comments'
+      ref: 'ReplyComments'
     }
   ]
 });

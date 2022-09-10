@@ -1,4 +1,4 @@
-const { Comments, Product } = require('../models');
+const { Comments, Product, ReplyComments } = require('../models');
 
 class CommentsService {
   async checkProduct (productId) {
@@ -33,7 +33,7 @@ class CommentsService {
   }
 
   async getComments (req, res) {
-    const product = await this.checkProduct(req.body.productId);
+    const product = await this.checkProduct(req.query.productId);
 
     if (!product) return res.boom.notFound('Product not found.');
 
@@ -51,7 +51,26 @@ class CommentsService {
   async deleteComment (req, res) {
     const comment = await Comments.findByIdAndDelete(req.params.id).exec();
 
-    return comment ? res.json(true) : res.boom.notFound();
+    if (comment) {
+      if (comment.replyComments) {
+        await this.deleteReplies(comment.replyComments);
+      }
+
+      await Product.findOneAndUpdate(
+        { comments: req.params.id },
+        { $pullAll: { comments: [{ _id: req.params.id }] } }
+      );
+
+      return res.json(true);
+    } else {
+      return res.boom.notFound();
+    }
+  }
+
+  async deleteReplies (replyComments) {
+    return await ReplyComments.deleteMany({
+      _id: { $in: replyComments }
+    }).exec();
   }
 }
 

@@ -12,7 +12,8 @@ const {
   usersRouter,
   productsRouter,
   categoriesRouter,
-  commentsRouter
+  commentsRouter,
+  replyCommentsRouter
 } = require('./routers');
 const mongoose = require('mongoose');
 const { database, up } = require('migrate-mongo');
@@ -70,6 +71,7 @@ app.use('/users', usersRouter);
 app.use('/products', productsRouter);
 app.use('/categories', categoriesRouter);
 app.use('/comments', commentsRouter);
+app.use('/replyComments', replyCommentsRouter);
 app.disable('etag');
 
 if (process.env.NODE_ENV !== 'test') {

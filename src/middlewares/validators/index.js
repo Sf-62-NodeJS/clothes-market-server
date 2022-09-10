@@ -4,3 +4,4 @@ module.exports.updateProductPayloadValidator = require('./products/updateProduct
 module.exports.categoryPayloadValidator = require('./categoryPayload');
 module.exports.createCommentsPayloadValidator = require('./createCommentsPayload');
 module.exports.updateCommentsPayloadValidator = require('./updateCommentsPayload');
+module.exports.createReplyCommentsPayloadValidator = require('./createReplyCommentsPayload');

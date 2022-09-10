@@ -1,4 +1,10 @@
-const { Product, ProductStatuses, Categories } = require('../models');
+const {
+  Product,
+  ProductStatuses,
+  Categories,
+  Comments,
+  ReplyComments
+} = require('../models');
 const { productImageService } = require('../uploads');
 
 class ProductsService {
@@ -120,12 +126,32 @@ class ProductsService {
     const product = await Product.findByIdAndDelete(req.params.id).exec();
 
     if (product) {
-      await productImageService.deleteImage(product.image);
+      if (product.image) {
+        await productImageService.deleteImage(product.image);
+      }
+
+      if (product.comments) {
+        await this.deleteComments(product.comments);
+      }
 
       return res.json(true);
     }
 
     return res.boom.notFound();
+  }
+
+  async deleteComments (comments) {
+    const commentsList = await Comments.find({ _id: { $in: comments } });
+
+    for (const comment of commentsList) {
+      if (comment.replyComments) {
+        await ReplyComments.deleteMany({
+          _id: { $in: comment.replyComments }
+        }).exec();
+      }
+    }
+
+    return await Comments.deleteMany({ _id: { $in: comments } }).exec();
   }
 }
 
