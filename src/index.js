@@ -8,7 +8,7 @@ const winston = require('winston');
 const app = express();
 const swaggerUi = require('swagger-ui-express');
 const swagger = require('./swagger.json');
-const { usersRouter, sizesRouter } = require('./routers');
+const { usersRouter, sizesRouter, categoriesRouter } = require('./routers');
 const mongoose = require('mongoose');
 const { database, up } = require('migrate-mongo');
 
@@ -61,17 +61,20 @@ mongoose.connect(process.env.MONGO_URL, async (error) => {
 // Routes
 app.use('/users', usersRouter);
 app.use('/sizes', sizesRouter);
+app.use('/categories', categoriesRouter);
 app.disable('etag');
 
-app.listen(process.env.PORT, (err) => {
-  if (err) {
-    console.error(err.message);
-  }
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(process.env.PORT || 5000, (err) => {
+    if (err) {
+      console.error(err.message);
+    }
+    console.log(`Server started at http://localhost:${process.env.PORT}`);
+    console.log(
+      `Open swagger ui at http://localhost:${process.env.PORT}/swagger`
+    );
+  });
+}
 
-  console.log(`Server started at http://localhost:${process.env.PORT}`);
-  console.log(
-    `Open swagger ui at http://localhost:${process.env.PORT}/swagger`
-  );
-});
 
 module.exports = app;
