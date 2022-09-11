@@ -54,7 +54,7 @@ class ReplyCommentsService {
     const comment = await ReplyComments.findByIdAndDelete(req.params.id).exec();
 
     if (comment) {
-      await Comments.findOneAndUpdate(
+      Comments.findOneAndUpdate(
         { replyComments: req.params.id },
         { $pullAll: { replyComments: [{ _id: req.params.id }] } }
       );

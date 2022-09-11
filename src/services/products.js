@@ -141,7 +141,7 @@ class ProductsService {
   }
 
   async deleteComments (comments) {
-    const commentsList = await Comments.find({ _id: { $in: comments } });
+    const commentsList = Comments.find({ _id: { $in: comments } });
 
     for (const comment of commentsList) {
       if (comment.replyComments) {
@@ -151,7 +151,7 @@ class ProductsService {
       }
     }
 
-    return await Comments.deleteMany({ _id: { $in: comments } }).exec();
+    return Comments.deleteMany({ _id: { $in: comments } }).exec();
   }
 }
 

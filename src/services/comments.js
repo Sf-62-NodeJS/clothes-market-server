@@ -56,7 +56,7 @@ class CommentsService {
         await this.deleteReplies(comment.replyComments);
       }
 
-      await Product.findOneAndUpdate(
+      Product.findOneAndUpdate(
         { comments: req.params.id },
         { $pullAll: { comments: [{ _id: req.params.id }] } }
       );
@@ -68,7 +68,7 @@ class CommentsService {
   }
 
   async deleteReplies (replyComments) {
-    return await ReplyComments.deleteMany({
+    return ReplyComments.deleteMany({
       _id: { $in: replyComments }
     }).exec();
   }
