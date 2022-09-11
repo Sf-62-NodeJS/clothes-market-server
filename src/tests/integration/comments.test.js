@@ -1,5 +1,6 @@
 const app = require('../../index');
 const request = require('supertest');
+const jwt = require('jsonwebtoken');
 
 jest.mock('../../models', () => ({
   Comments: class Comments {
@@ -73,6 +74,8 @@ jest.mock('mongoose', () => ({
   connect: () => {}
 }));
 
+jest.mock('jsonwebtoken');
+
 describe('Comments integration tests', function () {
   it('should return comments by product id', async () => {
     const response = await request(app).get('/comments/?productId=123sadf');
@@ -82,26 +85,43 @@ describe('Comments integration tests', function () {
   });
 
   it('should create comment', async () => {
-    const response = await request(app).post('/comments').send({
-      comment: 'comment',
-      productId: '12354fiajs12345asdsd1234'
+    jwt.verify = jest.fn().mockImplementationOnce((token, secret, cb) => {
+      cb(null, { role: 'Admin' });
     });
+    const response = await request(app)
+      .post('/comments')
+      .set('authorization', 'Bearer abc123')
+      .send({
+        comment: 'comment',
+        productId: '12354fiajs12345asdsd1234'
+      });
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual(true);
   });
 
   it('should update comment', async () => {
-    const response = await request(app).put('/comments/13ad122xa2ae').send({
-      comment: 'comment'
+    jwt.verify = jest.fn().mockImplementationOnce((token, secret, cb) => {
+      cb(null, { role: 'Admin' });
     });
+    const response = await request(app)
+      .put('/comments/13ad122xa2ae')
+      .set('authorization', 'Bearer abc123')
+      .send({
+        comment: 'comment'
+      });
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual(true);
   });
 
   it('should delete comment', async () => {
-    const response = await request(app).delete('/comments/13ad122xa2ae');
+    jwt.verify = jest.fn().mockImplementationOnce((token, secret, cb) => {
+      cb(null, { role: 'Admin' });
+    });
+    const response = await request(app)
+      .delete('/comments/13ad122xa2ae')
+      .set('authorization', 'Bearer abc123');
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual(true);

@@ -1,5 +1,6 @@
 const app = require('../../index');
 const request = require('supertest');
+const jwt = require('jsonwebtoken');
 
 jest.mock('../../models', () => ({
   ReplyComments: class ReplyComments {
@@ -83,6 +84,8 @@ jest.mock('mongoose', () => ({
   connect: () => {}
 }));
 
+jest.mock('jsonwebtoken');
+
 describe('Reply Comments integration tests', function () {
   it('should return reply comment by comment id', async () => {
     const response = await request(app).get(
@@ -94,18 +97,28 @@ describe('Reply Comments integration tests', function () {
   });
 
   it('should create reply comment', async () => {
-    const response = await request(app).post('/replyComments').send({
-      comment: 'comment',
-      commentId: '12354fiajs12345asdsd1234'
+    jwt.verify = jest.fn().mockImplementationOnce((token, secret, cb) => {
+      cb(null, { role: 'Admin' });
     });
+    const response = await request(app)
+      .post('/replyComments')
+      .set('authorization', 'Bearer abc123')
+      .send({
+        comment: 'comment',
+        commentId: '12354fiajs12345asdsd1234'
+      });
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual(true);
   });
 
   it('should update reply comment', async () => {
+    jwt.verify = jest.fn().mockImplementationOnce((token, secret, cb) => {
+      cb(null, { role: 'Admin' });
+    });
     const response = await request(app)
       .put('/replyComments/13ad122xa2ae')
+      .set('authorization', 'Bearer abc123')
       .send({
         comment: 'comment'
       });
@@ -115,7 +128,12 @@ describe('Reply Comments integration tests', function () {
   });
 
   it('should delete reply comment', async () => {
-    const response = await request(app).delete('/replyComments/13ad122xa2ae');
+    jwt.verify = jest.fn().mockImplementationOnce((token, secret, cb) => {
+      cb(null, { role: 'Admin' });
+    });
+    const response = await request(app)
+      .delete('/replyComments/13ad122xa2ae')
+      .set('authorization', 'Bearer abc123');
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual(true);
