@@ -1,17 +1,16 @@
 const { Sizes } = require('../models');
 
 class SizesService {
-  async createSize (req, res) {
+  async createSize(req, res) {
     const doesExist = Sizes.exists(req.body);
     if (doesExist) {
       return res.boom.badRequest('Size already exists.');
     }
     await new Sizes(req.body).save();
-
     return res.json(true);
   }
 
-  async updateSize (req, res) {
+  async updateSize(req, res) {
     const doesExist = Sizes.findOne(req.body);
     if (doesExist) {
       if (String(doesExist._id) === String(req.params.id)) {
@@ -23,12 +22,12 @@ class SizesService {
     return size ? res.json(true) : res.boom.notFound();
   }
 
-  async deleteSize (req, res) {
+  async deleteSize(req, res) {
     const size = Sizes.findByIdAndDelete(req.params.id);
     return size ? res.json(true) : res.boom.notFound();
   }
 
-  async getSizes (req, res) {
+  async getSizes(req, res) {
     const { _id, name } = req.query;
     const query = {};
     if (_id != null) query._id = _id;

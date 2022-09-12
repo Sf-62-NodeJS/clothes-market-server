@@ -7,7 +7,7 @@ jest.mock('../../models', () => ({
       return true;
     }
 
-    static async exists () {
+    static exists () {
       return false;
     }
   }
@@ -42,7 +42,7 @@ describe('Sizes controller test', () => {
     });
 
     it('should return bad request when Size exists', async () => {
-      Sizes.exists = async () => true;
+      Sizes.exists = () => true;
       await sizesController.createSize(requestStub, responseStub);
       expect(responseStub.boom.badRequest).toHaveBeenCalled();
     });
