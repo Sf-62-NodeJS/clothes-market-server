@@ -85,10 +85,10 @@ class UsersService {
           user.password = newPassword;
           const salt = await bcrypt.genSalt(10);
           user.password = await bcrypt.hash(user.password, salt);
-          const updatedUserPassword = await User.findOneAndUpdate(
+          const updatedUserPassword = User.findOneAndUpdate(
             { _id: req.params.id },
             user
-          );
+          ).exec();
           return updatedUserPassword ? res.json(true) : res.boom.notFound();
         } else {
           res.boom.badRequest('new password cannot be the same as old');

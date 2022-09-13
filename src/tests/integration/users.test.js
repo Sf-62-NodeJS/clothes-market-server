@@ -323,15 +323,17 @@ describe('Users integration tests', function () {
     };
     User.findOneAndUpdate = () => {
       return {
-        _id: '12ad172xa9e',
-        name: 'name4',
-        middleName: 'middlename4',
-        surname: 'surname4',
-        email: 'email4@gmail.com',
-        password: 'dasasdasfdsad',
-        phoneNumber: '0897133456',
-        address: 'address 15',
-        status: '12ad122xa7z'
+        exec: () => ({
+          _id: '12ad172xa9e',
+          name: 'name4',
+          middleName: 'middlename4',
+          surname: 'surname4',
+          email: 'email4@gmail.com',
+          password: 'dasasdasfdsad',
+          phoneNumber: '0897133456',
+          address: 'address 15',
+          status: '12ad122xa7z'
+        })
       };
     };
     const response = await request(app)
