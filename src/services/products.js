@@ -42,32 +42,30 @@ class ProductsService {
 
   async updateProduct (req, res) {
     const available = await Product.findById(req.params.id).exec();
+    const { category, status } = req.body;
 
     if (available) {
-      if (req.body.category) {
-        const category = await this.getCategory(req.body.category);
+      if (category) {
+        const categoryId = await this.getCategory(req.body.category);
 
-        if (!category) {
+        if (!categoryId) {
           return res.boom.notFound(
             `Category ${req.body.category} doesn't exist.`
           );
         }
 
-        req.body.category = category;
+        req.body.category = categoryId;
       }
 
       if (req.files) {
-        if (available.image.length) {
-          await productImageService.deleteImage(available.image);
-        }
-
+        await productImageService.deleteImage(available.image);
         await productImageService.uploadImage(req);
       }
 
-      if (req.body.status) {
-        const status = await this.getStatus(req.body.status);
+      if (status) {
+        const statusId = await this.getStatus(req.body.status);
 
-        if (!status) {
+        if (!statusId) {
           return res.boom.badRequest(
             'Status must be Available or Not available'
           );
@@ -134,9 +132,7 @@ class ProductsService {
     const product = await Product.findByIdAndDelete(req.params.id).exec();
 
     if (product) {
-      if (product.image) {
-        await productImageService.deleteImage(product.image);
-      }
+      await productImageService.deleteImage(product.image);
 
       if (product.comments.length) {
         await this.deleteComments(product.comments);
@@ -159,7 +155,7 @@ class ProductsService {
       }
     }
 
-    return await Comments.deleteMany({ _id: { $in: comments } }).exec();
+    return Comments.deleteMany({ _id: { $in: comments } }).exec();
   }
 }
 
