@@ -1,5 +1,5 @@
 const { ProductsService } = require('..');
-const { Product, Categories } = require('../../models');
+const { Product, Categories, ProductStatuses } = require('../../models');
 
 jest.mock('../../models', () => ({
   Product: class Product {
@@ -66,10 +66,12 @@ jest.mock('../../models', () => ({
   },
   Comments: class Comments {
     static find () {
-      return [
-        { _id: '123124125', replyComments: [{ id: '312312123' }] },
-        { id: '123124125' }
-      ];
+      return {
+        exec: () => [
+          { _id: '123124125', replyComments: [{ id: '312312123' }] },
+          { id: '123124125' }
+        ]
+      };
     }
 
     static deleteMany () {
@@ -198,6 +200,16 @@ describe('Products service tests', function () {
     );
 
     expect(response).toEqual(true);
+  });
+
+  it('should return that status does not exist on update product', async () => {
+    ProductStatuses.findOne = () => ({ exec: () => null });
+    const response = await productsService.updateProduct(
+      requestStub,
+      responseStub
+    );
+
+    expect(response).toBeFalsy();
   });
 
   it('should return product not exist when update', async () => {

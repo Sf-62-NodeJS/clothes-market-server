@@ -77,6 +77,12 @@ jest.mock('mongoose', () => ({
 jest.mock('jsonwebtoken');
 
 describe('Comments integration tests', function () {
+  beforeEach(() => {
+    jwt.verify = jest.fn().mockImplementationOnce((token, secret, cb) => {
+      cb(null, { role: 'Admin' });
+    });
+  });
+
   it('should return comments by product id', async () => {
     const response = await request(app).get('/comments/?productId=123sadf');
 
@@ -85,9 +91,6 @@ describe('Comments integration tests', function () {
   });
 
   it('should create comment', async () => {
-    jwt.verify = jest.fn().mockImplementationOnce((token, secret, cb) => {
-      cb(null, { role: 'Admin' });
-    });
     const response = await request(app)
       .post('/comments')
       .set('authorization', 'Bearer abc123')
@@ -101,9 +104,6 @@ describe('Comments integration tests', function () {
   });
 
   it('should update comment', async () => {
-    jwt.verify = jest.fn().mockImplementationOnce((token, secret, cb) => {
-      cb(null, { role: 'Admin' });
-    });
     const response = await request(app)
       .put('/comments/13ad122xa2ae')
       .set('authorization', 'Bearer abc123')
@@ -116,9 +116,6 @@ describe('Comments integration tests', function () {
   });
 
   it('should delete comment', async () => {
-    jwt.verify = jest.fn().mockImplementationOnce((token, secret, cb) => {
-      cb(null, { role: 'Admin' });
-    });
     const response = await request(app)
       .delete('/comments/13ad122xa2ae')
       .set('authorization', 'Bearer abc123');

@@ -87,6 +87,12 @@ jest.mock('mongoose', () => ({
 jest.mock('jsonwebtoken');
 
 describe('Reply Comments integration tests', function () {
+  beforeEach(() => {
+    jwt.verify = jest.fn().mockImplementationOnce((token, secret, cb) => {
+      cb(null, { role: 'Admin' });
+    });
+  });
+
   it('should return reply comment by comment id', async () => {
     const response = await request(app).get(
       '/replyComments/?commentId=123sadf'
@@ -97,9 +103,6 @@ describe('Reply Comments integration tests', function () {
   });
 
   it('should create reply comment', async () => {
-    jwt.verify = jest.fn().mockImplementationOnce((token, secret, cb) => {
-      cb(null, { role: 'Admin' });
-    });
     const response = await request(app)
       .post('/replyComments')
       .set('authorization', 'Bearer abc123')
@@ -113,9 +116,6 @@ describe('Reply Comments integration tests', function () {
   });
 
   it('should update reply comment', async () => {
-    jwt.verify = jest.fn().mockImplementationOnce((token, secret, cb) => {
-      cb(null, { role: 'Admin' });
-    });
     const response = await request(app)
       .put('/replyComments/13ad122xa2ae')
       .set('authorization', 'Bearer abc123')
@@ -128,9 +128,6 @@ describe('Reply Comments integration tests', function () {
   });
 
   it('should delete reply comment', async () => {
-    jwt.verify = jest.fn().mockImplementationOnce((token, secret, cb) => {
-      cb(null, { role: 'Admin' });
-    });
     const response = await request(app)
       .delete('/replyComments/13ad122xa2ae')
       .set('authorization', 'Bearer abc123');

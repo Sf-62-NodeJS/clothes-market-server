@@ -8,15 +8,15 @@ const {
 const { productImageService } = require('../uploads');
 
 class ProductsService {
-  async setStatus (statusName) {
+  async getStatus (statusName) {
     const status = await ProductStatuses.findOne({
       name: { $regex: statusName, $options: 'i' }
     }).exec();
 
-    return status._id;
+    return status ? status._id : null;
   }
 
-  async setCategory (categoryName) {
+  async getCategory (categoryName) {
     const category = await Categories.findOne({
       name: { $regex: categoryName, $options: 'i' }
     }).exec();
@@ -25,14 +25,14 @@ class ProductsService {
   }
 
   async createProduct (req, res) {
-    const category = await this.setCategory(req.body.category);
+    const category = await this.getCategory(req.body.category);
 
     if (!category) {
       return res.boom.notFound(`Category ${req.body.category} doesn't exist.`);
     }
 
     req.body.category = category;
-    req.body.status = await this.setStatus('Available');
+    req.body.status = await this.getStatus('Available');
 
     await productImageService.uploadImage(req);
     const product = await new Product(req.body).save();
@@ -45,7 +45,7 @@ class ProductsService {
 
     if (available) {
       if (req.body.category) {
-        const category = await this.setCategory(req.body.category);
+        const category = await this.getCategory(req.body.category);
 
         if (!category) {
           return res.boom.notFound(
@@ -65,7 +65,15 @@ class ProductsService {
       }
 
       if (req.body.status) {
-        req.body.status = await this.setStatus(req.body.status);
+        const status = await this.getStatus(req.body.status);
+
+        if (!status) {
+          return res.boom.badRequest(
+            'Status must be Available or Not available'
+          );
+        }
+
+        req.body.status = status;
       }
     } else {
       return res.boom.notFound('Product not found');
@@ -130,7 +138,7 @@ class ProductsService {
         await productImageService.deleteImage(product.image);
       }
 
-      if (product.comments) {
+      if (product.comments.length) {
         await this.deleteComments(product.comments);
       }
 
@@ -141,7 +149,7 @@ class ProductsService {
   }
 
   async deleteComments (comments) {
-    const commentsList = Comments.find({ _id: { $in: comments } });
+    const commentsList = await Comments.find({ _id: { $in: comments } }).exec();
 
     for (const comment of commentsList) {
       if (comment.replyComments) {
@@ -151,7 +159,7 @@ class ProductsService {
       }
     }
 
-    return Comments.deleteMany({ _id: { $in: comments } }).exec();
+    return await Comments.deleteMany({ _id: { $in: comments } }).exec();
   }
 }
 

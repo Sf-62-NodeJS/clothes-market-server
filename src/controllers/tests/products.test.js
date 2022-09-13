@@ -53,7 +53,7 @@ jest.mock('../../models', () => ({
 
     static findByIdAndDelete () {
       return {
-        exec: () => true
+        exec: () => ({ image: 'image.jpg', comments: 'comment' })
       };
     }
   },
@@ -65,6 +65,25 @@ jest.mock('../../models', () => ({
   Categories: class Categories {
     static findOne () {
       return { exec: () => ({ _id: '123asdasd' }) };
+    }
+  },
+  Comments: class Comments {
+    static find () {
+      return {
+        exec: () => [
+          { _id: '123124125', replyComments: [{ id: '312312123' }] },
+          { id: '123124125' }
+        ]
+      };
+    }
+
+    static deleteMany () {
+      return { exec: () => true };
+    }
+  },
+  ReplyComments: class ReplyComments {
+    static deleteMany () {
+      return { exec: () => true };
     }
   }
 }));

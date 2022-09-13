@@ -45,6 +45,12 @@ jest.mock('mongoose', () => ({
 jest.mock('jsonwebtoken');
 
 describe('Categories integration tests', function () {
+  beforeEach(() => {
+    jwt.verify = jest.fn().mockImplementationOnce((token, secret, cb) => {
+      cb(null, { role: 'Admin' });
+    });
+  });
+
   it('should return category by id', async () => {
     const response = await request(app).get('/categories/?name=name');
 
@@ -53,9 +59,6 @@ describe('Categories integration tests', function () {
   });
 
   it('should create category', async () => {
-    jwt.verify = jest.fn().mockImplementationOnce((token, secret, cb) => {
-      cb(null, { role: 'Admin' });
-    });
     const response = await request(app)
       .post('/categories')
       .set('authorization', 'Bearer abc123')
@@ -66,9 +69,6 @@ describe('Categories integration tests', function () {
   });
 
   it('should update category', async () => {
-    jwt.verify = jest.fn().mockImplementationOnce((token, secret, cb) => {
-      cb(null, { role: 'Admin' });
-    });
     const response = await request(app)
       .put('/categories/13ad122xa2ae')
       .set('authorization', 'Bearer abc123')
@@ -81,9 +81,6 @@ describe('Categories integration tests', function () {
   });
 
   it('should delete category', async () => {
-    jwt.verify = jest.fn().mockImplementationOnce((token, secret, cb) => {
-      cb(null, { role: 'Admin' });
-    });
     const response = await request(app)
       .delete('/categories/13ad122xa2ae')
       .set('authorization', 'Bearer abc123');

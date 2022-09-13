@@ -47,7 +47,7 @@ jest.mock('../../models', () => ({
 
     static findByIdAndDelete () {
       return {
-        exec: () => true
+        exec: () => ({ image: 'image.jpg', comments: ['comment'] })
       };
     }
   },
@@ -59,6 +59,25 @@ jest.mock('../../models', () => ({
   Categories: class Categories {
     static findOne () {
       return { exec: () => ({ _id: '123asdasd' }) };
+    }
+  },
+  Comments: class Comments {
+    static find () {
+      return {
+        exec: () => [
+          { _id: '123124125', replyComments: [{ id: '312312123' }] },
+          { id: '123124125' }
+        ]
+      };
+    }
+
+    static deleteMany () {
+      return { exec: () => true };
+    }
+  },
+  ReplyComments: class ReplyComments {
+    static deleteMany () {
+      return { exec: () => true };
     }
   }
 }));
@@ -89,10 +108,13 @@ jest.mock(
 jest.mock('jsonwebtoken');
 
 describe('Products integration tests', function () {
-  it('should create product', async () => {
+  beforeEach(() => {
     jwt.verify = jest.fn().mockImplementationOnce((token, secret, cb) => {
       cb(null, { role: 'Admin' });
     });
+  });
+
+  it('should create product', async () => {
     const response = await request(app)
       .post('/products')
       .set('authorization', 'Bearer abc123')
@@ -180,9 +202,6 @@ describe('Products integration tests', function () {
   });
 
   it('should return updated product by id', async () => {
-    jwt.verify = jest.fn().mockImplementationOnce((token, secret, cb) => {
-      cb(null, { role: 'Admin' });
-    });
     const response = await request(app)
       .put('/products/18ad122xa3e')
       .set('authorization', 'Bearer abc123')
@@ -197,9 +216,6 @@ describe('Products integration tests', function () {
   });
 
   it('should return deleted product by id', async () => {
-    jwt.verify = jest.fn().mockImplementationOnce((token, secret, cb) => {
-      cb(null, { role: 'Admin' });
-    });
     const response = await request(app)
       .delete('/products/19ad122xa3e')
       .set('authorization', 'Bearer abc123');
