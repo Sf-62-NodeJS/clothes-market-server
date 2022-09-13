@@ -3,16 +3,25 @@ const { Sizes } = require('../../models');
 
 jest.mock('../../models', () => ({
   Sizes: class Sizes {
-    async save () {
+    save () {
       return true;
     }
 
     static exists () {
       return false;
     }
+
+    static findOne () {
+      return true;
+    }
+
+    static find () {
+      return jest.fn();
+    }
   }
 }));
-Sizes.find = jest.fn(async () => []);
+// Sizes.find = jest.fn(async () => []);
+Sizes.exists = jest.fn(() => false);
 
 const sizesController = new SizesController();
 
@@ -26,16 +35,20 @@ const requestStub = {
   query: {}
 };
 const responseStub = {
-  json: jest.fn(() => true),
   boom: {
     badRequest: jest.fn(),
     notFound: jest.fn()
-  }
+  },
+  json: jest.fn()
 };
 
 describe('Sizes controller test', () => {
-  describe('createSize', () => {
+  describe('creating Size test', () => {
     it('should successfully create new Size', async () => {
+      Sizes.exists = jest.fn();
+      Sizes.exists.mockReturnValueOnce(false);
+      Sizes.exists.mockReturnValueOnce({ id: '123' });
+
       await sizesController.createSize(requestStub, responseStub);
       expect(responseStub.json).toHaveBeenCalled();
       expect(responseStub.boom.badRequest).not.toHaveBeenCalled();
@@ -50,28 +63,27 @@ describe('Sizes controller test', () => {
 
   describe('updateSize', () => {
     it('successfully updates Size', async () => {
+      Sizes.exists = jest.fn();
+      Sizes.exists.mockReturnValueOnce(false);
+      Sizes.exists.mockReturnValueOnce({ id: '123' });
       Sizes.findByIdAndUpdate = () => ({ name: 'M' });
-      Sizes.findOne = () => null;
       await sizesController.updateSize(requestStub, responseStub);
       expect(responseStub.json).toHaveBeenCalled();
       expect(responseStub.boom.notFound).not.toHaveBeenCalled();
     });
 
     it('fails when no Size is found', async () => {
-      Sizes.findByIdAndUpdate = () => null;
-      Sizes.findOne = () => null;
-
+      Sizes.exists = jest.fn();
+      Sizes.exists.mockReturnValueOnce(true);
+      Sizes.exists.mockReturnValueOnce(false);
       await sizesController.updateSize(requestStub, responseStub);
       expect(responseStub.boom.notFound).toHaveBeenCalled();
     });
 
     it('fails when Size already exists', async () => {
-      Sizes.findByIdAndUpdate = () => null;
-      Sizes.findOne = () => ({
-        name: 'M',
-        _id: 'someid'
-      });
-
+      Sizes.exists = jest.fn();
+      Sizes.exists.mockReturnValueOnce({ id: '123' });
+      Sizes.exists.mockReturnValueOnce(true);
       await sizesController.updateSize(requestStub, responseStub);
       expect(responseStub.boom.badRequest).toBeCalledWith(
         'Sizes should be unique'
@@ -79,11 +91,9 @@ describe('Sizes controller test', () => {
     });
 
     it('fails when trying to change Size name with its own name', async () => {
-      Sizes.findByIdAndUpdate = () => null;
-      Sizes.findOne = () => ({
-        name: 'M',
-        _id: '123'
-      });
+      Sizes.exists = jest.fn();
+      Sizes.exists.mockReturnValueOnce({ _id: '123' });
+      Sizes.exists.mockReturnValueOnce(true);
 
       await sizesController.updateSize(requestStub, responseStub);
       expect(responseStub.boom.badRequest).toBeCalledWith(

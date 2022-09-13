@@ -4,3 +4,4 @@
 /.env.production
 /.env
 /.idea
+*.DS_Store

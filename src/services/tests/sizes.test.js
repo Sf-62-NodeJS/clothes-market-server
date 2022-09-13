@@ -3,15 +3,17 @@ const { Sizes } = require('../../models');
 
 jest.mock('../../models', () => ({
   Sizes: class Sizes {
-    async save () {
+    save () {
       return true;
     }
 
-    static exists () {
-      return false;
+    static findOne () {
+      return true;
     }
   }
 }));
+
+Sizes.exists = jest.fn(() => false);
 Sizes.find = jest.fn();
 
 const requestStub = {
@@ -35,6 +37,10 @@ const sizesService = new SizesService();
 describe('Sizes services tests', () => {
   describe('creating Size test', () => {
     it('should successfully create new Size', async () => {
+      Sizes.exists = jest.fn();
+      Sizes.exists.mockReturnValueOnce(false);
+      Sizes.exists.mockReturnValueOnce({ id: '123' });
+
       await sizesService.createSize(requestStub, responseStub);
       expect(responseStub.json).toHaveBeenCalled();
       expect(responseStub.boom.badRequest).not.toHaveBeenCalled();
@@ -49,27 +55,27 @@ describe('Sizes services tests', () => {
 
   describe('updating Size test', () => {
     it('successfully updates Size', async () => {
+      Sizes.exists = jest.fn();
+      Sizes.exists.mockReturnValueOnce(false);
+      Sizes.exists.mockReturnValueOnce({ id: '123' });
       Sizes.findByIdAndUpdate = () => ({ name: 'M' });
-      Sizes.findOne = () => null;
       await sizesService.updateSize(requestStub, responseStub);
       expect(responseStub.json).toHaveBeenCalled();
       expect(responseStub.boom.notFound).not.toHaveBeenCalled();
     });
 
-    it('fails when no Size is found', async () => {
-      Sizes.findByIdAndUpdate = () => null;
-      Sizes.findOne = () => null;
-
+    it('fails when no Size with given id is found', async () => {
+      Sizes.exists = jest.fn();
+      Sizes.exists.mockReturnValueOnce(true);
+      Sizes.exists.mockReturnValueOnce(false);
       await sizesService.updateSize(requestStub, responseStub);
       expect(responseStub.boom.notFound).toHaveBeenCalled();
     });
 
-    it('fails when Size already exists', async () => {
-      Sizes.findByIdAndUpdate = () => null;
-      Sizes.findOne = () => ({
-        name: 'M',
-        _id: 'someid'
-      });
+    it('fails when Size value already exists', async () => {
+      Sizes.exists = jest.fn();
+      Sizes.exists.mockReturnValueOnce({ id: '123' });
+      Sizes.exists.mockReturnValueOnce(true);
 
       await sizesService.updateSize(requestStub, responseStub);
       expect(responseStub.boom.badRequest).toBeCalledWith(
@@ -78,11 +84,9 @@ describe('Sizes services tests', () => {
     });
 
     it('fails when trying to change Size name with its own name', async () => {
-      Sizes.findByIdAndUpdate = () => null;
-      Sizes.findOne = () => ({
-        name: 'M',
-        _id: '123'
-      });
+      Sizes.exists = jest.fn();
+      Sizes.exists.mockReturnValueOnce({ _id: '123' });
+      Sizes.exists.mockReturnValueOnce(true);
 
       await sizesService.updateSize(requestStub, responseStub);
       expect(responseStub.boom.badRequest).toBeCalledWith(

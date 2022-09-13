@@ -2,7 +2,8 @@ const { Sizes } = require('../models');
 
 class SizesService {
   async createSize(req, res) {
-    const doesExist = Sizes.exists(req.body);
+    const doesExist = await Sizes.exists(req.body);
+
     if (doesExist) {
       return res.boom.badRequest('Size already exists.');
     }
@@ -11,28 +12,32 @@ class SizesService {
   }
 
   async updateSize(req, res) {
-    const doesExist = Sizes.findOne(req.body);
-    if (doesExist) {
-      if (String(doesExist._id) === String(req.params.id)) {
+    const doesNewValueExist = await Sizes.exists(req.body);
+    const doesItemExist = await Sizes.exists({ _id: req.params.id });
+    if (!doesItemExist) {
+      return res.boom.notFound();
+    }
+    if (doesNewValueExist) {
+      if (String(doesNewValueExist._id) === String(req.params.id)) {
         return res.boom.badRequest('Size is alredy set to that value');
       }
       return res.boom.badRequest('Sizes should be unique');
     }
-    const size = Sizes.findByIdAndUpdate(req.params.id, req.body);
-    return size ? res.json(true) : res.boom.notFound();
+    await Sizes.findByIdAndUpdate(req.params.id, req.body);
+    return res.json(true);
   }
 
   async deleteSize(req, res) {
-    const size = Sizes.findByIdAndDelete(req.params.id);
+    const size = await Sizes.findByIdAndDelete(req.params.id);
     return size ? res.json(true) : res.boom.notFound();
   }
 
   async getSizes(req, res) {
     const { _id, name } = req.query;
     const query = {};
-    if (_id != null) query._id = _id;
-    if (name != null) query.name = name;
-    const sizes = Sizes.find(query);
+    if (_id) query._id = _id;
+    if (name) query.name = name;
+    const sizes = await Sizes.find(query);
     return sizes.length ? res.json(sizes) : res.boom.notFound();
   }
 }
