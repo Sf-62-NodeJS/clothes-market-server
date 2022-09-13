@@ -73,8 +73,6 @@ class UsersService {
       }).exec();
       if (currentStatus.toString() === statusActive._id.toString()) {
         const { oldPassword, newPassword } = req.body;
-        console.log('@@@@@@@@ ' + oldPassword);
-        console.log('######## ' + newPassword);
         const user = await User.findOne({ _id: req.params.id }).exec();
         const isMatchPasswords = await bcrypt.compare(
           oldPassword,
@@ -85,7 +83,6 @@ class UsersService {
         }
         if (isMatchPasswords && oldPassword !== newPassword) {
           user.password = newPassword;
-          console.log('!!!!!!!!!!!!!! ' + user.password);
           const salt = await bcrypt.genSalt(10);
           user.password = await bcrypt.hash(user.password, salt);
           const updatedUserPassword = await User.findOneAndUpdate(
