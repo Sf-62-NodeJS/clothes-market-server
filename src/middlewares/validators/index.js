@@ -5,3 +5,5 @@ module.exports.categoryPayloadValidator = require('./categoryPayload');
 module.exports.createCommentsPayloadValidator = require('./createCommentsPayload');
 module.exports.updateCommentsPayloadValidator = require('./updateCommentsPayload');
 module.exports.createReplyCommentsPayloadValidator = require('./createReplyCommentsPayload');
+module.exports.updateUserPayloadValidator = require('./updateUserPayload');
+module.exports.updateUserPasswordPayloadValidator = require('./updateUserPasswordPayload');

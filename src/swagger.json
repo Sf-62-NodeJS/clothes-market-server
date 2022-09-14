@@ -22,61 +22,6 @@
     }
   ],
   "paths": {
-    "/users/{id}": {
-      "get": {
-        "tags": [
-          "Users"
-        ],
-        "summary": "Retrieves user",
-        "description": "",
-        "operationId": "getUsers",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "responses": {
-          "200": {
-            "description": "Returns user",
-            "schema": {
-              "x-oad-type": "object",
-              "type": "object"
-            },
-            "examples": {
-              "application/json": {
-                "id": 1,
-                "name": "Name 1"
-              }
-            },
-            "x-oad-type": "response"
-          },
-          "404": {
-            "description": "User not found"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      },
-      "parameters": [
-        {
-          "name": "id",
-          "in": "path",
-          "required": true,
-          "type": "string",
-          "x-oad-type": "parameter"
-        }
-      ],
-      "x-hapi-options": {
-        "auth": {
-          "access": {
-            "scope": []
-          }
-        }
-      },
-      "x-oad-type": "operation"
-    },
     "/users": {
       "post": {
         "tags": [
@@ -101,6 +46,24 @@
               "properties": {
                 "name": {
                   "type": "string"
+                },
+                "middleName": {
+                  "type": "string"
+                },
+                "surname": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                },
+                "address": {
+                  "type": "string"
+                },
+                "phoneNumber": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": "string"
                 }
               }
             }
@@ -114,8 +77,265 @@
             },
             "examples": {
               "application/json": {
-                "id": 1,
-                "name": "Name 1"
+                "id": "1",
+                "name": "Name 1",
+                "surname": "Surname 1",
+                "middleName": "MiddleName 1",
+                "password": "Passowrd1",
+                "email": "email1@gmail.com",
+                "phoneNumber": "0898560891",
+                "address": "address 1",
+                "cart": [],
+                "orders": []
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Retrieves users",
+        "description": "",
+        "operationId": "getUsers",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "_id",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "email",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "role",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },  
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          }
+        ],
+        "x-hapi-options": {
+          "auth": {
+            "access": {
+              "scope": []
+            }
+          }
+        },
+        "x-oad-type": "operation",
+        "responses": {
+          "200": {
+            "description": "Returns users",
+            "schema": {
+              "x-oad-type": "object",
+              "type": "object"
+            },
+            "examples": {
+              "application/json": {
+                "id": "1",
+                "name": "Name 1",
+                "surname": "Surname 1",
+                "middleName": "MiddleName 1",
+                "email": "email1@gmail.com",
+                "phoneNumber": "0898560891",
+                "address": "address 1",
+                "status": "active",
+                "role": "admin",
+                "cart": [],
+                "orders": []
+              }
+            }
+          },
+          "404": {
+            "description": "Users not found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/users/{id}": {
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Update user",
+        "description": "",
+        "operationId": "updateUser",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "payload",
+            "in": "body",
+            "required": false,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "middleName": {
+                  "type": "string"
+                },
+                "surname": {
+                  "type": "string"
+                },
+                "address": {
+                  "type": "string"
+                },
+                "phoneNumber": {
+                  "type": "string"
+                },
+                "role": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User updated",
+            "schema": {
+              "type": "boolean"
+            },
+            "examples": {
+              "application/json": true
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      } 
+    },
+    "/users/admin": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Create admin",
+        "description": "",
+        "operationId": "createAdmin",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "payload",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "middleName": {
+                  "type": "string"
+                },
+                "surname": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                },
+                "address": {
+                  "type": "string"
+                },
+                "phoneNumber": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Admin created",
+            "schema": {
+              "type": "boolean"
+            },
+            "examples": {
+              "application/json": {
+                "id": "1",
+                "name": "Name 1",
+                "surname": "Surname 1",
+                "middleName": "MiddleName 1",
+                "password": "Passowrd1",
+                "email": "email1@gmail.com",
+                "phoneNumber": "0898560891",
+                "address": "address 1",
+                "role": "21asf4323d32f",
+                "status": "asd323f5sdf",
+                "cart": [],
+                "orders": []
               }
             }
           },
@@ -124,6 +344,163 @@
           }
         }
       }
+    },
+    "/users/block/{id}": {
+      "patch": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Block user",
+        "description": "",
+        "operationId": "blockUser",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "string",
+          "x-oad-type": "parameter"
+        }
+        ],
+        "x-hapi-options": {
+          "auth": { 
+            "access": {
+              "scope": []
+            }
+          }
+        },
+        "x-oad-type": "operation",
+        "responses": {
+          "200": {
+            "description": "User blocked",
+            "schema": {
+              "type": "boolean"
+            },
+            "examples": {
+              "application/json": true
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }   
+    },
+    "/users/delete/{id}": {
+      "patch": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Delete user",
+        "description": "",
+        "operationId": "deleteUser",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "string",
+          "x-oad-type": "parameter"
+        }
+        ],
+        "x-hapi-options": {
+          "auth": { 
+            "access": {
+              "scope": []
+            }
+          }
+        },
+        "x-oad-type": "operation",
+        "responses": {
+          "200": {
+            "description": "User deleted",
+            "schema": {
+              "type": "boolean"
+            },
+            "examples": {
+              "application/json": true
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }   
+    },
+    "/users/password/{id}": {
+      "patch": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Update password",
+        "description": "",
+        "operationId": "updateUserPassword",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "string",
+          "x-oad-type": "parameter"
+        },
+        {
+          "name": "payload",
+          "in": "body",
+          "required": true,
+          "schema": {
+            "type": "object",
+            "properties": {
+              "oldPassword": {
+                "type": "string"
+              },
+              "newPassword": {
+                "type": "string"
+              }
+            }
+          }
+        }
+        ],
+        "x-hapi-options": {
+          "auth": { 
+            "access": {
+              "scope": []
+            }
+          }
+        },
+        "x-oad-type": "operation",
+        "responses": {
+          "200": {
+            "description": "Password updated",
+            "schema": {
+              "type": "boolean"
+            },
+            "examples": {
+              "application/json": true
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }   
     },
     "/products": {
       "post": {
