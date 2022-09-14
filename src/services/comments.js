@@ -62,9 +62,9 @@ class CommentsService {
       );
 
       return res.json(true);
-    } else {
-      return res.boom.notFound();
     }
+
+    return res.boom.notFound();
   }
 
   async deleteReplies (replyComments) {
