@@ -6,7 +6,9 @@
     "title": "academy-project-server"
   },
   "basePath": "/",
-  "produces": ["application/json"],
+  "produces": [
+    "application/json"
+  ],
   "securityDefinitions": {
     "app-jwt": {
       "type": "apiKey",
@@ -22,12 +24,18 @@
   "paths": {
     "/users": {
       "post": {
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "summary": "Creates user",
         "description": "",
         "operationId": "createUser",
-        "consumes": ["application/json"],
-        "produces": ["application/json"],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
         "parameters": [
           {
             "name": "payload",
@@ -88,12 +96,18 @@
         }
       },
       "get": {
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "summary": "Retrieves users",
         "description": "",
         "operationId": "getUsers",
-        "consumes": ["application/json"],
-        "produces": ["application/json"],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
         "parameters": [
           {
             "name": "_id",
@@ -187,12 +201,18 @@
     },
     "/users/{id}": {
       "put": {
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "summary": "Update user",
         "description": "",
         "operationId": "updateUser",
-        "consumes": ["application/json"],
-        "produces": ["application/json"],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -251,12 +271,18 @@
     },
     "/users/admin": {
       "post": {
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "summary": "Create admin",
         "description": "",
         "operationId": "createAdmin",
-        "consumes": ["application/json"],
-        "produces": ["application/json"],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
         "parameters": [
           {
             "name": "payload",
@@ -321,20 +347,26 @@
     },
     "/users/block/{id}": {
       "patch": {
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "summary": "Block user",
         "description": "",
         "operationId": "blockUser",
-        "consumes": ["application/json"],
-        "produces": ["application/json"],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
         "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "x-oad-type": "parameter"
-          }
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "string",
+          "x-oad-type": "parameter"
+        }
         ],
         "x-hapi-options": {
           "auth": {
@@ -362,51 +394,26 @@
     },
     "/users/delete/{id}": {
       "patch": {
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "summary": "Delete user",
         "description": "",
         "operationId": "deleteUser",
-        "consumes": ["application/json"],
-        "produces": ["application/json"],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
         "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "x-oad-type": "parameter"
-          },
-          {
-            "name": "payload",
-            "in": "body",
-            "required": false,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "string"
-                },
-                "middleName": {
-                  "type": "string"
-                },
-                "surname": {
-                  "type": "string"
-                },
-                "address": {
-                  "type": "string"
-                },
-                "phoneNumber": {
-                  "type": "string"
-                },
-                "role": {
-                  "type": "string"
-                },
-                "status": {
-                  "type": "string"
-                }
-              }
-            }
-          }
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "string",
+          "x-oad-type": "parameter"
+        }
         ],
         "x-hapi-options": {
           "auth": {
@@ -434,36 +441,42 @@
     },
     "/users/password/{id}": {
       "patch": {
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "summary": "Update password",
         "description": "",
         "operationId": "updateUserPassword",
-        "consumes": ["application/json"],
-        "produces": ["application/json"],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
         "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "x-oad-type": "parameter"
-          },
-          {
-            "name": "payload",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "oldPassword": {
-                  "type": "string"
-                },
-                "newPassword": {
-                  "type": "string"
-                }
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "string",
+          "x-oad-type": "parameter"
+        },
+        {
+          "name": "payload",
+          "in": "body",
+          "required": true,
+          "schema": {
+            "type": "object",
+            "properties": {
+              "oldPassword": {
+                "type": "string"
+              },
+              "newPassword": {
+                "type": "string"
               }
             }
           }
+        }
         ],
         "x-hapi-options": {
           "auth": {
@@ -491,69 +504,18 @@
     },
     "/categories": {
       "post": {
-        "tags": ["Categories"],
-        "summary": "Creates category",
-        "description": "",
-        "operationId": "createCategory",
-        "consumes": ["application/json"],
-        "produces": ["application/json"],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "x-oad-type": "parameter"
-          },
-          {
-            "name": "payload",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "oldPassword": {
-                  "type": "string"
-                },
-                "newPassword": {
-                  "type": "string"
-                }
-              }
-            }
-          }
+        "tags": [
+          "Categories"
         ],
-        "x-hapi-options": {
-          "auth": {
-            "access": {
-              "scope": []
-            }
-          }
-        },
-        "x-oad-type": "operation",
-        "responses": {
-          "200": {
-            "description": "Password updated",
-            "schema": {
-              "type": "boolean"
-            },
-            "examples": {
-              "application/json": true
-            }
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/categories": {
-      "post": {
-        "tags": ["Categories"],
         "summary": "Creates category",
         "description": "",
         "operationId": "createCategory",
-        "consumes": ["application/json"],
-        "produces": ["application/json"],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
         "parameters": [
           {
             "name": "payload",
@@ -590,12 +552,18 @@
     },
     "/categories/": {
       "get": {
-        "tags": ["Categories"],
+        "tags": [
+          "Categories"
+        ],
         "summary": "Gets category/es",
         "description": "",
         "operationId": "getCategories",
-        "consumes": ["application/json"],
-        "produces": ["application/json"],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
         "parameters": [
           {
             "name": "_id",
@@ -633,12 +601,18 @@
     },
     "/categories/{id}/": {
       "put": {
-        "tags": ["Categories"],
+        "tags": [
+          "Categories"
+        ],
         "summary": "Updates category",
         "description": "",
         "operationId": "updateCategory",
-        "consumes": ["application/json"],
-        "produces": ["application/json"],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -660,7 +634,7 @@
               }
             }
           }
-        ],
+          ],
         "responses": {
           "200": {
             "description": "Category updated",
@@ -679,12 +653,18 @@
     },
     "/categories/{id}": {
       "delete": {
-        "tags": ["Categories"],
+        "tags": [
+          "Categories"
+        ],
         "summary": "Deletes category",
         "description": "",
         "operationId": "deleteCategory",
-        "consumes": ["application/json"],
-        "produces": ["application/json"],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
         "parameters": [
           {
             "name": "id",
