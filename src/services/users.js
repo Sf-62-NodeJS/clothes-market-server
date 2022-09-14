@@ -38,7 +38,7 @@ class UsersService {
         list: users ? res.json(users) : res.json([])
       };
     } catch (err) {
-      return res.boom.badRequest();
+      return res.boom.badImplementation();
     }
   }
 
@@ -59,7 +59,7 @@ class UsersService {
         res.boom.badRequest('user is not active');
       }
     } catch (err) {
-      return res.boom.badRequest();
+      return res.boom.badImplementation();
     }
   }
 
@@ -95,7 +95,7 @@ class UsersService {
         }
       }
     } catch {
-      res.boom.badRequest();
+      res.boom.badImplementation();
     }
   }
 
@@ -123,7 +123,7 @@ class UsersService {
         return res.boom.badRequest('user already blocked');
       }
     } catch (err) {
-      res.boom.badRequest();
+      res.boom.badImplementation();
     }
   }
 
@@ -148,7 +148,7 @@ class UsersService {
         return res.boom.badRequest('user already deleted');
       }
     } catch (err) {
-      res.boom.badRequest();
+      res.boom.badImplementation();
     }
   }
 
@@ -179,7 +179,7 @@ class UsersService {
         res.boom.badRequest('user already exists');
       }
     } catch (err) {
-      res.boom.badRequest();
+      res.boom.badImplementation();
     }
   }
 }
