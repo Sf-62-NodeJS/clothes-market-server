@@ -1,17 +1,22 @@
-const { User } = require('../models');
+const { UsersService } = require('../services');
 
 class UsersController {
-  async getUser (req, res) {
-    const user = await User.findById(req.params.id).exec();
+  #usersService = new UsersService();
 
-    return user ? res.json(user) : res.boom.notFound();
-  }
+  createUser = (req, res) => this.#usersService.createUser(req, res);
 
-  async createUser (req, res) {
-    const newUser = await new User(req.body).save();
+  getUsers = (req, res) => this.#usersService.getUsers(req, res);
 
-    return res.json(newUser);
-  }
+  updateUser = (req, res) => this.#usersService.updateUser(req, res);
+
+  updateUserPassword = (req, res) =>
+    this.#usersService.updateUserPassword(req, res);
+
+  createAdmin = (req, res) => this.#usersService.createAdmin(req, res);
+
+  blockUser = (req, res) => this.#usersService.blockUser(req, res);
+
+  deleteUser = (req, res) => this.#usersService.deleteUser(req, res);
 }
 
 module.exports = UsersController;
