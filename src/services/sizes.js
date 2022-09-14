@@ -1,7 +1,7 @@
 const { Sizes } = require('../models');
 
 class SizesService {
-  async createSize(req, res) {
+  async createSize (req, res) {
     const doesExist = await Sizes.exists(req.body);
 
     if (doesExist) {
@@ -11,7 +11,7 @@ class SizesService {
     return res.json(true);
   }
 
-  async updateSize(req, res) {
+  async updateSize (req, res) {
     const doesNewValueExist = await Sizes.exists(req.body);
     const doesItemExist = await Sizes.exists({ _id: req.params.id });
     if (!doesItemExist) {
@@ -27,12 +27,12 @@ class SizesService {
     return res.json(true);
   }
 
-  async deleteSize(req, res) {
+  async deleteSize (req, res) {
     const size = await Sizes.findByIdAndDelete(req.params.id);
     return size ? res.json(true) : res.boom.notFound();
   }
 
-  async getSizes(req, res) {
+  async getSizes (req, res) {
     const { _id, name } = req.query;
     const query = {};
     if (_id) query._id = _id;
