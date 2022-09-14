@@ -1,4 +1,4 @@
-const UsersController = require('../users');
+const { UsersService } = require('..');
 const { User } = require('../../models');
 const { UserStatuses } = require('../../models');
 
@@ -16,7 +16,7 @@ jest.mock('../../models', () => ({
 
     save () {
       return {
-        id: '13ad122xa2ae',
+        id: '12ad172xa9e',
         name: 'Name',
         middleName: 'middlename',
         surname: 'surname',
@@ -58,6 +58,7 @@ jest.mock('../../models', () => ({
           middleName: 'middlename',
           surname: 'surname',
           email: 'email@gmail.com',
+          password: 'dasasdasfdsad',
           phoneNumber: '0897123456',
           address: 'address 10'
         })
@@ -107,14 +108,21 @@ jest.mock('bcryptjs', () => ({
   compare: () => true
 }));
 
-describe('usersController tests', () => {
-  const usersController = new UsersController();
+describe('Users service tests', function () {
+  const usersService = new UsersService();
   const requestStub = {
     body: {
-      name: 'Name'
+      name: 'name4',
+      middleName: 'middlename4',
+      surname: 'surname4',
+      email: 'email4@gmail.com',
+      password: 'dasasdasfdsad',
+      phoneNumber: '0897133456',
+      address: 'address 15',
+      status: '12ad122xa7z'
     },
     params: {
-      id: '12ad122xa3e'
+      id: '12ad172xa9e'
     },
     query: {
       _id: '32423rsf3xv',
@@ -135,9 +143,9 @@ describe('usersController tests', () => {
   };
 
   it('should return all users', async () => {
-    const users = await usersController.getUsers(requestStub, responseStub);
+    const response = await usersService.getUsers(requestStub, responseStub);
 
-    expect(users).toEqual({
+    expect(response).toEqual({
       total_size: 1,
       list: {
         id: '12ad122xa7e',
@@ -167,12 +175,9 @@ describe('usersController tests', () => {
         })
       };
     };
-    const updatedUser = await usersController.updateUser(
-      requestStub,
-      responseStub
-    );
+    const response = await usersService.updateUser(requestStub, responseStub);
 
-    expect(updatedUser).toEqual(true);
+    expect(response).toEqual(true);
   });
 
   it('should block user', async () => {
@@ -205,9 +210,9 @@ describe('usersController tests', () => {
         ]
       };
     };
-    const user = await usersController.blockUser(requestStub, responseStub);
+    const response = await usersService.blockUser(requestStub, responseStub);
 
-    expect(user).toEqual(true);
+    expect(response).toEqual(true);
   });
 
   it('should delete user', async () => {
@@ -234,8 +239,8 @@ describe('usersController tests', () => {
         })
       };
     };
-    const user = await usersController.deleteUser(requestStub, responseStub);
+    const response = await usersService.deleteUser(requestStub, responseStub);
 
-    expect(user).toEqual(true);
+    expect(response).toEqual(true);
   });
 });
