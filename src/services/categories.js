@@ -1,4 +1,4 @@
-const { Categories } = require('../models');
+const { Categories, Product } = require('../models');
 
 class CategoriesService {
   async checkCategory (categoryName) {
@@ -54,6 +54,10 @@ class CategoriesService {
   }
 
   async deleteCategory (req, res) {
+    const product = await Product.find({ category: { $in: req.params.id } });
+
+    if (product.length > 0) { return res.boom.badRequest('There are still products in this category.'); }
+
     const category = await Categories.findByIdAndDelete(req.params.id).exec();
 
     return category ? res.json(true) : res.boom.notFound();

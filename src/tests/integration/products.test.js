@@ -79,6 +79,16 @@ jest.mock('../../models', () => ({
     static deleteMany () {
       return { exec: () => true };
     }
+  },
+  Sizes: class Sizes {
+    static find () {
+      return {
+        exec: () => [
+          { id: '1235asdasoe', name: 'somename' },
+          { id: '1242asdasoe', name: 'othername' }
+        ]
+      };
+    }
   }
 }));
 
@@ -122,17 +132,12 @@ describe('Products integration tests', function () {
         name: 'Name',
         description: 'Description',
         category: '123456789123456789123456',
-        sizes: '123456789123456789123456',
+        sizes: 'S',
         price: 2.0
       });
 
     expect(response.statusCode).toBe(200);
-    expect(response.body).toEqual({
-      id: '16ad122xa2ae',
-      name: 'Name',
-      sizes: [],
-      comments: []
-    });
+    expect(response.body).toEqual(true);
   });
 
   it('should return all products', async () => {

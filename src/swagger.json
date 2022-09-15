@@ -542,7 +542,8 @@
             "name": "sizes",
             "in": "formData",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "description": "Write sizes separated by comma. Example: S, M, L"
           },
           {
             "name": "price",
@@ -556,12 +557,6 @@
             "description": "Product created",
             "schema": {
               "type": "boolean"
-            },
-            "examples": {
-              "application/json": {
-                "id": 1,
-                "name": "Name 1"
-              }
             }
           },
           "500": {
@@ -701,7 +696,8 @@
             "name": "sizes",
             "in": "formData",
             "required": false,
-            "type": "string"
+            "type": "string",
+            "description": "Write sizes separated by comma. Example: S, M, L"
           },
           {
             "name": "price",

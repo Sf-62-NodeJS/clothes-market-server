@@ -3,7 +3,8 @@ const {
   ProductStatuses,
   Categories,
   Comments,
-  ReplyComments
+  ReplyComments,
+  Sizes
 } = require('../models');
 const { productImageService } = require('../uploads');
 
@@ -24,6 +25,19 @@ class ProductsService {
     return category ? category._id : null;
   }
 
+  async getSizes (sizesName) {
+    const sizes = [];
+    const find = await Sizes.find({ name: { $in: [...sizesName] } }).exec();
+
+    if (find.length === 0) return null;
+
+    for (const size of find) {
+      sizes.push(size._id);
+    }
+
+    return sizes;
+  }
+
   async createProduct (req, res) {
     const category = await this.getCategory(req.body.category);
 
@@ -31,27 +45,32 @@ class ProductsService {
       return res.boom.notFound(`Category ${req.body.category} doesn't exist.`);
     }
 
+    const sizes = await this.getSizes(req.body.sizes);
+
+    if (!sizes) {
+      return res.boom.notFound('Sizes are not found.');
+    }
+
+    req.body.sizes = sizes;
     req.body.category = category;
     req.body.status = await this.getStatus('Available');
 
     await productImageService.uploadImage(req);
     const product = await new Product(req.body).save();
 
-    return res.json(product);
+    return product ? res.json(true) : req.boom.badRequest();
   }
 
   async updateProduct (req, res) {
     const available = await Product.findById(req.params.id).exec();
-    const { category, status } = req.body;
+    const { category, status, sizes } = req.body;
 
     if (available) {
       if (category) {
-        const categoryId = await this.getCategory(req.body.category);
+        const categoryId = await this.getCategory(category);
 
         if (!categoryId) {
-          return res.boom.notFound(
-            `Category ${req.body.category} doesn't exist.`
-          );
+          return res.boom.notFound(`Category ${category} doesn't exist.`);
         }
 
         req.body.category = categoryId;
@@ -63,7 +82,7 @@ class ProductsService {
       }
 
       if (status) {
-        const statusId = await this.getStatus(req.body.status);
+        const statusId = await this.getStatus(status);
 
         if (!statusId) {
           return res.boom.badRequest(
@@ -71,7 +90,17 @@ class ProductsService {
           );
         }
 
-        req.body.status = status;
+        req.body.status = statusId;
+      }
+
+      if (sizes) {
+        const sizesId = await this.getSizes(sizes);
+
+        if (!sizesId) {
+          return res.boom.notFound('Sizes are not found.');
+        }
+
+        req.body.sizes = sizesId;
       }
     } else {
       return res.boom.notFound('Product not found');
@@ -82,7 +111,7 @@ class ProductsService {
       req.body
     ).exec();
 
-    return product ? res.json(true) : res.boom.notFound();
+    return product ? res.json(true) : res.boom.notFound('Product not found');
   }
 
   async getProducts (req, res) {

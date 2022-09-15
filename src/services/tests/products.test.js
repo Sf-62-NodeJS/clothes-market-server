@@ -1,5 +1,5 @@
 const { ProductsService } = require('..');
-const { Product, Categories, ProductStatuses } = require('../../models');
+const { Product, Categories, ProductStatuses, Sizes } = require('../../models');
 
 jest.mock('../../models', () => ({
   Product: class Product {
@@ -82,6 +82,16 @@ jest.mock('../../models', () => ({
     static deleteMany () {
       return { exec: () => true };
     }
+  },
+  Sizes: class Sizes {
+    static find () {
+      return {
+        exec: () => [
+          { _id: '1235asdasoe', name: 'somename' },
+          { _id: '1242asdasoe', name: 'othername' }
+        ]
+      };
+    }
   }
 }));
 
@@ -100,7 +110,8 @@ describe('Products service tests', function () {
     },
     body: {
       name: 'Name',
-      price: 3.0
+      price: 3.0,
+      sizes: 'S'
     },
     params: {
       id: '15ad122xa3e'
@@ -132,19 +143,30 @@ describe('Products service tests', function () {
       responseStub
     );
 
-    expect(response).toEqual({
-      id: '16ad122xa2ae',
-      name: 'Name',
-      files: 'img.png',
-      category: '16cat122xa2ae',
-      sizes: ['16size122xa2ae', '16size222xa2ae'],
-      status: '16stat122xa2ae',
-      comments: ['16comm122xa2ae', '16comm222xa2ae'],
-      price: 2.0
-    });
+    expect(response).toEqual(true);
   });
 
-  it('should return that category does not exist on create product', async () => {
+  it('should return that sizes not found on update product', async () => {
+    Sizes.find = () => ({ exec: () => [] });
+    const response = await productsService.updateProduct(
+      requestStub,
+      responseStub
+    );
+
+    expect(response).toBeFalsy();
+  });
+
+  it('should return that sizes not found on create product', async () => {
+    Sizes.find = () => ({ exec: () => [] });
+    const response = await productsService.createProduct(
+      requestStub,
+      responseStub
+    );
+
+    expect(response).toBeFalsy();
+  });
+
+  it('should return category does not exist on create product', async () => {
     Categories.findOne = () => ({ exec: () => null });
     const response = await productsService.createProduct(
       requestStub,
@@ -192,7 +214,13 @@ describe('Products service tests', function () {
     expect(response).toEqual({ list: [], total_size: 0 });
   });
 
-  it('should return updated product by id', async () => {
+  it('should return true on update product by id', async () => {
+    Sizes.find = () => ({
+      exec: () => [
+        { id: '1235asdasoe', name: 'somename' },
+        { id: '1242asdasoe', name: 'othername' }
+      ]
+    });
     Categories.findOne = () => ({ exec: () => ({ _id: '123asdasd' }) });
     const response = await productsService.updateProduct(
       requestStub,

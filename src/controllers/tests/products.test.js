@@ -85,6 +85,16 @@ jest.mock('../../models', () => ({
     static deleteMany () {
       return { exec: () => true };
     }
+  },
+  Sizes: class Sizes {
+    static find () {
+      return {
+        exec: () => [
+          { id: '1235asdasoe', name: 'somename' },
+          { id: '1242asdasoe', name: 'othername' }
+        ]
+      };
+    }
   }
 }));
 
@@ -93,7 +103,8 @@ describe('productsController tests', function () {
   const requestStub = {
     body: {
       name: 'Name',
-      price: 3.0
+      price: 3.0,
+      sizes: 'S'
     },
     params: {
       id: '15ad122xa3e'
@@ -124,16 +135,7 @@ describe('productsController tests', function () {
       responseStub
     );
 
-    expect(response).toEqual({
-      id: '16ad122xa2ae',
-      name: 'Name',
-      image: 'img.png',
-      category: '16cat122xa2ae',
-      sizes: ['16size122xa2ae', '16size222xa2ae'],
-      status: '16stat122xa2ae',
-      comments: ['16comm122xa2ae', '16comm222xa2ae'],
-      price: 2.0
-    });
+    expect(response).toEqual(true);
   });
 
   it('should return all products', async () => {

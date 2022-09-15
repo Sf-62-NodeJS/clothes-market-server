@@ -34,6 +34,11 @@ jest.mock('../../models', () => ({
         exec: () => true
       };
     }
+  },
+  Product: class Product {
+    static find () {
+      return false;
+    }
   }
 }));
 
