@@ -3,7 +3,7 @@ const request = require('supertest');
 const jwt = require('jsonwebtoken');
 
 jest.mock('../../models', () => ({
-  Categories: class Categories {
+  ReplyComments: class ReplyComments {
     save () {
       return true;
     }
@@ -36,9 +36,46 @@ jest.mock('../../models', () => ({
       };
     }
   },
+  Comments: class Comments {
+    save () {
+      return true;
+    }
+
+    static findById () {
+      return {
+        exec: () => true
+      };
+    }
+
+    static findByIdAndUpdate () {
+      return {
+        exec: () => true
+      };
+    }
+
+    static findOneAndUpdate () {
+      return {
+        exec: () => true
+      };
+    }
+
+    static updateOne () {
+      return {
+        exec: () => true
+      };
+    }
+  },
   Product: class Product {
-    static find () {
-      return { exec: () => false };
+    static findById () {
+      return {
+        exec: () => true
+      };
+    }
+
+    static updateOne () {
+      return {
+        exec: () => true
+      };
     }
   }
 }));
@@ -49,45 +86,50 @@ jest.mock('mongoose', () => ({
 
 jest.mock('jsonwebtoken');
 
-describe('Categories integration tests', function () {
+describe('Reply Comments integration tests', function () {
   beforeEach(() => {
     jwt.verify = jest.fn().mockImplementationOnce((token, secret, cb) => {
       cb(null, { role: 'Admin' });
     });
   });
 
-  it('should return category by id', async () => {
-    const response = await request(app).get('/categories/?name=name');
+  it('should return reply comment by comment id', async () => {
+    const response = await request(app).get(
+      '/replyComments/?commentId=123sadf'
+    );
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual({ id: '13ad122xa2ae', name: 'Name' });
   });
 
-  it('should create category', async () => {
+  it('should create reply comment', async () => {
     const response = await request(app)
-      .post('/categories')
-      .set('authorization', 'Bearer abc123')
-      .send({ name: 'Name' });
-
-    expect(response.statusCode).toBe(200);
-    expect(response.body).toEqual(true);
-  });
-
-  it('should update category', async () => {
-    const response = await request(app)
-      .put('/categories/13ad122xa2ae')
+      .post('/replyComments')
       .set('authorization', 'Bearer abc123')
       .send({
-        name: 'Name'
+        comment: 'comment',
+        commentId: '12354fiajs12345asdsd1234'
       });
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual(true);
   });
 
-  it('should delete category', async () => {
+  it('should update reply comment', async () => {
     const response = await request(app)
-      .delete('/categories/13ad122xa2ae')
+      .put('/replyComments/13ad122xa2ae')
+      .set('authorization', 'Bearer abc123')
+      .send({
+        comment: 'comment'
+      });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toEqual(true);
+  });
+
+  it('should delete reply comment', async () => {
+    const response = await request(app)
+      .delete('/replyComments/13ad122xa2ae')
       .set('authorization', 'Bearer abc123');
 
     expect(response.statusCode).toBe(200);

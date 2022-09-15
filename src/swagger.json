@@ -502,6 +502,272 @@
         }
       }
     },
+    "/products": {
+      "post": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Creates product",
+        "description": "",
+        "operationId": "createProduct",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "image",
+            "in": "formData",
+            "required": true,
+            "type": "file"
+          },
+          {
+            "name": "name",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "category",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "sizes",
+            "in": "formData",
+            "required": true,
+            "type": "string",
+            "description": "Write sizes separated by comma. Example: S, M, L"
+          },
+          {
+            "name": "price",
+            "in": "formData",
+            "required": true,
+            "type": "number"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product created",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/products/": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Gets product/s",
+        "description": "",
+        "operationId": "getProducts",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sizes",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "minPrice",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "maxPrice",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product created",
+            "schema": {
+              "type": "boolean"
+            },
+            "examples": {
+              "application/json": {
+                "id": 1,
+                "name": "Name 1"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/products/{id}/": {
+      "put": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Updates product",
+        "description": "",
+        "operationId": "updateProduct",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "image",
+            "in": "formData",
+            "required": false,
+            "type": "file"
+          },
+          {
+            "name": "name",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "category",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sizes",
+            "in": "formData",
+            "required": false,
+            "type": "string",
+            "description": "Write sizes separated by comma. Example: S, M, L"
+          },
+          {
+            "name": "price",
+            "in": "formData",
+            "required": false,
+            "type": "number"
+          },
+          {
+            "name": "status",
+            "in": "formData",
+            "description": "You can use Available or Not available.",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product updated",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          "404": {
+            "description": "Product not found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/products/{id}": {
+      "delete": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Deletes product",
+        "description": "",
+        "operationId": "deleteProduct",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product deleted",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          "404": {
+            "description": "Product not found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
     "/categories": {
       "post": {
         "tags": [
@@ -940,6 +1206,376 @@
                 "message": "Not Found"
               }
             }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/comments": {
+      "post": {
+        "tags": [
+          "Comments"
+        ],
+        "summary": "Creates comment",
+        "description": "",
+        "operationId": "createComment",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "payload",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "comment": {
+                  "type": "string"
+                },
+                "productId": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Comment created",
+            "schema": {
+              "type": "boolean"
+            },
+            "examples": {
+              "application/json": {
+                "id": 1,
+                "name": "Name 1"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/comments/": {
+      "get": {
+        "tags": [
+          "Comments"
+        ],
+        "summary": "Gets comment/s",
+        "description": "",
+        "operationId": "getComments",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get comments",
+            "schema": {
+              "type": "boolean"
+            },
+            "examples": {
+              "application/json": {
+                "id": 1,
+                "comment": "Name 1"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/comments/{id}/": {
+      "put": {
+        "tags": [
+          "Comments"
+        ],
+        "summary": "Updates comment",
+        "description": "",
+        "operationId": "updateComment",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "payload",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "comment": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+          ],
+        "responses": {
+          "200": {
+            "description": "Comment updated",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          "404": {
+            "description": "Comment not found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/comments/{id}": {
+      "delete": {
+        "tags": [
+          "Comments"
+        ],
+        "summary": "Deletes comment",
+        "description": "",
+        "operationId": "deleteComment",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Comment deleted",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          "404": {
+            "description": "Comment not found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/replyComments": {
+      "post": {
+        "tags": [
+          "Reply Comments"
+        ],
+        "summary": "Creates reply comment",
+        "description": "",
+        "operationId": "createReplyComment",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "payload",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "comment": {
+                  "type": "string"
+                },
+                "commentId": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reply Comment created",
+            "schema": {
+              "type": "boolean"
+            },
+            "examples": {
+              "application/json": {
+                "id": 1,
+                "name": "Name 1"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/replyComments/": {
+      "get": {
+        "tags": [
+          "Reply Comments"
+        ],
+        "summary": "Gets reply comment/s",
+        "description": "",
+        "operationId": "getReplyComments",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "commentId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get reply comments",
+            "schema": {
+              "type": "boolean"
+            },
+            "examples": {
+              "application/json": {
+                "id": 1,
+                "comment": "Name 1"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/replyComments/{id}/": {
+      "put": {
+        "tags": [
+          "Reply Comments"
+        ],
+        "summary": "Updates reply comment",
+        "description": "",
+        "operationId": "updateReplyComment",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "payload",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "comment": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+          ],
+        "responses": {
+          "200": {
+            "description": "Reply Comment updated",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          "404": {
+            "description": "Comment not found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/replyComments/{id}": {
+      "delete": {
+        "tags": [
+          "Reply Comments"
+        ],
+        "summary": "Deletes reply comment",
+        "description": "",
+        "operationId": "deleteReplyComment",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reply Comment deleted",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          "404": {
+            "description": "Reply Comment not found"
           },
           "500": {
             "description": "Internal Server Error"

@@ -8,9 +8,17 @@ const winston = require('winston');
 const app = express();
 const swaggerUi = require('swagger-ui-express');
 const swagger = require('./swagger.json');
-const { usersRouter, sizesRouter, categoriesRouter } = require('./routers');
+const {
+  usersRouter,
+  sizesRouter,
+  productsRouter,
+  categoriesRouter,
+  commentsRouter,
+  replyCommentsRouter
+} = require('./routers');
 const mongoose = require('mongoose');
 const { database, up } = require('migrate-mongo');
+const fileUpload = require('express-fileupload');
 
 const loggerOptions = {
   transports:
@@ -47,6 +55,7 @@ app.use(
 expressWinston.requestWhitelist.push('body');
 app.use(expressWinston.logger(loggerOptions));
 app.use(expressWinston.errorLogger(loggerOptions));
+app.use(fileUpload());
 
 // DB connect
 mongoose.connect(process.env.MONGO_URL, async (error) => {
@@ -60,8 +69,11 @@ mongoose.connect(process.env.MONGO_URL, async (error) => {
 
 // Routes
 app.use('/users', usersRouter);
+app.use('/products', productsRouter);
 app.use('/sizes', sizesRouter);
 app.use('/categories', categoriesRouter);
+app.use('/comments', commentsRouter);
+app.use('/replyComments', replyCommentsRouter);
 app.disable('etag');
 
 if (process.env.NODE_ENV !== 'test') {

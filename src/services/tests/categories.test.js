@@ -1,5 +1,5 @@
 const { CategoriesService } = require('..');
-const { Categories } = require('../../models');
+const { Categories, Product } = require('../../models');
 
 jest.mock('../../models', () => ({
   Categories: class Categories {
@@ -34,12 +34,23 @@ jest.mock('../../models', () => ({
         exec: () => true
       };
     }
+  },
+  Product: class Product {
+    static find () {
+      return { exec: () => false };
+    }
   }
 }));
 
 describe('Categories service tests', function () {
   const categoriesService = new CategoriesService();
   const requestStub = {
+    headers: {
+      authorization: 'some token'
+    },
+    userInfo: {
+      role: 'Admin'
+    },
     body: {
       name: 'Name'
     },
@@ -120,12 +131,22 @@ describe('Categories service tests', function () {
   });
 
   it('should delete category', async () => {
-    Categories.findByIdAndDelete = () => ({ exec: () => false });
+    Categories.findByIdAndDelete = () => ({ exec: () => true });
     const response = await categoriesService.deleteCategory(
       requestStub,
       responseStub
     );
 
-    expect(response).toEqual(false);
+    expect(response).toEqual(true);
+  });
+
+  it('throws an error while trying to delete category that still have products', async () => {
+    Product.find = () => ({ exec: () => ['Product'] });
+    const response = await categoriesService.deleteCategory(
+      requestStub,
+      responseStub
+    );
+
+    expect(response).toBeFalsy();
   });
 });
