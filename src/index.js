@@ -10,6 +10,7 @@ const swaggerUi = require('swagger-ui-express');
 const swagger = require('./swagger.json');
 const {
   usersRouter,
+  sizesRouter,
   productsRouter,
   categoriesRouter,
   commentsRouter,
@@ -69,6 +70,7 @@ mongoose.connect(process.env.MONGO_URL, async (error) => {
 // Routes
 app.use('/users', usersRouter);
 app.use('/products', productsRouter);
+app.use('/sizes', sizesRouter);
 app.use('/categories', categoriesRouter);
 app.use('/comments', commentsRouter);
 app.use('/replyComments', replyCommentsRouter);
@@ -79,7 +81,6 @@ if (process.env.NODE_ENV !== 'test') {
     if (err) {
       console.error(err.message);
     }
-
     console.log(`Server started at http://localhost:${process.env.PORT}`);
     console.log(
       `Open swagger ui at http://localhost:${process.env.PORT}/swagger`
