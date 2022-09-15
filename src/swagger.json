@@ -143,7 +143,7 @@
             "required": false,
             "type": "string",
             "x-oad-type": "parameter"
-          },  
+          },
           {
             "name": "skip",
             "in": "query",
@@ -267,7 +267,7 @@
             "description": "Internal Server Error"
           }
         }
-      } 
+      }
     },
     "/users/admin": {
       "post": {
@@ -369,7 +369,7 @@
         }
         ],
         "x-hapi-options": {
-          "auth": { 
+          "auth": {
             "access": {
               "scope": []
             }
@@ -390,7 +390,7 @@
             "description": "Internal Server Error"
           }
         }
-      }   
+      }
     },
     "/users/delete/{id}": {
       "patch": {
@@ -416,7 +416,7 @@
         }
         ],
         "x-hapi-options": {
-          "auth": { 
+          "auth": {
             "access": {
               "scope": []
             }
@@ -437,7 +437,7 @@
             "description": "Internal Server Error"
           }
         }
-      }   
+      }
     },
     "/users/password/{id}": {
       "patch": {
@@ -479,7 +479,7 @@
         }
         ],
         "x-hapi-options": {
-          "auth": { 
+          "auth": {
             "access": {
               "scope": []
             }
@@ -500,7 +500,7 @@
             "description": "Internal Server Error"
           }
         }
-      }   
+      }
     },
     "/categories": {
       "post": {
@@ -683,6 +683,263 @@
           },
           "404": {
             "description": "Category not found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/sizes/": {
+      "post": {
+        "tags": ["Sizes"],
+        "summary": "Creates Size",
+        "description": "Creates Size by given name in request body",
+        "operationId": "createSize",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "sizeName",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Size created",
+            "schema": {
+              "type": "boolean"
+            },
+            "examples": true
+          },
+          "400": {
+            "description": "Size already exists",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "statusCode": {
+                  "type": "integer"
+                },
+                "error": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "statusCode": 400,
+                "error": "Bad Request",
+                "message": "Size already exists."
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "get": {
+        "tags": ["Sizes"],
+        "summary": "Get Sizes by filter",
+        "description": "Returns sizes matching the filter or all sizes when no filter is given",
+        "operationId": "getSize",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "_id",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns Sizes",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "_id": {
+                  "type": "string"
+                },
+                "__v": {
+                  "type": "string"
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "name": "M",
+                "_id": "631f3211ff74298e711db04c",
+                "__v": "0"
+              }
+            }
+          },
+          "404": {
+            "description": "Size not found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "statusCode": {
+                  "type": "integer"
+                },
+                "error": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "statusCode": 404,
+                "error": "Not Found",
+                "message": "Not Found"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/sizes/{id}": {
+      "put": {
+        "tags": ["Sizes"],
+        "summary": "Update Size",
+        "description": "Updates a Size by given id with a value given in the request body",
+        "operationId": "updateSize",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "sizeName",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Size updated",
+            "schema": {
+              "type": "boolean"
+            },
+            "examples": true
+          },
+          "400": {
+            "description": "Size matches existing size",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "statusCode": {
+                  "type": "integer"
+                },
+                "error": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "statusCode": 400,
+                "error": "Bad Request",
+                "message": "Sizes should be unique"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Sizes"],
+        "summary": "Delete Size",
+        "description": "Deletes a size by given id",
+        "operationId": "deleteSize",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Size deleted",
+            "schema": {
+              "type": "boolean",
+              "examples": true
+            }
+          },
+          "404": {
+            "description": "Size not found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "statusCode": {
+                  "type": "integer"
+                },
+                "error": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "statusCode": 404,
+                "error": "Not Found",
+                "message": "Not Found"
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error"
