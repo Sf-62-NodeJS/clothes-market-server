@@ -6,15 +6,14 @@ jest.mock('../../models', () => ({
     save () {
       return true;
     }
-
-    static findOne () {
-      return true;
-    }
   }
 }));
-
-Sizes.exists = jest.fn(() => false);
+Sizes.exists = jest.fn();
 Sizes.find = jest.fn();
+Sizes.findByIdAndUpdate = jest.fn();
+Sizes.findByIdAndDelete = jest.fn();
+
+const execMock = jest.fn().mockReturnValue(true);
 
 const requestStub = {
   body: {
@@ -37,9 +36,8 @@ const sizesService = new SizesService();
 describe('Sizes services tests', () => {
   describe('creating Size test', () => {
     it('should successfully create new Size', async () => {
-      Sizes.exists = jest.fn();
-      Sizes.exists.mockReturnValueOnce(false);
-      Sizes.exists.mockReturnValueOnce({ id: '123' });
+      Sizes.exists.mockReturnValue({ exec: execMock });
+      execMock.mockReturnValueOnce(false);
 
       await sizesService.createSize(requestStub, responseStub);
       expect(responseStub.json).toHaveBeenCalled();
@@ -47,7 +45,9 @@ describe('Sizes services tests', () => {
     });
 
     it('should return bad request when Size exists', async () => {
-      Sizes.exists = () => true;
+      Sizes.exists.mockReturnValue({ exec: execMock });
+      execMock.mockReturnValueOnce(true);
+
       await sizesService.createSize(requestStub, responseStub);
       expect(responseStub.boom.badRequest).toHaveBeenCalled();
     });
@@ -55,27 +55,34 @@ describe('Sizes services tests', () => {
 
   describe('updating Size test', () => {
     it('successfully updates Size', async () => {
-      Sizes.exists = jest.fn();
-      Sizes.exists.mockReturnValueOnce(false);
-      Sizes.exists.mockReturnValueOnce({ id: '123' });
-      Sizes.findByIdAndUpdate = () => ({ name: 'M' });
+      Sizes.exists.mockReturnValue({ exec: execMock });
+      execMock.mockReturnValueOnce(false);
+      execMock.mockReturnValueOnce(true);
+
+      Sizes.findByIdAndUpdate.mockReturnValueOnce({ exec: execMock });
+
       await sizesService.updateSize(requestStub, responseStub);
       expect(responseStub.json).toHaveBeenCalled();
       expect(responseStub.boom.notFound).not.toHaveBeenCalled();
     });
 
     it('fails when no Size with given id is found', async () => {
-      Sizes.exists = jest.fn();
-      Sizes.exists.mockReturnValueOnce(true);
-      Sizes.exists.mockReturnValueOnce(false);
+      Sizes.exists.mockReturnValue({ exec: execMock });
+      execMock.mockReturnValueOnce(false);
+      execMock.mockReturnValueOnce(false);
+
+      Sizes.findByIdAndUpdate.mockReturnValueOnce({ exec: execMock });
+
       await sizesService.updateSize(requestStub, responseStub);
       expect(responseStub.boom.notFound).toHaveBeenCalled();
     });
 
     it('fails when Size value already exists', async () => {
-      Sizes.exists = jest.fn();
-      Sizes.exists.mockReturnValueOnce({ id: '123' });
-      Sizes.exists.mockReturnValueOnce(true);
+      Sizes.exists.mockReturnValue({ exec: execMock });
+      execMock.mockReturnValueOnce(true);
+      execMock.mockReturnValueOnce(true);
+
+      Sizes.findByIdAndUpdate.mockReturnValueOnce({ exec: execMock });
 
       await sizesService.updateSize(requestStub, responseStub);
       expect(responseStub.boom.badRequest).toBeCalledWith(
@@ -84,9 +91,11 @@ describe('Sizes services tests', () => {
     });
 
     it('fails when trying to change Size name with its own name', async () => {
-      Sizes.exists = jest.fn();
-      Sizes.exists.mockReturnValueOnce({ _id: '123' });
-      Sizes.exists.mockReturnValueOnce(true);
+      Sizes.exists.mockReturnValue({ exec: execMock });
+      execMock.mockReturnValueOnce({ _id: '123' });
+      execMock.mockReturnValueOnce(true);
+
+      Sizes.findByIdAndUpdate.mockReturnValueOnce({ exec: execMock });
 
       await sizesService.updateSize(requestStub, responseStub);
       expect(responseStub.boom.badRequest).toBeCalledWith(
@@ -97,14 +106,16 @@ describe('Sizes services tests', () => {
 
   describe('deleting Size test', () => {
     it('successfully deletes Size', async () => {
-      Sizes.findByIdAndDelete = () => ({ name: 'M' });
+      Sizes.findByIdAndDelete.mockReturnValue({ exec: execMock });
+      execMock.mockReturnValue(true);
       await sizesService.deleteSize(requestStub, responseStub);
       expect(responseStub.json).toHaveBeenCalled();
       expect(responseStub.boom.notFound).not.toHaveBeenCalled();
     });
 
     it('fails when no Size is found', async () => {
-      Sizes.findByIdAndDelete = () => 0;
+      Sizes.findByIdAndDelete.mockReturnValue({ exec: execMock });
+      execMock.mockReturnValue(false);
       await sizesService.deleteSize(requestStub, responseStub);
       expect(responseStub.boom.notFound).toHaveBeenCalled();
     });
@@ -113,7 +124,8 @@ describe('Sizes services tests', () => {
   describe('getting Sizes', () => {
     it('gets sizes when query is not given', async () => {
       const findSpy = jest.spyOn(Sizes, 'find');
-      findSpy.mockReturnValue({ length: 1 });
+      findSpy.mockReturnValue({ exec: execMock });
+      execMock.mockReturnValue({ length: 1 });
 
       await sizesService.getSizes(requestStub, responseStub);
 
@@ -127,7 +139,8 @@ describe('Sizes services tests', () => {
         name: 'M'
       };
       const findSpy = jest.spyOn(Sizes, 'find');
-      findSpy.mockReturnValue({ length: 1 });
+      findSpy.mockReturnValue({ exec: execMock });
+      execMock.mockReturnValue({ length: 1 });
       await sizesService.getSizes(requestStub, responseStub);
 
       expect(findSpy).toBeCalledWith(
@@ -142,7 +155,8 @@ describe('Sizes services tests', () => {
 
     it('returns not found when no Sizes found', async () => {
       const findSpy = jest.spyOn(Sizes, 'find');
-      findSpy.mockReturnValue({ length: 0 });
+      findSpy.mockReturnValue({ exec: execMock });
+      execMock.mockReturnValue({ length: 0 });
 
       await sizesService.getSizes(requestStub, responseStub);
 
