@@ -65,45 +65,41 @@ class ProductsService {
     const available = await Product.findById(req.params.id).exec();
     const { category, status, sizes } = req.body;
 
-    if (available) {
-      if (category) {
-        const categoryId = await this.getCategory(category);
+    if (!available) return res.boom.notFound('Product not found');
 
-        if (!categoryId) {
-          return res.boom.notFound(`Category ${category} doesn't exist.`);
-        }
+    if (category) {
+      const categoryId = await this.getCategory(category);
 
-        req.body.category = categoryId;
+      if (!categoryId) {
+        return res.boom.notFound(`Category ${category} doesn't exist.`);
       }
 
-      if (req.files) {
-        await productImageService.deleteImage(available.image);
-        await productImageService.uploadImage(req);
+      req.body.category = categoryId;
+    }
+
+    if (req.files) {
+      await productImageService.deleteImage(available.image);
+      await productImageService.uploadImage(req);
+    }
+
+    if (status) {
+      const statusId = await this.getStatus(status);
+
+      if (!statusId) {
+        return res.boom.badRequest('Status must be Available or Not available');
       }
 
-      if (status) {
-        const statusId = await this.getStatus(status);
+      req.body.status = statusId;
+    }
 
-        if (!statusId) {
-          return res.boom.badRequest(
-            'Status must be Available or Not available'
-          );
-        }
+    if (sizes) {
+      const sizesId = await this.getSizes(sizes);
 
-        req.body.status = statusId;
+      if (!sizesId) {
+        return res.boom.notFound('Sizes are not found.');
       }
 
-      if (sizes) {
-        const sizesId = await this.getSizes(sizes);
-
-        if (!sizesId) {
-          return res.boom.notFound('Sizes are not found.');
-        }
-
-        req.body.sizes = sizesId;
-      }
-    } else {
-      return res.boom.notFound('Product not found');
+      req.body.sizes = sizesId;
     }
 
     const product = await Product.findByIdAndUpdate(

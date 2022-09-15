@@ -37,7 +37,7 @@ jest.mock('../../models', () => ({
   },
   Product: class Product {
     static find () {
-      return false;
+      return { exec: () => false };
     }
   }
 }));
@@ -141,7 +141,7 @@ describe('Categories service tests', function () {
   });
 
   it('throws an error while trying to delete category that still have products', async () => {
-    Product.find = () => ['Product'];
+    Product.find = () => ({ exec: () => ['Product'] });
     const response = await categoriesService.deleteCategory(
       requestStub,
       responseStub

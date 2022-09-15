@@ -54,9 +54,13 @@ class CategoriesService {
   }
 
   async deleteCategory (req, res) {
-    const product = await Product.find({ category: { $in: req.params.id } });
+    const product = await Product.find({
+      category: { $in: req.params.id }
+    }).exec();
 
-    if (product.length > 0) { return res.boom.badRequest('There are still products in this category.'); }
+    if (product.length > 0) {
+      return res.boom.badRequest('There are still products in this category.');
+    }
 
     const category = await Categories.findByIdAndDelete(req.params.id).exec();
 
