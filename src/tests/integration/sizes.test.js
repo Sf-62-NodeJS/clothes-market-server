@@ -16,10 +16,6 @@ Sizes.find = jest.fn();
 Sizes.findByIdAndUpdate = jest.fn();
 Sizes.findByIdAndDelete = jest.fn();
 
-jest.mock('mongoose', () => ({
-  connect: () => {}
-}));
-
 describe('Integration test for collection Sizes', () => {
   describe('create Size', () => {
     it('should create new size', async () => {
