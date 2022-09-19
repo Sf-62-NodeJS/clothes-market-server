@@ -22,6 +22,9 @@ const { database, up } = require('migrate-mongo');
 const fileUpload = require('express-fileupload');
 const session = require('express-session');
 const passport = require('passport');
+const CustomStrategy = require('passport-custom').Strategy;
+const GoogleStrategy = require('passport-google-oauth2').Strategy;
+const { authStrategies } = require('./middlewares/auth/');
 
 const loggerOptions = {
   transports:
@@ -71,6 +74,18 @@ app.use(
 );
 app.use(passport.initialize());
 app.use(passport.session());
+
+// Passport JS
+passport.use('custom', new CustomStrategy(authStrategies.verifyCustom));
+passport.use(
+  new GoogleStrategy(authStrategies.googleSettings, authStrategies.verifyGoogle)
+);
+passport.serializeUser(function (user, done) {
+  done(null, user);
+});
+passport.deserializeUser(function (user, done) {
+  done(null, user);
+});
 
 // DB connect
 mongoose.connect(process.env.MONGO_URL, async (error) => {

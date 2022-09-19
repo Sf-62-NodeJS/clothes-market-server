@@ -1,8 +1,6 @@
 const authRouter = require('express').Router();
 const passport = require('passport');
 
-require('../middlewares/auth/authCustom');
-
 // Custom authentication
 authRouter.post(
   '/',
