@@ -5,10 +5,10 @@ require('../middlewares/auth/authCustom');
 
 // Custom authentication
 authRouter.post(
-  '/login',
+  '/',
   passport.authenticate('custom', {
     successRedirect: '/',
-    failureRedirect: '/auth/failure'
+    failureRedirect: '/auth/fail'
   })
 );
 
@@ -22,11 +22,11 @@ authRouter.get(
   '/google/callback',
   passport.authenticate('google', {
     successRedirect: '/',
-    failureRedirect: '/'
+    failureRedirect: '/auth/fail'
   })
 );
 
-// Logout
+// Logout and fail
 authRouter.get('/logout', (req, res) => {
   req.logout(function (err) {
     if (err) {
@@ -35,6 +35,10 @@ authRouter.get('/logout', (req, res) => {
   });
   req.session.destroy();
   res.redirect('/');
+});
+
+authRouter.get('/fail', (req, res) => {
+  res.boom.unauthorized('Wrong email or password.');
 });
 
 module.exports = authRouter;
