@@ -1,6 +1,5 @@
 const app = require('../../index');
 const request = require('supertest');
-const jwt = require('jsonwebtoken');
 
 jest.mock('../../models', () => ({
   Categories: class Categories {
@@ -47,15 +46,7 @@ jest.mock('mongoose', () => ({
   connect: () => {}
 }));
 
-jest.mock('jsonwebtoken');
-
 describe('Categories integration tests', function () {
-  beforeEach(() => {
-    jwt.verify = jest.fn().mockImplementationOnce((token, secret, cb) => {
-      cb(null, { role: 'Admin' });
-    });
-  });
-
   it('should return category by id', async () => {
     const response = await request(app).get('/categories/?name=name');
 

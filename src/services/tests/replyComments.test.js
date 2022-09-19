@@ -65,12 +65,6 @@ jest.mock('../../models', () => ({
 describe('ReplyComments service tests', function () {
   const replyCommentsService = new ReplyCommentsService();
   const requestStub = {
-    headers: {
-      authorization: 'some token'
-    },
-    userInfo: {
-      role: 'Admin'
-    },
     body: {
       name: 'Name'
     },

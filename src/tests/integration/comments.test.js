@@ -1,6 +1,5 @@
 const app = require('../../index');
 const request = require('supertest');
-const jwt = require('jsonwebtoken');
 
 jest.mock('../../models', () => ({
   Comments: class Comments {
@@ -74,15 +73,7 @@ jest.mock('mongoose', () => ({
   connect: () => {}
 }));
 
-jest.mock('jsonwebtoken');
-
 describe('Comments integration tests', function () {
-  beforeEach(() => {
-    jwt.verify = jest.fn().mockImplementationOnce((token, secret, cb) => {
-      cb(null, { role: 'Admin' });
-    });
-  });
-
   it('should return comments by product id', async () => {
     const response = await request(app).get('/comments/?productId=123sadf');
 

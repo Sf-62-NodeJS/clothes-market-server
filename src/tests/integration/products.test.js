@@ -1,6 +1,5 @@
 const app = require('../../index');
 const request = require('supertest');
-const jwt = require('jsonwebtoken');
 
 jest.mock('../../models', () => ({
   Product: class Product {
@@ -115,15 +114,7 @@ jest.mock(
     }
 );
 
-jest.mock('jsonwebtoken');
-
 describe('Products integration tests', function () {
-  beforeEach(() => {
-    jwt.verify = jest.fn().mockImplementationOnce((token, secret, cb) => {
-      cb(null, { role: 'Admin' });
-    });
-  });
-
   it('should create product', async () => {
     const response = await request(app)
       .post('/products')

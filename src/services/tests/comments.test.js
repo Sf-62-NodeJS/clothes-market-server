@@ -72,12 +72,6 @@ jest.mock('../../models', () => ({
 describe('Comments service tests', function () {
   const commentsService = new CommentsService();
   const requestStub = {
-    headers: {
-      authorization: 'some token'
-    },
-    userInfo: {
-      role: 'Admin'
-    },
     body: {
       comment: 'comment',
       productId: '12354fiajs12345asdsd1234'
