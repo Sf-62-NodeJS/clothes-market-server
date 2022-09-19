@@ -9,22 +9,6 @@
   "produces": [
     "application/json"
   ],
-  "securityDefinitions": {
-    "oauth2": {
-      "type": "oauth2",
-      "flow": "accessCode",
-      "authorizationUrl": "https://accounts.google.com/o/oauth2/v2/auth",
-      "tokenUrl": "https://www.googleapis.com/oauth2/v4/token",
-      "scopes": {
-        "read": "Grants read access"
-      }
-    }
-  },
-  "security": [
-    {
-      "app-jwt": []
-    }
-  ],
   "paths": {
     "/auth": {
       "post": {
