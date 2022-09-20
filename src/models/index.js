@@ -8,3 +8,4 @@ module.exports.Categories = require('./categories');
 module.exports.Comments = require('./comments');
 module.exports.ReplyComments = require('./replyComments');
 module.exports.OrderStatuses = require('./orderStatuses');
+module.exports.Orders = require('./orders');
