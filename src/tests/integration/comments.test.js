@@ -66,12 +66,55 @@ jest.mock('../../models', () => ({
         exec: () => true
       };
     }
+  },
+  UserRoles: class UserRoles {
+    static find () {
+      return { exec: () => [{ _id: 'Admin' }] };
+    }
   }
 }));
 
 jest.mock('mongoose', () => ({
   connect: () => {}
 }));
+
+jest.mock('passport', () => ({
+  use: jest.fn(),
+  serializeUser: jest.fn(),
+  deserializeUser: jest.fn(),
+  authenticate: () => (req, res, next) => next(),
+  session: () => (req, res, next) => next(),
+  initialize: () => (req, res, next) => {
+    req.session = {
+      passport: {
+        user: {
+          role: 'Admin'
+        }
+      }
+    };
+
+    next();
+  }
+}));
+
+jest.mock('passport-google-oauth2', () => ({
+  Strategy: class GoogleStrategy {
+    constructor (settings, verifyFunc) {
+      this.settings = settings;
+      this.verifyFunc = verifyFunc;
+    }
+  }
+}));
+
+jest.mock('passport-custom', () => ({
+  Strategy: class CustomStrategy {
+    constructor (verifyFunc) {
+      this.verifyFunc = verifyFunc;
+    }
+  }
+}));
+
+jest.mock('express-session', () => () => (req, res, next) => next());
 
 describe('Comments integration tests', function () {
   it('should return comments by product id', async () => {

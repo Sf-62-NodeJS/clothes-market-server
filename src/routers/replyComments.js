@@ -9,7 +9,7 @@ const { userAuthentication } = require('../middlewares/auth');
 const replyCommentsController = new ReplyCommentsController();
 replyCommentsRouter.post(
   '/',
-  userAuthentication('User'),
+  userAuthentication('User', 'Admin', 'Super admin'),
   createReplyCommentsPayloadValidator,
   replyCommentsController.createReplyComment
 );

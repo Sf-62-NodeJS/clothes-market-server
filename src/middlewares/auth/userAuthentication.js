@@ -8,9 +8,11 @@ const userAuthentication = (...allowedRoles) => {
       name: { $in: allowedRoles }
     }).exec();
 
-    for (const role of userRoles) {
-      if (role._id.toString() === req.session.passport.user.role) return next();
-    }
+    if (
+      userRoles.some(
+        (el) => el._id.toString() === req.session.passport.user.role
+      )
+    ) { return next(); }
 
     return res.boom.unauthorized();
   };

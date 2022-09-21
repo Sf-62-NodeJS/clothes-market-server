@@ -6,17 +6,20 @@ const verifyCustom = async (req, done) => {
   const user = await User.findOne({ email: req.body.email }).exec();
   const status = await UserStatuses.findOne({ name: 'Active' }).exec();
 
-  if (!user || user.status.toString() === status._id.toString()) {
+  if (!user || user.status.toString() !== status._id.toString()) {
     return done(null, false);
   }
 
   const password = await bcrypt.compare(req.body.password, user.password);
 
   if (!password) {
-    done(null, false);
+    return done(null, false);
   }
 
-  done(null, { role: user.role, name: user.name.concat(` ${user.surname}`) });
+  return done(null, {
+    role: user.role,
+    name: user.name.concat(` ${user.surname}`)
+  });
 };
 
 const verifyGoogle = async (

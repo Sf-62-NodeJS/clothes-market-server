@@ -9,7 +9,7 @@ const { userAuthentication } = require('../middlewares/auth');
 const commentsController = new CommentsController();
 commentsRouter.post(
   '/',
-  userAuthentication('User'),
+  userAuthentication('User', 'Admin', 'Super admin'),
   createCommentsPayloadValidator,
   commentsController.createComment
 );
