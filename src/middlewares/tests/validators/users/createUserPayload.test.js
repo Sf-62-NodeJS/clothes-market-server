@@ -1,4 +1,4 @@
-const { createUserPayloadValidator } = require('../../validators');
+const { createUserPayloadValidator } = require('../../../validators');
 
 describe('createUserPayloadValidator tests', () => {
   const requestStub = {

@@ -18,7 +18,7 @@ jest.mock('../../models', () => ({
 
     save () {
       return {
-        id: '12ad172xa9e',
+        id: '632883492f58e39923fe1ac1',
         name: 'Name',
         middleName: 'middlename',
         surname: 'surname',
@@ -35,7 +35,7 @@ jest.mock('../../models', () => ({
           skip: () => ({
             limit: () => ({
               exec: () => ({
-                id: '12ad122xa7e',
+                id: '632883492f58e39923fe1ac1',
                 name: 'Nameabc',
                 middleName: 'middlename',
                 surname: 'surname',
@@ -55,7 +55,7 @@ jest.mock('../../models', () => ({
     static findByIdAndUpdate () {
       return {
         exec: () => ({
-          id: '12ad122xa9e',
+          id: '632883492f58e39923fe1ac1',
           name: 'Gosho',
           middleName: 'middlename',
           surname: 'surname',
@@ -70,7 +70,7 @@ jest.mock('../../models', () => ({
     static findOne () {
       return {
         exec: () => ({
-          _id: '12ad172xa9e',
+          _id: '632883492f58e39923fe1ac1',
           name: 'name4',
           middleName: 'middlename4',
           surname: 'surname4',
@@ -162,7 +162,7 @@ describe('Users integration tests', function () {
       return {
         exec: () => [
           {
-            _id: '12ad122xa7babc',
+            _id: '632883492f58e39923fe1ac1',
             email: 'email123@gmail.com',
             status: '12ad122xa7b'
           }
@@ -254,7 +254,7 @@ describe('Users integration tests', function () {
           skip: () => ({
             limit: () => ({
               exec: () => ({
-                id: '12ad122xa7e',
+                id: '632883492f58e39923fe1ac1',
                 name: 'Nameabc',
                 middleName: 'middlename',
                 surname: 'surname',
@@ -274,7 +274,7 @@ describe('Users integration tests', function () {
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual({
-      id: '12ad122xa7e',
+      id: '632883492f58e39923fe1ac1',
       name: 'Nameabc',
       middleName: 'middlename',
       surname: 'surname',
@@ -291,7 +291,7 @@ describe('Users integration tests', function () {
           skip: () => ({
             limit: () => ({
               exec: () => ({
-                id: '12ad122xa7e',
+                id: '632883492f58e39923fe1ac1',
                 name: 'Nameabc',
                 middleName: 'middlename',
                 surname: 'surname',
@@ -308,12 +308,12 @@ describe('Users integration tests', function () {
       };
     };
     const response = await request(app).get(
-      '/users/?_id=234235sfsfeq234&name=Name&email=email@yahoo.com&status=214sf43524d&role=234segf53452&skip=1&take=50'
+      '/users/?_id=632883492f58e39923fe1ac1&email=email@gmail.com&status=630f51a601db34bca1f8b19f&role=630f51a601db34bca1f8b19f&skip=1&take=50'
     );
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual({
-      id: '12ad122xa7e',
+      id: '632883492f58e39923fe1ac1',
       name: 'Nameabc',
       middleName: 'middlename',
       surname: 'surname',
@@ -327,7 +327,7 @@ describe('Users integration tests', function () {
     User.findOne = () => {
       return {
         exec: () => ({
-          _id: '12ad172xa9e',
+          _id: '632883492f58e39923fe1ac1',
           name: 'name4',
           middleName: 'middlename4',
           surname: 'surname4',
@@ -340,7 +340,7 @@ describe('Users integration tests', function () {
       };
     };
     const response = await request(app)
-      .put('/users/12ad122xa9e')
+      .put('/users/632883492f58e39923fe1ac1')
       .send({ name: 'Gosho' });
 
     expect(response.statusCode).toBe(200);
@@ -351,7 +351,7 @@ describe('Users integration tests', function () {
     User.findOne = () => {
       return {
         exec: () => ({
-          _id: '12ad172xa9e',
+          _id: '632883492f58e39923fe1ac1',
           name: 'name4',
           middleName: 'middlename4',
           surname: 'surname4',
@@ -366,7 +366,7 @@ describe('Users integration tests', function () {
     User.findOneAndUpdate = () => {
       return {
         exec: () => ({
-          _id: '12ad172xa9e',
+          _id: '632883492f58e39923fe1ac1',
           name: 'name4',
           middleName: 'middlename4',
           surname: 'surname4',
@@ -379,7 +379,7 @@ describe('Users integration tests', function () {
       };
     };
     const response = await request(app)
-      .patch('/users/password/12ad172xa9e')
+      .patch('/users/password/632883492f58e39923fe1ac1')
       .send({ oldPassword: 'somepassword', newPassword: 'dasasdasfdsad' });
 
     expect(response.statusCode).toBe(200);
@@ -432,7 +432,7 @@ describe('Users integration tests', function () {
     User.findOne = () => {
       return {
         exec: () => ({
-          _id: '12ad172xa9e',
+          _id: '632883492f58e39923fe1ac1',
           name: 'name4',
           middleName: 'middlename4',
           surname: 'surname4',
@@ -458,7 +458,9 @@ describe('Users integration tests', function () {
         ]
       };
     };
-    const response = await request(app).patch('/users/block/12ad122xa9e');
+    const response = await request(app).patch(
+      '/users/block/632883492f58e39923fe1ac1'
+    );
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual(true);
@@ -468,7 +470,7 @@ describe('Users integration tests', function () {
     User.findOne = () => {
       return {
         exec: () => ({
-          _id: '12ad172xa9e',
+          _id: '632883492f58e39923fe1ac1',
           name: 'name4',
           middleName: 'middlename4',
           surname: 'surname4',
@@ -488,7 +490,9 @@ describe('Users integration tests', function () {
         })
       };
     };
-    const response = await request(app).patch('/users/delete/12ad122xa9e');
+    const response = await request(app).patch(
+      '/users/delete/632883492f58e39923fe1ac1'
+    );
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual(true);

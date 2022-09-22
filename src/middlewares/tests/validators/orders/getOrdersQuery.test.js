@@ -1,13 +1,10 @@
-const { updateUserPayloadValidator } = require('../../validators');
+const { getOrdersQueryValidator } = require('../../../validators');
 
-describe('updateUserPayloadValidator tests', () => {
+describe('getOrdersQueryValidator tests', () => {
   const requestStub = {
-    body: {
-      name: 'Name',
-      surname: 'Surname',
-      middleName: 'Middlename',
-      phoneNumber: '0898123456',
-      address: 'Address 15'
+    query: {
+      _id: '630f51a601db34bca1f8b19f',
+      name: 'Name'
     }
   };
   const nextFunctionMock = jest.fn();
@@ -18,15 +15,15 @@ describe('updateUserPayloadValidator tests', () => {
   };
 
   it('should call next function on valid payload', () => {
-    updateUserPayloadValidator(requestStub, responseStub, nextFunctionMock);
+    getOrdersQueryValidator(requestStub, responseStub, nextFunctionMock);
 
     expect(nextFunctionMock).toHaveBeenCalled();
     expect(responseStub.boom.badRequest).not.toHaveBeenCalled();
   });
 
   it('should call badRequest function on invalid payload', () => {
-    requestStub.body.name = 'N';
-    updateUserPayloadValidator(requestStub, responseStub, nextFunctionMock);
+    requestStub.query.name = 'N';
+    getOrdersQueryValidator(requestStub, responseStub, nextFunctionMock);
 
     expect(responseStub.boom.badRequest).toHaveBeenCalled();
   });
