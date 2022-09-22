@@ -1,7 +1,6 @@
 const { User } = require('../models');
 const { UserRoles } = require('../models');
 const { UserStatuses } = require('../models');
-const { Product } = require('../models');
 const bcrypt = require('bcryptjs');
 const { ProductsService } = require('../services');
 
