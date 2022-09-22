@@ -312,6 +312,8 @@ describe('Users service tests', function () {
     User.findById = jest.fn();
     Product.findById = jest.fn();
     User.updateOne = jest.fn();
+    const execMock = jest.fn().mockReturnValue(true);
+
     requestStub.body = {
       productId: '1',
       sizeId: '1',
@@ -319,10 +321,8 @@ describe('Users service tests', function () {
     };
 
     it('should add product to cart when product in cart', async () => {
-      Product.findById.mockReturnValueOnce({
-        sizes: ['1', '2', '3']
-      });
-      User.findById.mockReturnValueOnce({
+      User.findById.mockReturnValueOnce({ exec: execMock });
+      execMock.mockReturnValueOnce({
         cart: [
           {
             productId: '1',
@@ -331,6 +331,12 @@ describe('Users service tests', function () {
           }
         ]
       });
+      Product.findById.mockReturnValueOnce({ exec: execMock });
+      execMock.mockReturnValueOnce({
+        sizes: ['1', '2', '3']
+      });
+      User.updateOne.mockReturnValueOnce({ exec: execMock });
+
       const response = await usersService.addProducts(
         requestStub,
         responseStub
@@ -338,10 +344,10 @@ describe('Users service tests', function () {
       expect(response).toBe(true);
     });
     it('should add product when product not in cart', async () => {
-      Product.findById.mockReturnValueOnce({
-        sizes: ['1', '2', '3']
-      });
-      User.findById.mockReturnValueOnce({
+      Product.findById.mockReturnValueOnce({ exec: execMock });
+      User.findById.mockReturnValueOnce({ exec: execMock });
+      User.updateOne.mockReturnValueOnce({ exec: execMock });
+      execMock.mockReturnValueOnce({
         cart: [
           {
             productId: '2',
@@ -349,6 +355,9 @@ describe('Users service tests', function () {
             quantity: 3
           }
         ]
+      });
+      execMock.mockReturnValueOnce({
+        sizes: ['1', '2', '3']
       });
       const response = await usersService.addProducts(
         requestStub,
@@ -357,15 +366,16 @@ describe('Users service tests', function () {
       expect(response).toBe(true);
     });
     it('should fail when User is not found', async () => {
-      User.findById.mockReturnValueOnce(null);
+      User.findById.mockReturnValueOnce({ exec: execMock });
+
+      execMock.mockReturnValueOnce(null);
       await usersService.addProducts(requestStub, responseStub);
       expect(responseStub.boom.notFound).toBeCalledWith('User not found');
     });
     it('should fail when request body is not complete', async () => {
-      Product.findById.mockReturnValueOnce({
-        sizes: ['1', '2', '3']
-      });
-      User.findById.mockReturnValueOnce({
+      Product.findById.mockReturnValueOnce({ exec: execMock });
+      User.findById.mockReturnValueOnce({ exec: execMock });
+      execMock.mockReturnValueOnce({
         cart: [
           {
             productId: '2',
@@ -373,6 +383,9 @@ describe('Users service tests', function () {
             quantity: 3
           }
         ]
+      });
+      execMock.mockReturnValueOnce({
+        sizes: ['1', '2', '3']
       });
       requestStub.body = {
         productId: '1',
@@ -385,8 +398,9 @@ describe('Users service tests', function () {
     });
 
     it('should fail when Product does not exist', async () => {
-      Product.findById.mockReturnValueOnce(null);
-      User.findById.mockReturnValueOnce({
+      Product.findById.mockReturnValueOnce({ exec: execMock });
+      User.findById.mockReturnValueOnce({ exec: execMock });
+      execMock.mockReturnValueOnce({
         cart: [
           {
             productId: '2',
@@ -395,6 +409,7 @@ describe('Users service tests', function () {
           }
         ]
       });
+      execMock.mockReturnValueOnce(null);
       requestStub.body = {
         productId: '1',
         sizeId: '1',
@@ -406,10 +421,9 @@ describe('Users service tests', function () {
       );
     });
     it('should fail when Product not available in given Size', async () => {
-      Product.findById.mockReturnValueOnce({
-        sizes: ['2', '3']
-      });
-      User.findById.mockReturnValueOnce({
+      Product.findById.mockReturnValueOnce({ exec: execMock });
+      User.findById.mockReturnValueOnce({ exec: execMock });
+      execMock.mockReturnValueOnce({
         cart: [
           {
             productId: '2',
@@ -418,15 +432,15 @@ describe('Users service tests', function () {
           }
         ]
       });
+      execMock.mockReturnValueOnce({
+        sizes: ['2', '3']
+      });
       await usersService.addProducts(requestStub, responseStub);
       expect(responseStub.boom.badRequest).toBeCalledWith(
         'Product not available in this size'
       );
     });
     it('should fail when error thrown', async () => {
-      Product.findById.mockReturnValueOnce({
-        sizes: ['2', '3']
-      });
       User.findById.mockImplementationOnce(() => {
         throw Error('some error');
       });
@@ -435,8 +449,13 @@ describe('Users service tests', function () {
     });
   });
   describe('Delete product from User cart', () => {
+    const execMock = jest.fn().mockReturnValue(true);
     it('should delete product', async () => {
-      User.findById.mockReturnValueOnce({
+      User.findById.mockReturnValueOnce({ exec: execMock });
+      User.findByIdAndUpdate = jest
+        .fn()
+        .mockReturnValueOnce({ exec: execMock });
+      execMock.mockReturnValueOnce({
         cart: [
           {
             productId: '1',
@@ -445,14 +464,12 @@ describe('Users service tests', function () {
           }
         ]
       });
+      execMock.mockReturnValueOnce({ some: 'object' });
       requestStub.body = {
         productId: '1',
         sizeId: '1',
         quantity: 1
       };
-      User.findByIdAndUpdate = jest
-        .fn()
-        .mockReturnValueOnce({ some: 'object' });
       const response = await usersService.deleteProducts(
         requestStub,
         responseStub
@@ -460,12 +477,14 @@ describe('Users service tests', function () {
       expect(response).toBe(true);
     });
     it('should fail when user does not exist', async () => {
-      User.findById.mockReturnValueOnce(null);
+      User.findById.mockReturnValueOnce({ exec: execMock });
+      execMock.mockReturnValueOnce(null);
       await usersService.deleteProducts(requestStub, responseStub);
       expect(responseStub.boom.notFound).toBeCalledWith('User not found');
     });
     it('should fail when request body is empty', async () => {
-      User.findById.mockReturnValueOnce({
+      User.findById.mockReturnValueOnce({ exec: execMock });
+      execMock.mockReturnValueOnce({
         cart: [
           {
             productId: '1',
@@ -481,7 +500,8 @@ describe('Users service tests', function () {
       );
     });
     it('should fail when no card items found with given filter', async () => {
-      User.findById.mockReturnValueOnce({
+      User.findById.mockReturnValueOnce({ exec: execMock });
+      execMock.mockReturnValueOnce({
         cart: [
           {
             productId: '1',
@@ -501,7 +521,11 @@ describe('Users service tests', function () {
       );
     });
     it('should fail when an error occurs while pulling items', async () => {
-      User.findById.mockReturnValueOnce({
+      User.findById.mockReturnValueOnce({ exec: execMock });
+      User.findByIdAndUpdate = jest
+        .fn()
+        .mockReturnValueOnce({ exec: execMock });
+      execMock.mockReturnValueOnce({
         cart: [
           {
             productId: '1',
@@ -510,12 +534,13 @@ describe('Users service tests', function () {
           }
         ]
       });
+      execMock.mockReturnValueOnce(null);
       requestStub.body = {
         productId: '1',
         sizeId: '1',
         quantity: 1
       };
-      User.findByIdAndUpdate.mockReturnValueOnce(null);
+
       await usersService.deleteProducts(requestStub, responseStub);
       expect(responseStub.boom.badRequest).toBeCalledWith(
         'An error occured while deleting product'
@@ -530,8 +555,10 @@ describe('Users service tests', function () {
     });
   });
   describe('Retrieves products from User cart', () => {
+    const execMock = jest.fn().mockReturnValue(true);
     it('should retrieve products', async () => {
-      User.findById.mockReturnValueOnce({
+      User.findById.mockReturnValueOnce({ exec: execMock });
+      execMock.mockReturnValueOnce({
         cart: [
           {
             productId: '1',
@@ -555,12 +582,14 @@ describe('Users service tests', function () {
       ]);
     });
     it('should fail when user not found', async () => {
-      User.findById.mockReturnValueOnce(null);
+      User.findById.mockReturnValueOnce({ exec: execMock });
+      execMock.mockReturnValueOnce(null);
       await usersService.getProducts(requestStub, responseStub);
       expect(responseStub.boom.notFound).toBeCalledWith('User not found');
     });
     it('should fail when no items found', async () => {
-      User.findById.mockReturnValueOnce({
+      User.findById.mockReturnValueOnce({ exec: execMock });
+      execMock.mockReturnValueOnce({
         cart: [
           {
             productId: '2',

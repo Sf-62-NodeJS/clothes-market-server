@@ -189,18 +189,17 @@ class UsersService {
 
   async addProducts (req, res) {
     try {
-      const user = await User.findById(req.params.id);
+      const user = await User.findById(req.params.id).exec();
       if (!user) {
         return res.boom.notFound('User not found');
       }
-
       if (!(req.body.productId && req.body.sizeId && req.body.quantity)) {
         return res.boom.badRequest(
           'Request body should include productId, sizeId and quantity'
         );
       }
 
-      const reqProduct = await Product.findById(req.body.productId);
+      const reqProduct = await Product.findById(req.body.productId).exec();
       if (!reqProduct) {
         return res.boom.badRequest('Product does not exist');
       }
@@ -229,12 +228,12 @@ class UsersService {
               'cart.$.quantity': productInCart.quantity + req.body.quantity
             }
           }
-        );
+        ).exec();
       } else {
         await User.updateOne(
           { _id: req.params.id },
           { $push: { cart: req.body } }
-        );
+        ).exec();
       }
       return res.json(true);
     } catch (err) {
@@ -264,7 +263,7 @@ class UsersService {
 
   async deleteProducts (req, res) {
     try {
-      const user = await User.findById(req.params.id);
+      const user = await User.findById(req.params.id).exec();
       if (!user) {
         return res.boom.notFound('User not found');
       }
@@ -279,7 +278,7 @@ class UsersService {
         $pull: {
           cart: req.body
         }
-      });
+      }).exec();
       return product
         ? res.json(true)
         : res.boom.badRequest('An error occured while deleting product');
@@ -290,7 +289,7 @@ class UsersService {
 
   async getProducts (req, res) {
     try {
-      const user = await User.findById(req.query.userId);
+      const user = await User.findById(req.query.userId).exec();
       if (!user) {
         return res.boom.notFound('User not found');
       }
