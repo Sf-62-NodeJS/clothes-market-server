@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 const { User } = require('../../../models');
 const { authStrategies } = require('../../auth');
 const bcrypt = require('bcryptjs');
