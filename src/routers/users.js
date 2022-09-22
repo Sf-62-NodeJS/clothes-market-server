@@ -36,4 +36,8 @@ usersRouter.post(
 usersRouter.patch('/block/:id', userAuthentication('Admin', 'Super admin'), idParamValidator, usersController.blockUser);
 usersRouter.patch('/delete/:id', userAuthentication('Admin', 'Super admin'), idParamValidator, usersController.deleteUser);
 
+usersRouter.post('/cart/:id', usersController.addProducts);
+usersRouter.delete('/cart/:id', usersController.deleteProducts);
+usersRouter.get('/cart/', usersController.getProducts);
+
 module.exports = usersRouter;

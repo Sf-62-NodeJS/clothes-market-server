@@ -1,6 +1,7 @@
 const { User } = require('../models');
 const { UserRoles } = require('../models');
 const { UserStatuses } = require('../models');
+const { Product } = require('../models');
 const bcrypt = require('bcryptjs');
 
 class UsersService {
@@ -183,6 +184,123 @@ class UsersService {
       }
     } catch (err) {
       res.boom.badImplementation();
+    }
+  }
+
+  async addProducts (req, res) {
+    try {
+      const user = await User.findById(req.params.id);
+      if (!user) {
+        return res.boom.notFound('User not found');
+      }
+
+      if (!(req.body.productId && req.body.sizeId && req.body.quantity)) {
+        return res.boom.badRequest(
+          'Request body should include productId, sizeId and quantity'
+        );
+      }
+
+      const reqProduct = await Product.findById(req.body.productId);
+      if (!reqProduct) {
+        return res.boom.badRequest('Product does not exist');
+      }
+      if (
+        !reqProduct.sizes.some(
+          (sizeId) => String(sizeId) === String(req.body.sizeId)
+        )
+      ) {
+        return res.boom.badRequest('Product not available in this size');
+      }
+      const userCart = user.cart;
+      const productInCart = userCart.find(
+        (element) =>
+          String(element.productId) === String(req.body.productId) &&
+          String(element.sizeId) === String(req.body.sizeId)
+      );
+      if (productInCart) {
+        await User.updateOne(
+          {
+            _id: req.params.id,
+            'cart.productId': req.body.productId,
+            'cart.sizeId': req.body.sizeId
+          },
+          {
+            $set: {
+              'cart.$.quantity': productInCart.quantity + req.body.quantity
+            }
+          }
+        );
+      } else {
+        await User.updateOne(
+          { _id: req.params.id },
+          { $push: { cart: req.body } }
+        );
+      }
+      return res.json(true);
+    } catch (err) {
+      return res.boom.badImplementation(err);
+    }
+  }
+
+  async #findProductsByQuery (reqQuery, user) {
+    const cart = user.cart;
+
+    const query = {};
+    if (reqQuery.id) query._id = reqQuery.id;
+    if (reqQuery.productId) query.productId = reqQuery.productId;
+    if (reqQuery.sizeId) query.sizeId = reqQuery.sizeId;
+    if (reqQuery.quantity) query.quantity = reqQuery.quantity;
+
+    const results = cart.filter((product) => {
+      for (const prop in query) {
+        if (String(product[prop]) !== String(query[prop])) {
+          return false;
+        }
+      }
+      return true;
+    });
+    return results;
+  }
+
+  async deleteProducts (req, res) {
+    try {
+      const user = await User.findById(req.params.id);
+      if (!user) {
+        return res.boom.notFound('User not found');
+      }
+      if (!Object.keys(req.body).length) {
+        return res.boom.badRequest('Request body cannot be empty');
+      }
+      const cardItems = await this.#findProductsByQuery(req.body, user);
+      if (!cardItems.length) {
+        return res.boom.notFound('No items with these parameters found.');
+      }
+      const product = await User.findByIdAndUpdate(req.params.id, {
+        $pull: {
+          cart: req.body
+        }
+      });
+      return product
+        ? res.json(true)
+        : res.boom.badRequest('An error occured while deleting product');
+    } catch (err) {
+      return res.boom.badImplementation(err);
+    }
+  }
+
+  async getProducts (req, res) {
+    try {
+      const user = await User.findById(req.query.userId);
+      if (!user) {
+        return res.boom.notFound('User not found');
+      }
+      const cartItems = await this.#findProductsByQuery(req.query, user);
+      if (!cartItems.length) {
+        return res.boom.notFound('No card items found');
+      }
+      return res.json(cartItems);
+    } catch (err) {
+      return res.boom.badImplementation(err);
     }
   }
 }
