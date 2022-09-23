@@ -372,31 +372,6 @@ describe('Users service tests', function () {
       await usersService.addProducts(requestStub, responseStub);
       expect(responseStub.boom.notFound).toBeCalledWith('User not found');
     });
-    it('should fail when request body is not complete', async () => {
-      Product.findById.mockReturnValueOnce({ exec: execMock });
-      User.findById.mockReturnValueOnce({ exec: execMock });
-      execMock.mockReturnValueOnce({
-        cart: [
-          {
-            productId: '2',
-            sizeId: '1',
-            quantity: 3
-          }
-        ]
-      });
-      execMock.mockReturnValueOnce({
-        sizes: ['1', '2', '3']
-      });
-      requestStub.body = {
-        productId: '1',
-        sizeId: '1'
-      };
-      await usersService.addProducts(requestStub, responseStub);
-      expect(responseStub.boom.badRequest).toBeCalledWith(
-        'Request body should include productId, sizeId and quantity'
-      );
-    });
-
     it('should fail when Product does not exist', async () => {
       Product.findById.mockReturnValueOnce({ exec: execMock });
       User.findById.mockReturnValueOnce({ exec: execMock });

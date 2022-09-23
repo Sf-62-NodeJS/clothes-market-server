@@ -3,7 +3,8 @@ const { UsersController } = require('../controllers');
 const { createUserPayloadValidator } = require('../middlewares/validators');
 const { updateUserPayloadValidator } = require('../middlewares/validators');
 const {
-  updateUserPasswordPayloadValidator
+  updateUserPasswordPayloadValidator,
+  addProductToCartPayloadValidator
 } = require('../middlewares/validators');
 const { userAuthentication } = require('../middlewares/auth');
 const { idParamValidator } = require('../middlewares/validators');
@@ -36,7 +37,11 @@ usersRouter.post(
 usersRouter.patch('/block/:id', userAuthentication('Admin', 'Super admin'), idParamValidator, usersController.blockUser);
 usersRouter.patch('/delete/:id', userAuthentication('Admin', 'Super admin'), idParamValidator, usersController.deleteUser);
 
-usersRouter.post('/cart/:id', usersController.addProducts);
+usersRouter.post(
+  '/cart/:id',
+  addProductToCartPayloadValidator,
+  usersController.addProducts
+);
 usersRouter.delete('/cart/:id', usersController.deleteProducts);
 usersRouter.get('/cart/', usersController.getProducts);
 

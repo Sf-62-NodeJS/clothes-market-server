@@ -675,6 +675,9 @@
                 },
                 "quantity": {
                   "type": "number"
+                },
+                "_id": {
+                  "type": "string"
                 }
               }
             }

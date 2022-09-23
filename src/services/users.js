@@ -193,11 +193,6 @@ class UsersService {
       if (!user) {
         return res.boom.notFound('User not found');
       }
-      if (!(req.body.productId && req.body.sizeId && req.body.quantity)) {
-        return res.boom.badRequest(
-          'Request body should include productId, sizeId and quantity'
-        );
-      }
 
       const reqProduct = await Product.findById(req.body.productId).exec();
       if (!reqProduct) {
