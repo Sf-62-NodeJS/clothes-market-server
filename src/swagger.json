@@ -282,12 +282,6 @@
                 },
                 "phoneNumber": {
                   "type": "string"
-                },
-                "role": {
-                  "type": "string"
-                },
-                "status": {
-                  "type": "string"
                 }
               }
             }

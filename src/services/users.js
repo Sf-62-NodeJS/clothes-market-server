@@ -93,6 +93,8 @@ class UsersService {
         } else {
           res.boom.badRequest('new password cannot be the same as old');
         }
+      } else {
+        res.boom.badRequest('user is not active');
       }
     } catch {
       res.boom.badImplementation();
@@ -120,7 +122,7 @@ class UsersService {
         ).exec();
         return user ? res.json(true) : res.boom.notFound();
       } else {
-        return res.boom.badRequest('user already blocked');
+        return res.boom.badRequest('user is not active');
       }
     } catch (err) {
       res.boom.badImplementation();
