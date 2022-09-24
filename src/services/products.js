@@ -58,7 +58,7 @@ class ProductsService {
     await productImageService.uploadImage(req);
     const product = await new Product(req.body).save();
 
-    return product ? res.json(true) : req.boom.badRequest();
+    return product ? res.json(true) : res.json(false);
   }
 
   async updateProduct (req, res) {
@@ -122,13 +122,16 @@ class ProductsService {
       query.name = { $regex: name, $options: 'i' };
     }
     if (category) {
-      query.category = category;
+      const getCategory = await this.getCategory(category);
+      query.category = { $in: getCategory };
     }
     if (sizes) {
-      query.sizes = sizes;
+      const getSizes = await this.getSizes(sizes);
+      query.sizes = { $in: getSizes };
     }
     if (status) {
-      query.status = status;
+      const getStatus = await this.getStatus(status);
+      query.status = { $in: getStatus };
     }
     if (+Math.abs(minPrice)) {
       query.price = { $gte: minPrice };

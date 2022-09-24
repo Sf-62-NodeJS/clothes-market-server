@@ -51,15 +51,13 @@ class CommentsService {
   async deleteComment (req, res) {
     const comment = await Comments.findByIdAndDelete(req.params.id).exec();
 
-    if (comment) {
-      if (comment.replyComments) {
-        await this.deleteReplies(comment.replyComments);
-      }
+    if (comment && comment.replyComments) {
+      await this.deleteReplies(comment.replyComments);
 
-      Product.findOneAndUpdate(
+      await Product.findOneAndUpdate(
         { comments: req.params.id },
-        { $pullAll: { comments: [{ _id: req.params.id }] } }
-      );
+        { $pull: { comments: req.params.id } }
+      ).exec();
 
       return res.json(true);
     }

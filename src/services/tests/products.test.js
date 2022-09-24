@@ -140,6 +140,16 @@ describe('Products service tests', function () {
     expect(response).toEqual(true);
   });
 
+  it('should return false on create product', async () => {
+    jest.spyOn(Product.prototype, 'save').mockImplementationOnce(() => false);
+    const response = await productsService.createProduct(
+      requestStub,
+      responseStub
+    );
+
+    expect(response).toEqual(false);
+  });
+
   it('should return that sizes not found on update product', async () => {
     Sizes.find = () => ({ exec: () => [] });
     const response = await productsService.updateProduct(
@@ -224,6 +234,26 @@ describe('Products service tests', function () {
     expect(response).toEqual(true);
   });
 
+  it('should return true on update product by id when no files attached', async () => {
+    requestStub.files = null;
+    const response = await productsService.updateProduct(
+      requestStub,
+      responseStub
+    );
+
+    expect(response).toEqual(true);
+  });
+
+  it('should return product not exist when update (final)', async () => {
+    jest.restoreAllMocks();
+    Product.findByIdAndUpdate = () => ({
+      exec: () => false
+    });
+    await productsService.updateProduct(requestStub, responseStub);
+
+    expect(responseStub.boom.notFound).toBeCalled();
+  });
+
   it('should return that status does not exist on update product', async () => {
     ProductStatuses.findOne = () => ({ exec: () => null });
     const response = await productsService.updateProduct(
@@ -260,6 +290,21 @@ describe('Products service tests', function () {
   });
 
   it('should return deleted product by id', async () => {
+    const response = await productsService.deleteProduct(
+      requestStub,
+      responseStub
+    );
+
+    expect(response).toEqual(true);
+  });
+
+  it('should return deleted product by id when there are no comments', async () => {
+    Product.findByIdAndDelete = () => ({
+      exec: () => ({
+        image: 'image.jpg',
+        comments: () => ({ length: () => 0 })
+      })
+    });
     const response = await productsService.deleteProduct(
       requestStub,
       responseStub
