@@ -33,18 +33,11 @@ class OrdersService {
     if (!order) return res.boom.notFound('order not found');
 
     const statuses = await OrderStatuses.find().exec();
-    const statusInProgress = statuses.find(
-      ({ name }) => name === 'In progress'
-    );
     const statusResolved = statuses.find(({ name }) => name === 'Resolved');
     const statusRejected = statuses.find(({ name }) => name === 'Rejected');
     const newStatus = req.body.orderStatus;
     const productsToAdd = req.body.productsToAdd;
     const productsToDelete = req.body.productsToDelete;
-
-    if (order.status.toString() !== statusInProgress._id.toString()) {
-      res.boom.badRequest('cannot update resolved/rejected orders');
-    }
 
     if (newStatus && (productsToAdd || productsToDelete)) {
       return res.boom.badRequest(
@@ -68,14 +61,16 @@ class OrdersService {
       }
     }
 
-    if (newStatus && newStatus === statusResolved._id.toString()) {
-      const updatedOrder = await this.#resolveOrder(req, res, order);
-      order.status = updatedOrder.status;
-    }
-
-    if (newStatus && newStatus === statusRejected._id.toString()) {
-      const updatedOrder = await this.#rejectOrder(req, res, order);
-      order.status = updatedOrder.status;
+    if (
+      newStatus &&
+      (newStatus === statusResolved._id.toString() ||
+        newStatus === statusRejected.toString())
+    ) {
+      const updatedOrder = await this.#updateStatus(req, res, order);
+      if (updatedOrder) order.status = updatedOrder.status;
+      else {
+        return res.boom.badRequest('order already resolved/rejected');
+      }
     }
 
     await Orders.findByIdAndUpdate(
@@ -133,19 +128,11 @@ class OrdersService {
     }
   }
 
-  async #resolveOrder (req, res, order) {
-    const resolvedOrder = await this.#updateStatus(req, res, order, 'Resolved');
-    return resolvedOrder;
-  }
-
-  async #rejectOrder (req, res, order) {
-    const rejectedOrder = await this.#updateStatus(req, res, order, 'Rejected');
-    return rejectedOrder;
-  }
-
-  async #updateStatus (req, res, order, orderStatus) {
+  async #updateStatus (req, res, order) {
     const statuses = await OrderStatuses.find().exec();
-    const statusToUpdate = statuses.find(({ name }) => name === orderStatus);
+    const statusToUpdate = statuses.find(
+      ({ _id }) => _id.toString() === req.body.orderStatus
+    );
     const statusInProgress = statuses.find(
       ({ name }) => name === 'In progress'
     );
@@ -154,7 +141,7 @@ class OrdersService {
       order.status = statusToUpdate;
       return order;
     } else {
-      return res.boom.badRequest(`order already ${orderStatus}`);
+      return false;
     }
   }
 }
