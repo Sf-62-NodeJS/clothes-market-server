@@ -42,54 +42,52 @@ class OrdersService {
     const productsToAdd = req.body.productsToAdd;
     const productsToDelete = req.body.productsToDelete;
 
-    if (order.status.toString() === statusInProgress._id.toString()) {
-      if (newStatus && (productsToAdd || productsToDelete)) {
-        return res.boom.badRequest(
-          'cannot add/remove products and change status at the same time'
-        );
-      }
-
-      if (productsToAdd) {
-        const updatedOrder = await this.#addProductsToOrder(req, res, order);
-        if (updatedOrder) order.products = updatedOrder.products;
-        else { return res.boom.notFound('cannot add a product that does not exist'); }
-      }
-
-      if (productsToDelete) {
-        const updatedOrder = await this.#deleteProductsFromOrder(
-          req,
-          res,
-          order
-        );
-        if (updatedOrder) order.products = updatedOrder.products;
-        else {
-          return res.boom.notFound(
-            'cannot delete a product that does not exist'
-          );
-        }
-      }
-
-      if (newStatus && newStatus === statusResolved._id.toString()) {
-        const updatedOrder = await this.#resolveOrder(req, res, order);
-        order.status = updatedOrder.status;
-      }
-
-      if (newStatus && newStatus === statusRejected._id.toString()) {
-        const updatedOrder = await this.#rejectOrder(req, res, order);
-        order.status = updatedOrder.status;
-      }
-      await Orders.findByIdAndUpdate(
-        req.params.id,
-        {
-          products: order.products,
-          status: order.status
-        },
-        { new: true }
-      ).exec();
-      return res.json(true);
-    } else {
+    if (order.status.toString() !== statusInProgress._id.toString()) {
       res.boom.badRequest('cannot update resolved/rejected orders');
     }
+
+    if (newStatus && (productsToAdd || productsToDelete)) {
+      return res.boom.badRequest(
+        'cannot add/remove products and change status at the same time'
+      );
+    }
+
+    if (productsToAdd) {
+      const updatedOrder = await this.#addProductsToOrder(req, res, order);
+      if (updatedOrder) order.products = updatedOrder.products;
+      else {
+        return res.boom.notFound('cannot add a product that does not exist');
+      }
+    }
+
+    if (productsToDelete) {
+      const updatedOrder = await this.#deleteProductsFromOrder(req, res, order);
+      if (updatedOrder) order.products = updatedOrder.products;
+      else {
+        return res.boom.notFound('cannot delete a product that does not exist');
+      }
+    }
+
+    if (newStatus && newStatus === statusResolved._id.toString()) {
+      const updatedOrder = await this.#resolveOrder(req, res, order);
+      order.status = updatedOrder.status;
+    }
+
+    if (newStatus && newStatus === statusRejected._id.toString()) {
+      const updatedOrder = await this.#rejectOrder(req, res, order);
+      order.status = updatedOrder.status;
+    }
+
+    await Orders.findByIdAndUpdate(
+      req.params.id,
+      {
+        products: order.products,
+        status: order.status
+      },
+      { new: true }
+    ).exec();
+
+    return res.json(true);
   }
 
   async deleteOrder (req, res) {
