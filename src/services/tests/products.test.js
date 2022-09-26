@@ -102,12 +102,6 @@ jest.mock('fs', () => ({
 describe('Products service tests', function () {
   const productsService = new ProductsService();
   const requestStub = {
-    headers: {
-      authorization: 'some token'
-    },
-    userInfo: {
-      role: 'Admin'
-    },
     body: {
       name: 'Name',
       price: 3.0,

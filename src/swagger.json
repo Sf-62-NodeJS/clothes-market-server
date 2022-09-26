@@ -9,19 +9,59 @@
   "produces": [
     "application/json"
   ],
-  "securityDefinitions": {
-    "app-jwt": {
-      "type": "apiKey",
-      "in": "header",
-      "name": "Authorization"
-    }
-  },
-  "security": [
-    {
-      "app-jwt": []
-    }
-  ],
   "paths": {
+    "/auth": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "User Login",
+        "description": "",
+        "operationId": "userLogin",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "payload",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Redirect to /"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "examples": {
+              "application/json": {
+                "statusCode": "401",
+                "error": "Unauthorized",
+                "message": "Wrong email or password."
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
     "/users": {
       "post": {
         "tags": [

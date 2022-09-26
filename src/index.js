@@ -14,11 +14,17 @@ const {
   productsRouter,
   categoriesRouter,
   commentsRouter,
-  replyCommentsRouter
+  replyCommentsRouter,
+  authRouter
 } = require('./routers');
 const mongoose = require('mongoose');
 const { database, up } = require('migrate-mongo');
 const fileUpload = require('express-fileupload');
+const session = require('express-session');
+const passport = require('passport');
+const CustomStrategy = require('passport-custom').Strategy;
+const GoogleStrategy = require('passport-google-oauth2').Strategy;
+const { authStrategies } = require('./middlewares/auth/');
 
 const loggerOptions = {
   transports:
@@ -56,6 +62,30 @@ expressWinston.requestWhitelist.push('body');
 app.use(expressWinston.logger(loggerOptions));
 app.use(expressWinston.errorLogger(loggerOptions));
 app.use(fileUpload());
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      maxAge: 24 * 60 * 60 * 1000
+    }
+  })
+);
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Passport JS
+passport.use('custom', new CustomStrategy(authStrategies.verifyCustom));
+passport.use(
+  new GoogleStrategy(authStrategies.googleSettings, authStrategies.verifyGoogle)
+);
+passport.serializeUser(function (user, done) {
+  done(null, user);
+});
+passport.deserializeUser(function (user, done) {
+  done(null, user);
+});
 
 // DB connect
 mongoose.connect(process.env.MONGO_URL, async (error) => {
@@ -74,6 +104,7 @@ app.use('/sizes', sizesRouter);
 app.use('/categories', categoriesRouter);
 app.use('/comments', commentsRouter);
 app.use('/replyComments', replyCommentsRouter);
+app.use('/auth', authRouter);
 app.disable('etag');
 
 if (process.env.NODE_ENV !== 'test') {

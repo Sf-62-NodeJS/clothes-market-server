@@ -4,28 +4,25 @@ const {
   createReplyCommentsPayloadValidator,
   updateCommentsPayloadValidator
 } = require('../middlewares/validators');
-const { checkAuth, verifyRole } = require('../middlewares/auth');
+const { userAuthentication } = require('../middlewares/auth');
 
 const replyCommentsController = new ReplyCommentsController();
 replyCommentsRouter.post(
   '/',
-  checkAuth,
-  verifyRole('User', 'Admin', 'Super admin'),
+  userAuthentication('User', 'Admin', 'Super admin'),
   createReplyCommentsPayloadValidator,
   replyCommentsController.createReplyComment
 );
 replyCommentsRouter.put(
   '/:id',
-  checkAuth,
-  verifyRole('User', 'Admin', 'Super admin'),
+  userAuthentication('Admin', 'Super admin'),
   updateCommentsPayloadValidator,
   replyCommentsController.updateReplyComment
 );
 replyCommentsRouter.get('/', replyCommentsController.getReplyComments);
 replyCommentsRouter.delete(
   '/:id',
-  checkAuth,
-  verifyRole('User', 'Admin', 'Super admin'),
+  userAuthentication('Admin', 'Super admin'),
   replyCommentsController.deleteReplyComment
 );
 

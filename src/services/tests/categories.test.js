@@ -45,12 +45,6 @@ jest.mock('../../models', () => ({
 describe('Categories service tests', function () {
   const categoriesService = new CategoriesService();
   const requestStub = {
-    headers: {
-      authorization: 'some token'
-    },
-    userInfo: {
-      role: 'Admin'
-    },
     body: {
       name: 'Name'
     },

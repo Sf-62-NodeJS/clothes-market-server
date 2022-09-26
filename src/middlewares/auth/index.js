@@ -1,2 +1,2 @@
-module.exports.checkAuth = require('./checkAuth');
-module.exports.verifyRole = require('./verifyRole');
+module.exports.userAuthentication = require('./userAuthentication');
+module.exports.authStrategies = require('./authStrategies');

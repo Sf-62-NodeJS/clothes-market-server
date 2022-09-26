@@ -92,6 +92,10 @@ jest.mock('../../models', () => ({
         })
       };
     }
+
+    static find () {
+      return { exec: () => [{ _id: 'Admin' }] };
+    }
   },
   UserStatuses: class UserStatuses {
     static findOne () {
@@ -113,6 +117,44 @@ jest.mock('bcryptjs', () => ({
   ...jest.requireActual('bcryptjs'),
   compare: () => true
 }));
+
+jest.mock('passport', () => ({
+  use: jest.fn(),
+  serializeUser: jest.fn(),
+  deserializeUser: jest.fn(),
+  authenticate: () => (req, res, next) => next(),
+  session: () => (req, res, next) => next(),
+  initialize: () => (req, res, next) => {
+    req.session = {
+      passport: {
+        user: {
+          role: 'Admin'
+        }
+      }
+    };
+
+    next();
+  }
+}));
+
+jest.mock('passport-google-oauth2', () => ({
+  Strategy: class GoogleStrategy {
+    constructor (settings, verifyFunc) {
+      this.settings = settings;
+      this.verifyFunc = verifyFunc;
+    }
+  }
+}));
+
+jest.mock('passport-custom', () => ({
+  Strategy: class CustomStrategy {
+    constructor (verifyFunc) {
+      this.verifyFunc = verifyFunc;
+    }
+  }
+}));
+
+jest.mock('express-session', () => () => (req, res, next) => next());
 
 describe('Users integration tests', function () {
   it('should create user if user is deleted', async () => {
