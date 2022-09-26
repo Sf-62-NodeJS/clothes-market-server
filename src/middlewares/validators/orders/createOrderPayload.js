@@ -1,8 +1,8 @@
 const Joi = require('joi');
 
-const orderPayloadValidator = (req, res, next) => {
+const createOrderPayloadValidator = (req, res, next) => {
   const schema = Joi.object({
-    products: Joi.array().items(Joi.string().hex().length(24)).required()
+    products: Joi.array().items(Joi.string().hex().length(24))
   });
   const { error } = schema.validate(req.body);
 
@@ -13,4 +13,4 @@ const orderPayloadValidator = (req, res, next) => {
   next();
 };
 
-module.exports = orderPayloadValidator;
+module.exports = createOrderPayloadValidator;

@@ -10,10 +10,6 @@ class OrdersController {
   updateOrder = (req, res) => this.#ordersService.updateOrder(req, res);
 
   deleteOrder = (req, res) => this.#ordersService.deleteOrder(req, res);
-
-  resolveOrder = (req, res) => this.#ordersService.resolveOrder(req, res);
-
-  rejectOrder = (req, res) => this.#ordersService.rejectOrder(req, res);
 }
 
 module.exports = OrdersController;

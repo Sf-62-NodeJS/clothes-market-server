@@ -1,6 +1,5 @@
 const { OrdersController } = require('..');
 const { Orders } = require('../../models');
-// const { Orders, OrderStatuses } = require('../../models');
 
 jest.mock('../../models', () => ({
   Orders: class Orders {
@@ -138,18 +137,6 @@ describe('Orders controller tests', function () {
     );
 
     expect(response).toEqual({ list: [], total_size: 0 });
-  });
-
-  it('should return that order is not found on update', async () => {
-    Orders.findByIdAndUpdate = () => ({
-      exec: () => null
-    });
-    const response = await ordersController.updateOrder(
-      requestStub,
-      responseStub
-    );
-
-    expect(response).toBeFalsy();
   });
 
   it('should return that order is not found on delete', async () => {
