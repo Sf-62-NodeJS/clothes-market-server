@@ -54,10 +54,10 @@ class ReplyCommentsService {
     const comment = await ReplyComments.findByIdAndDelete(req.params.id).exec();
 
     if (comment) {
-      Comments.findOneAndUpdate(
+      await Comments.findOneAndUpdate(
         { replyComments: req.params.id },
-        { $pullAll: { replyComments: [{ _id: req.params.id }] } }
-      );
+        { $pull: { replyComments: req.params.id } }
+      ).exec();
 
       return res.json(true);
     }

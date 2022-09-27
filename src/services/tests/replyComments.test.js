@@ -94,6 +94,18 @@ describe('ReplyComments service tests', function () {
     expect(response).toEqual(true);
   });
 
+  it('should return false on create category', async () => {
+    jest
+      .spyOn(ReplyComments.prototype, 'save')
+      .mockImplementationOnce(() => false);
+    const response = await replyCommentsService.createReplyComment(
+      requestStub,
+      responseStub
+    );
+
+    expect(response).toEqual(false);
+  });
+
   it('should update reply comment', async () => {
     const response = await replyCommentsService.updateReplyComment(
       requestStub,

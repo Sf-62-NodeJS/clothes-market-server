@@ -60,7 +60,7 @@ describe('Categories service tests', function () {
   const responseStub = {
     boom: {
       badRequest: jest.fn(),
-      notFound: () => false
+      notFound: jest.fn()
     },
     json: (payload) => payload
   };
@@ -74,6 +74,18 @@ describe('Categories service tests', function () {
     expect(response).toEqual(true);
   });
 
+  it('should return false on create category', async () => {
+    jest
+      .spyOn(Categories.prototype, 'save')
+      .mockImplementationOnce(() => false);
+    const response = await categoriesService.createCategory(
+      requestStub,
+      responseStub
+    );
+
+    expect(response).toEqual(false);
+  });
+
   it('should update category', async () => {
     const response = await categoriesService.updateCategory(
       requestStub,
@@ -85,15 +97,28 @@ describe('Categories service tests', function () {
 
   it('should not find a category to update', async () => {
     Categories.findByIdAndUpdate = () => ({ exec: () => false });
-    const response = await categoriesService.updateCategory(
+    await categoriesService.updateCategory(requestStub, responseStub);
+
+    expect(responseStub.boom.notFound).toBeCalled();
+  });
+
+  it('should return all categories', async () => {
+    const response = await categoriesService.getCategories(
       requestStub,
       responseStub
     );
 
-    expect(response).toEqual(false);
+    expect(response).toEqual({
+      list: {
+        id: '13ad122xa2ae',
+        name: 'Name'
+      },
+      total_size: 1
+    });
   });
 
-  it('should return all categories', async () => {
+  it('should return all categories if no specific name is included in the request', async () => {
+    requestStub.query.name = '';
     const response = await categoriesService.getCategories(
       requestStub,
       responseStub
@@ -132,6 +157,13 @@ describe('Categories service tests', function () {
     );
 
     expect(response).toEqual(true);
+  });
+
+  it('should not find category to delete', async () => {
+    Categories.findByIdAndDelete = () => ({ exec: () => false });
+    await categoriesService.deleteCategory(requestStub, responseStub);
+
+    expect(responseStub.boom.notFound).toBeCalled();
   });
 
   it('throws an error while trying to delete category that still have products', async () => {

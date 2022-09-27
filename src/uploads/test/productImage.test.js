@@ -68,14 +68,26 @@ describe('Upload product image tests', function () {
   });
 
   it('throws an error while trying to delete an image', async () => {
-    jest.spyOn(fs, 'unlink').mockImplementation((_, callback) =>
-      callback(Error('some error'))
-    );
+    jest
+      .spyOn(fs, 'unlink')
+      .mockImplementation((_, callback) => callback(Error('some error')));
 
     console.error = jest.fn();
 
     await productImageService.deleteImage('do-not-exist.jpg');
 
     expect(console.error).toHaveBeenCalled();
+  });
+
+  it('throws a null error while trying to delete an image', async () => {
+    jest
+      .spyOn(fs, 'unlink')
+      .mockImplementation((_, callback) => callback(null));
+
+    console.error = jest.fn();
+
+    await productImageService.deleteImage('do-not-exist.jpg');
+
+    expect(console.error).not.toHaveBeenCalled();
   });
 });

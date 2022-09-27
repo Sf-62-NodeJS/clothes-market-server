@@ -101,6 +101,16 @@ describe('Comments service tests', function () {
     expect(response).toEqual(true);
   });
 
+  it('should return false on create comment', async () => {
+    jest.spyOn(Comments.prototype, 'save').mockImplementationOnce(() => false);
+    const response = await commentsService.createComment(
+      requestStub,
+      responseStub
+    );
+
+    expect(response).toEqual(false);
+  });
+
   it('should update comment', async () => {
     const response = await commentsService.updateComment(
       requestStub,
