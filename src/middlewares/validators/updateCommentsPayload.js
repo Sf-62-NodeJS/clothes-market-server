@@ -2,7 +2,7 @@ const Joi = require('joi');
 
 const updateCommentsPayloadValidator = (req, res, next) => {
   const schema = Joi.object({
-    comment: Joi.string().min(2).required()
+    comment: Joi.string().min(1).required()
   });
   const { error } = schema.validate(req.body);
 
