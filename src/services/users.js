@@ -5,11 +5,11 @@ const bcrypt = require('bcryptjs');
 
 class UsersService {
   async createUser (req, res) {
-    await this.#createBaseUser(req, res, 'User');
+    await this.createBaseUser(req, res, 'User');
   }
 
   async createAdmin (req, res) {
-    await this.#createBaseUser(req, res, 'Admin');
+    await this.createBaseUser(req, res, 'Admin');
   }
 
   async getUsers (req, res) {
@@ -152,7 +152,7 @@ class UsersService {
     }
   }
 
-  async #createBaseUser (req, res, userRole) {
+  async createBaseUser (req, res, userRole) {
     try {
       const statuses = await UserStatuses.find().exec();
       const statusActive = statuses.find(({ name }) => name === 'Active');

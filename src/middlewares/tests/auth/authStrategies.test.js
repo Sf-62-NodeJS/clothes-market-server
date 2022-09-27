@@ -1,4 +1,5 @@
-const { User } = require('../../../models');
+const { User, UserStatuses } = require('../../../models');
+const { UsersService } = require('../../../services');
 const { authStrategies } = require('../../auth');
 const bcrypt = require('bcryptjs');
 
@@ -11,7 +12,7 @@ jest.mock('../../../models', () => ({
           name: 'name4',
           middleName: 'middlename4',
           surname: 'surname4',
-          email: 'email4@gmail.com',
+          email: 'email@gmail.com',
           password: 'somepassword',
           phoneNumber: '0897133456',
           address: 'address 15',
@@ -29,22 +30,22 @@ jest.mock('../../../models', () => ({
         })
       };
     }
-  },
-  UserRoles: class UserRoles {
-    static findOne () {
-      return {
-        exec: () => ({
-          _id: '12ad122xa7b',
-          name: 'User'
-        })
-      };
-    }
   }
 }));
 
 jest.mock('bcryptjs');
 
-describe('userAuthentication tests', () => {
+jest.mock('../../../services', () => ({
+  UsersService: class UsersService {
+    async createUser () {
+      return true;
+    }
+  }
+}));
+
+const doneStub = jest.fn();
+
+describe('userAuthentication verifyCustom tests', () => {
   const requestStub = {
     body: {
       email: 'email@email.com',
@@ -53,18 +54,17 @@ describe('userAuthentication tests', () => {
   };
 
   const profileStub = {
-    role: 'User',
-    name: 'Name',
-    displayName: 'DisplayName'
+    given_name: 'Name',
+    family_name: 'Surname',
+    id: '123456789123456789',
+    email: 'email@gmail.com'
   };
-
-  const doneStub = jest.fn();
 
   const requestGoogleStub = jest.fn();
   const accessTokenGoogleStub = jest.fn();
   const refreshTokenGoogleStub = jest.fn();
 
-  it('should return done on verifyGoogle', async () => {
+  it('Google should return done on successfully created user', async () => {
     await authStrategies.verifyGoogle(
       requestGoogleStub,
       accessTokenGoogleStub,
@@ -76,7 +76,7 @@ describe('userAuthentication tests', () => {
     expect(doneStub).toHaveBeenCalled();
   });
 
-  it('should return done on successful check', async () => {
+  it('Custom should return done on successful check', async () => {
     bcrypt.compare.mockResolvedValue(true);
 
     await authStrategies.verifyCustom(requestStub, doneStub);
@@ -84,7 +84,19 @@ describe('userAuthentication tests', () => {
     expect(doneStub).toHaveBeenCalled();
   });
 
-  it('should return done on unsuccessful password check', async () => {
+  it('Google should return done on successful user check', async () => {
+    await authStrategies.verifyGoogle(
+      requestGoogleStub,
+      accessTokenGoogleStub,
+      refreshTokenGoogleStub,
+      profileStub,
+      doneStub
+    );
+
+    expect(doneStub).toHaveBeenCalled();
+  });
+
+  it('Custom should return done on unsuccessful password check', async () => {
     bcrypt.compare.mockResolvedValue(false);
 
     await authStrategies.verifyCustom(requestStub, doneStub);
@@ -92,7 +104,31 @@ describe('userAuthentication tests', () => {
     expect(doneStub).toHaveBeenCalled();
   });
 
-  it('should return done on unsuccessful user check', async () => {
+  it('Custom should return done on unsuccessful user status check', async () => {
+    UserStatuses.findOne = () => {
+      return {
+        exec: () => ({ _id: 'Active' })
+      };
+    };
+
+    await authStrategies.verifyCustom(requestStub, doneStub);
+
+    expect(doneStub).toHaveBeenCalled();
+  });
+
+  it('Google should return done on unsuccessful user status check', async () => {
+    await authStrategies.verifyGoogle(
+      requestGoogleStub,
+      accessTokenGoogleStub,
+      refreshTokenGoogleStub,
+      profileStub,
+      doneStub
+    );
+
+    expect(doneStub).toHaveBeenCalled();
+  });
+
+  it('Custom should return done on unsuccessful user check', async () => {
     User.findOne = () => {
       return {
         exec: () => null
@@ -100,6 +136,32 @@ describe('userAuthentication tests', () => {
     };
 
     await authStrategies.verifyCustom(requestStub, doneStub);
+
+    expect(doneStub).toHaveBeenCalled();
+  });
+
+  it('Google should return done on unsuccessful user check', async () => {
+    await authStrategies.verifyGoogle(
+      requestGoogleStub,
+      accessTokenGoogleStub,
+      refreshTokenGoogleStub,
+      profileStub,
+      doneStub
+    );
+
+    expect(doneStub).toHaveBeenCalled();
+  });
+
+  it('Google should return done on unsuccessful user check', async () => {
+    UsersService.prototype.createUser = () => false;
+
+    await authStrategies.verifyGoogle(
+      requestGoogleStub,
+      accessTokenGoogleStub,
+      refreshTokenGoogleStub,
+      profileStub,
+      doneStub
+    );
 
     expect(doneStub).toHaveBeenCalled();
   });
