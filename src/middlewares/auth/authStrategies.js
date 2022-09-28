@@ -18,8 +18,9 @@ const checkUser = async (req) => {
 
 const verifyCustom = async (req, done) => {
   const user = await checkUser(req.body);
+  const activeStatus = await UserStatuses.findOne({ name: 'Active' }).exec();
 
-  if (!user || user === 'Bad status') {
+  if (!user || user.status.toString() !== activeStatus._id.toString()) {
     return done(null, false);
   }
 
