@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
 
 const orderSchema = new mongoose.Schema({
+  name: String,
+  surname: String,
+  middleName: String,
+  phoneNumber: String,
+  address: String,
   date: {
     type: Date,
     default: Date.now

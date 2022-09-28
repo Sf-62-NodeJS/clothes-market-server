@@ -13,10 +13,14 @@ jest.mock('../../models', () => ({
 
     static find () {
       return {
-        exec: () => ({
-          id: '632883492f58e39923fe1ac1',
-          products: ['632883492f58e39923fe1ac4'],
-          status: '632883492f58e39923fe1ac2'
+        skip: () => ({
+          limit: () => ({
+            exec: () => ({
+              id: '632883492f58e39923fe1ac1',
+              products: ['632883492f58e39923fe1ac4'],
+              status: '632883492f58e39923fe1ac2'
+            })
+          })
         }),
         countDocuments: () => ({
           exec: () => 1
@@ -129,7 +133,11 @@ describe('Orders controller tests', function () {
       countDocuments: () => ({
         exec: () => 0
       }),
-      exec: () => null
+      skip: () => ({
+        limit: () => ({
+          exec: () => null
+        })
+      })
     });
     const response = await ordersController.getOrders(
       requestStub,

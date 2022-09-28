@@ -13,16 +13,12 @@ class UsersService {
   }
 
   async getUsers (req, res) {
-    const { _id, name, email, status, role, skip, take } = req.query;
-
-    const query = {};
-    if (_id) query._id = _id;
-    if (name) query.name = name;
-    if (email) query.email = email;
-    if (status) query.status = status;
-    if (role) query.role = role;
-    if (skip) query.skip = skip;
-    if (take) query.take = take;
+    const query = req.query;
+    Object.keys(query).forEach((key) => {
+      if (!query[key]) {
+        delete query[key];
+      }
+    });
 
     try {
       const users = await User.find(query)

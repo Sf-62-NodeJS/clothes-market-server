@@ -188,14 +188,14 @@
             "name": "skip",
             "in": "query",
             "required": false,
-            "type": "string",
+            "type": "number",
             "x-oad-type": "parameter"
           },
           {
             "name": "take",
             "in": "query",
             "required": false,
-            "type": "string",
+            "type": "number",
             "x-oad-type": "parameter"
           }
         ],
@@ -1639,6 +1639,21 @@
             "schema": {
               "type": "object",
               "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "surname": {
+                  "type": "string"
+                },
+                "middleName": {
+                  "type": "string"
+                },
+                "phoneNumber": {
+                  "type": "string"
+                },
+                "address": {
+                  "type": "string"
+                },
                 "products": {
                   "type": "array",
                   "items": {
@@ -1656,12 +1671,7 @@
               "type": "boolean"
             },
             "examples": {
-              "application/json": {
-                "id": "123423425235",
-                "date": "2022-09-12",
-                "status": "3252345s5sd5sds",
-                "products": ["2543sdg434525"]
-              }
+              "application/json": true
             }
           },
           "500": {
@@ -1695,6 +1705,27 @@
             "in": "query",
             "required": false,
             "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "type": "number",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "required": false,
+            "type": "number",
             "x-oad-type": "parameter"
           }
         ],
@@ -1760,6 +1791,21 @@
             "schema": {
               "type": "object",
               "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "surname": {
+                  "type": "string"
+                },
+                "middleName": {
+                  "type": "string"
+                },
+                "phoneNumber": {
+                  "type": "string"
+                },
+                "address": {
+                  "type": "string"
+                },
                 "orderStatus": {
                   "type": "string"
                 },

@@ -1,12 +1,11 @@
-const { Orders } = require('../models');
-const { OrderStatuses } = require('../models');
-const { Product } = require('../models');
+const { Orders, Product } = require('../models');
+const { OrderStatusesService } = require('../services');
+
+const orderStatusesService = new OrderStatusesService();
 
 class OrdersService {
   async createOrder (req, res) {
-    const orderStatus = await OrderStatuses.findOne({
-      name: 'In progress'
-    }).exec();
+    const orderStatus = await orderStatusesService.getStatusInProgress();
     const order = new Orders(req.body);
     order.status = orderStatus._id;
     await order.save();
@@ -14,14 +13,19 @@ class OrdersService {
   }
 
   async getOrders (req, res) {
-    const { _id, status } = req.query;
-    const query = {};
-
-    if (_id) query._id = _id;
-    if (status) query.status = status;
+    const query = req.query;
+    Object.keys(query).forEach((key) => {
+      if (!query[key]) {
+        delete query[key];
+      }
+    });
 
     const count = Orders.find(query).countDocuments().exec();
-    const orders = await Orders.find(query).exec();
+    const orders = await Orders.find(query)
+      .skip(+query.skip || 0)
+      .limit(+query.take || 50)
+      .exec();
+
     return {
       total_size: count,
       list: orders ? res.json(orders) : res.json([])
@@ -32,7 +36,7 @@ class OrdersService {
     const order = await Orders.findOne({ _id: req.params.id }).exec();
     if (!order) return res.boom.notFound('order not found');
 
-    const statuses = await OrderStatuses.find().exec();
+    const statuses = await orderStatusesService.getStatuses();
     const statusResolved = statuses.find(({ name }) => name === 'Resolved');
     const statusRejected = statuses.find(({ name }) => name === 'Rejected');
     const newStatus = req.body.orderStatus;
@@ -64,7 +68,7 @@ class OrdersService {
     if (
       newStatus &&
       (newStatus === statusResolved._id.toString() ||
-        newStatus === statusRejected.toString())
+        newStatus === statusRejected._id.toString())
     ) {
       const updatedOrder = await this.#updateStatus(req, res, order);
       if (updatedOrder) order.status = updatedOrder.status;
@@ -76,6 +80,11 @@ class OrdersService {
     await Orders.findByIdAndUpdate(
       req.params.id,
       {
+        name: req.body.name,
+        surname: req.body.surname,
+        middleName: req.body.middleName,
+        phoneNumber: req.body.phoneNumber,
+        address: req.body.address,
         products: order.products,
         status: order.status
       },
@@ -91,9 +100,7 @@ class OrdersService {
   }
 
   async #addProductsToOrder (req, res, order) {
-    const statusInProgress = await OrderStatuses.findOne({
-      name: 'In progress'
-    }).exec();
+    const statusInProgress = await orderStatusesService.getStatusInProgress();
 
     if (order.status.toString() === statusInProgress._id.toString()) {
       const allProducts = await Product.find().exec();
@@ -111,9 +118,7 @@ class OrdersService {
   }
 
   async #deleteProductsFromOrder (req, res, order) {
-    const statusInProgress = await OrderStatuses.findOne({
-      name: 'In progress'
-    }).exec();
+    const statusInProgress = await orderStatusesService.getStatusInProgress();
     const productsToDelete = req.body.productsToDelete;
     if (order.status.toString() === statusInProgress._id.toString()) {
       for (const product of req.body.productsToDelete) {
@@ -129,7 +134,7 @@ class OrdersService {
   }
 
   async #updateStatus (req, res, order) {
-    const statuses = await OrderStatuses.find().exec();
+    const statuses = await orderStatusesService.getStatuses();
     const statusToUpdate = statuses.find(
       ({ _id }) => _id.toString() === req.body.orderStatus
     );

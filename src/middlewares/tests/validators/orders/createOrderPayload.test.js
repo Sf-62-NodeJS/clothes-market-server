@@ -3,6 +3,11 @@ const { createOrderPayloadValidator } = require('../../../validators');
 describe('createOrderPayloadValidator tests', () => {
   const requestStub = {
     body: {
+      name: 'Name',
+      surname: 'Surname',
+      middleName: 'Middlename',
+      phoneNumber: '0898123456',
+      address: 'Address 15',
       products: ['632883492f58e39923fe1ac1']
     }
   };

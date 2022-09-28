@@ -3,7 +3,10 @@ const Joi = require('joi');
 const getOrdersQueryValidator = (req, res, next) => {
   const schema = Joi.object({
     _id: Joi.string().hex().length(24),
-    name: Joi.string().alphanum().min(2).max(45).trim(true)
+    status: Joi.string().hex().length(24),
+    name: Joi.string().alphanum().min(2).max(45).trim(true),
+    skip: Joi.number(),
+    take: Joi.number()
   });
   const { error } = schema.validate(req.query);
 

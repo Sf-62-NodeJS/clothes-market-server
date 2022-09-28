@@ -7,6 +7,11 @@ jest.mock('../../models', () => ({
     save () {
       return {
         id: '632883492f58e39923fe1ac1',
+        name: 'Pesho',
+        surname: 'Petrov',
+        middleName: 'Petrov',
+        phoneNumber: '0898786745',
+        address: 'Address 10',
         products: ['632883492f58e39923fe1ac4'],
         status: '632883492f58e39923fe1ac2'
       };
@@ -14,10 +19,14 @@ jest.mock('../../models', () => ({
 
     static find () {
       return {
-        exec: () => ({
-          id: '632883492f58e39923fe1ac1',
-          products: ['632883492f58e39923fe1ac4'],
-          status: '632883492f58e39923fe1ac2'
+        skip: () => ({
+          limit: () => ({
+            exec: () => ({
+              id: '632883492f58e39923fe1ac1',
+              products: ['632883492f58e39923fe1ac4'],
+              status: '632883492f58e39923fe1ac2'
+            })
+          })
         }),
         countDocuments: () => ({
           exec: () => 1
@@ -82,6 +91,12 @@ jest.mock('../../models', () => ({
           }
         ]
       };
+    }
+  },
+
+  UserRoles: class UserRoles {
+    static find () {
+      return { exec: () => [{ _id: 'Admin' }] };
     }
   },
 
@@ -151,6 +166,11 @@ describe('Orders integration tests', function () {
     const response = await request(app)
       .post('/orders')
       .send({
+        name: 'Pesho',
+        surname: 'Petrov',
+        middleName: 'Petrov',
+        phoneNumber: '0898786745',
+        address: 'Address 10',
         products: ['632883492f58e39923fe1ac4']
       });
 

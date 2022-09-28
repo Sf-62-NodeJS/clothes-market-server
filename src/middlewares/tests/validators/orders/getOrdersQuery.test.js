@@ -4,7 +4,10 @@ describe('getOrdersQueryValidator tests', () => {
   const requestStub = {
     query: {
       _id: '630f51a601db34bca1f8b19f',
-      name: 'Name'
+      status: '630f51a601db34bca1f8b19f',
+      name: 'Name',
+      skip: 1,
+      take: 50
     }
   };
   const nextFunctionMock = jest.fn();
