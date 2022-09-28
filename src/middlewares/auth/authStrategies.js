@@ -8,14 +8,9 @@ const usersService = new UsersService();
 
 const checkUser = async (req) => {
   const user = await User.findOne({ email: req.email }).exec();
-  const status = await UserStatuses.findOne({ name: 'Active' }).exec();
 
   if (!user) {
     return false;
-  }
-
-  if (user.status.toString() !== status._id.toString()) {
-    return 'Bad status';
   }
 
   return user;
@@ -49,12 +44,9 @@ const verifyGoogle = async (
   done
 ) => {
   const user = await checkUser(profile);
+  const activeStatus = await UserStatuses.findOne({ name: 'Active' }).exec();
 
-  if (user === 'Bad status') {
-    return done(null, false);
-  }
-
-  if (user) {
+  if (user && user.status.toString() === activeStatus._id.toString()) {
     return done(null, {
       role: user.role,
       name: user.name.concat(` ${user.surname}`),
@@ -65,8 +57,11 @@ const verifyGoogle = async (
   const newUserData = {
     body: {
       name: profile.given_name,
+      middleName: 'Not provided',
       surname: profile.family_name,
       password: profile.id,
+      phoneNumber: 'Not provided',
+      address: 'Not provided',
       email: profile.email
     }
   };
