@@ -13,7 +13,9 @@ const checkUser = async (req) => {
 };
 
 const getStatus = async () => {
-  return await UserStatuses.findOne({ name: 'Active' }).exec();
+  const status = await UserStatuses.findOne({ name: 'Active' }).exec();
+
+  return status;
 };
 
 const verifyCustom = async (req, done) => {
@@ -68,17 +70,21 @@ const verifyGoogle = async (
   };
 
   const res = null;
-  await usersService.createBaseUser(newUserData, res, 'User');
+  const newUser = await usersService.createBaseUser(newUserData, res, 'User');
 
-  const newUser = await checkUser({ email: profile.email });
+  if (newUser) {
+    const user = await checkUser({ email: profile.email });
 
-  return newUser
-    ? done(null, {
-      role: user.role,
-      name: `${user.name} ${user.surname}`,
-      id: user._id
-    })
-    : done(null, false);
+    return user
+      ? done(null, {
+        role: user.role,
+        name: `${user.name} ${user.surname}`,
+        id: user._id
+      })
+      : done(null, false);
+  }
+
+  return done(null, false);
 };
 
 const googleSettings = {
