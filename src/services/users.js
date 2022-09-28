@@ -1,10 +1,12 @@
 const { User } = require('../models');
 const { UserRoles } = require('../models');
 const { UserStatuses } = require('../models');
-const { Product } = require('../models');
 const bcrypt = require('bcryptjs');
+const { ProductsService } = require('../services');
 
 class UsersService {
+  #productService = new ProductsService();
+
   async createUser (req, res) {
     await this.#createBaseUser(req, res, 'User');
   }
@@ -189,12 +191,14 @@ class UsersService {
 
   async addProducts (req, res) {
     try {
-      const user = await User.findById(req.params.id).exec();
+      const user = await User.findById(req.session.passport.user.id).exec();
       if (!user) {
         return res.boom.notFound('User not found');
       }
 
-      const reqProduct = await Product.findById(req.body.productId).exec();
+      const reqProduct = await this.#productService.findById(
+        req.body.productId
+      );
       if (!reqProduct) {
         return res.boom.badRequest('Product does not exist');
       }
@@ -214,7 +218,7 @@ class UsersService {
       if (productInCart) {
         await User.updateOne(
           {
-            _id: req.params.id,
+            _id: req.session.passport.user.id,
             'cart.productId': req.body.productId,
             'cart.sizeId': req.body.sizeId
           },
@@ -226,7 +230,7 @@ class UsersService {
         ).exec();
       } else {
         await User.updateOne(
-          { _id: req.params.id },
+          { _id: req.session.passport.user.id },
           { $push: { cart: req.body } }
         ).exec();
       }
@@ -258,22 +262,22 @@ class UsersService {
 
   async deleteProducts (req, res) {
     try {
-      const user = await User.findById(req.params.id).exec();
+      const user = await User.findById(req.session.passport.user.id).exec();
       if (!user) {
         return res.boom.notFound('User not found');
-      }
-      if (!Object.keys(req.body).length) {
-        return res.boom.badRequest('Request body cannot be empty');
       }
       const cardItems = await this.#findProductsByQuery(req.body, user);
       if (!cardItems.length) {
         return res.boom.notFound('No items with these parameters found.');
       }
-      const product = await User.findByIdAndUpdate(req.params.id, {
-        $pull: {
-          cart: req.body
+      const product = await User.findByIdAndUpdate(
+        req.session.passport.user.id,
+        {
+          $pull: {
+            cart: req.body
+          }
         }
-      }).exec();
+      ).exec();
       return product
         ? res.json(true)
         : res.boom.badRequest('An error occured while deleting product');
@@ -284,7 +288,7 @@ class UsersService {
 
   async getProducts (req, res) {
     try {
-      const user = await User.findById(req.query.userId).exec();
+      const user = await User.findById(req.session.passport.user.id).exec();
       if (!user) {
         return res.boom.notFound('User not found');
       }

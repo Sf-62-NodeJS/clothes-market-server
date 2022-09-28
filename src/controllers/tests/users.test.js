@@ -257,6 +257,13 @@ describe('usersController tests', () => {
       sizeId: '1',
       quantity: 3
     };
+    requestStub.session = {
+      passport: {
+        user: {
+          id: 'someid'
+        }
+      }
+    };
 
     it('should add product to cart when product in cart', async () => {
       User.findById.mockReturnValueOnce({ exec: execMock });
@@ -396,23 +403,7 @@ describe('usersController tests', () => {
       await usersController.deleteProducts(requestStub, responseStub);
       expect(responseStub.boom.notFound).toBeCalledWith('User not found');
     });
-    it('should fail when request body is empty', async () => {
-      User.findById.mockReturnValueOnce({ exec: execMock });
-      execMock.mockReturnValueOnce({
-        cart: [
-          {
-            productId: '1',
-            sizeId: '1',
-            quantity: 1
-          }
-        ]
-      });
-      requestStub.body = {};
-      await usersController.deleteProducts(requestStub, responseStub);
-      expect(responseStub.boom.badRequest).toBeCalledWith(
-        'Request body cannot be empty'
-      );
-    });
+
     it('should fail when no card items found with given filter', async () => {
       User.findById.mockReturnValueOnce({ exec: execMock });
       execMock.mockReturnValueOnce({

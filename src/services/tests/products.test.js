@@ -324,4 +324,12 @@ describe('Products service tests', function () {
 
     expect(response).toBeFalsy();
   });
+
+  it('should find document by id', async () => {
+    const id = 'someId';
+    const execMock = jest.fn();
+    Product.findById = () => ({ exec: execMock });
+    await productsService.findById(id);
+    expect(execMock).toHaveBeenCalled();
+  });
 });

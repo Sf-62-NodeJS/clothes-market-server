@@ -38,11 +38,20 @@ usersRouter.patch('/block/:id', userAuthentication('Admin', 'Super admin'), idPa
 usersRouter.patch('/delete/:id', userAuthentication('Admin', 'Super admin'), idParamValidator, usersController.deleteUser);
 
 usersRouter.post(
-  '/cart/:id',
+  '/cart',
+  userAuthentication('User', 'Admin', 'Super admin'),
   addProductToCartPayloadValidator,
   usersController.addProducts
 );
-usersRouter.delete('/cart/:id', usersController.deleteProducts);
-usersRouter.get('/cart/', usersController.getProducts);
+usersRouter.delete(
+  '/cart/:id',
+  userAuthentication('User', 'Admin', 'Super admin'),
+  usersController.deleteProducts
+);
+usersRouter.get(
+  '/cart/',
+  userAuthentication('User', 'Admin', 'Super admin'),
+  usersController.getProducts
+);
 
 module.exports = usersRouter;
