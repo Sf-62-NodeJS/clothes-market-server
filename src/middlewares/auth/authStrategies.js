@@ -67,21 +67,18 @@ const verifyGoogle = async (
     }
   };
 
-  const newUser = await usersService.createUser(newUserData);
+  const res = null;
+  await usersService.createBaseUser(newUserData, res, 'User');
 
-  if (newUser) {
-    const user = await User.findOne({ email: profile.email }).exec();
+  const newUser = await checkUser({ email: profile.email });
 
-    return user
-      ? done(null, {
-        role: user.role,
-        name: user.name.concat(` ${user.surname}`),
-        id: user._id
-      })
-      : done(null, false);
-  }
-
-  return done(null, false);
+  return newUser
+    ? done(null, {
+      role: user.role,
+      name: `${user.name} ${user.surname}`,
+      id: user._id
+    })
+    : done(null, false);
 };
 
 const googleSettings = {

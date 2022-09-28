@@ -37,7 +37,7 @@ jest.mock('bcryptjs');
 
 jest.mock('../../../services', () => ({
   UsersService: class UsersService {
-    async createUser () {
+    async createBaseUser () {
       return true;
     }
   }
@@ -153,7 +153,7 @@ describe('userAuthentication verifyCustom tests', () => {
   });
 
   it('Google should return done on unsuccessful user check', async () => {
-    UsersService.prototype.createUser = () => false;
+    UsersService.prototype.createBaseUser = () => false;
 
     await authStrategies.verifyGoogle(
       requestGoogleStub,
