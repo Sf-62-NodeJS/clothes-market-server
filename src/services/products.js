@@ -187,7 +187,7 @@ class ProductsService {
   }
 
   async findById (id) {
-    return await Product.findById(id).exec();
+    return Product.findById(id);
   }
 }
 

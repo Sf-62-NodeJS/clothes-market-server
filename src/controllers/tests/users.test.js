@@ -276,8 +276,7 @@ describe('usersController tests', () => {
           }
         ]
       });
-      Product.findById.mockReturnValueOnce({ exec: execMock });
-      execMock.mockReturnValueOnce({
+      Product.findById.mockReturnValueOnce({
         sizes: ['1', '2', '3']
       });
       User.updateOne.mockReturnValueOnce({ exec: execMock });
@@ -289,7 +288,9 @@ describe('usersController tests', () => {
       expect(response).toBe(true);
     });
     it('should add product when product not in cart', async () => {
-      Product.findById.mockReturnValueOnce({ exec: execMock });
+      Product.findById.mockReturnValueOnce({
+        sizes: ['1', '2', '3']
+      });
       User.findById.mockReturnValueOnce({ exec: execMock });
       User.updateOne.mockReturnValueOnce({ exec: execMock });
       execMock.mockReturnValueOnce({
@@ -300,9 +301,6 @@ describe('usersController tests', () => {
             quantity: 3
           }
         ]
-      });
-      execMock.mockReturnValueOnce({
-        sizes: ['1', '2', '3']
       });
       const response = await usersController.addProducts(
         requestStub,
@@ -319,7 +317,7 @@ describe('usersController tests', () => {
     });
 
     it('should fail when Product does not exist', async () => {
-      Product.findById.mockReturnValueOnce({ exec: execMock });
+      Product.findById.mockReturnValueOnce(null);
       User.findById.mockReturnValueOnce({ exec: execMock });
       execMock.mockReturnValueOnce({
         cart: [
@@ -330,7 +328,6 @@ describe('usersController tests', () => {
           }
         ]
       });
-      execMock.mockReturnValueOnce(null);
       requestStub.body = {
         productId: '1',
         sizeId: '1',
@@ -342,7 +339,9 @@ describe('usersController tests', () => {
       );
     });
     it('should fail when Product not available in given Size', async () => {
-      Product.findById.mockReturnValueOnce({ exec: execMock });
+      Product.findById.mockReturnValueOnce({
+        sizes: ['2', '3']
+      });
       User.findById.mockReturnValueOnce({ exec: execMock });
       execMock.mockReturnValueOnce({
         cart: [
@@ -352,9 +351,6 @@ describe('usersController tests', () => {
             quantity: 3
           }
         ]
-      });
-      execMock.mockReturnValueOnce({
-        sizes: ['2', '3']
       });
       await usersController.addProducts(requestStub, responseStub);
       expect(responseStub.boom.badRequest).toBeCalledWith(

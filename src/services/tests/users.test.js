@@ -338,8 +338,7 @@ describe('Users service tests', function () {
           }
         ]
       });
-      Product.findById.mockReturnValueOnce({ exec: execMock });
-      execMock.mockReturnValueOnce({
+      Product.findById.mockReturnValueOnce({
         sizes: ['1', '2', '3']
       });
       User.updateOne.mockReturnValueOnce({ exec: execMock });
@@ -351,7 +350,9 @@ describe('Users service tests', function () {
       expect(response).toBe(true);
     });
     it('should add product when product not in cart', async () => {
-      Product.findById.mockReturnValueOnce({ exec: execMock });
+      Product.findById.mockReturnValueOnce({
+        sizes: ['1', '2', '3']
+      });
       User.findById.mockReturnValueOnce({ exec: execMock });
       User.updateOne.mockReturnValueOnce({ exec: execMock });
       execMock.mockReturnValueOnce({
@@ -362,9 +363,6 @@ describe('Users service tests', function () {
             quantity: 3
           }
         ]
-      });
-      execMock.mockReturnValueOnce({
-        sizes: ['1', '2', '3']
       });
       const response = await usersService.addProducts(
         requestStub,
@@ -380,7 +378,7 @@ describe('Users service tests', function () {
       expect(responseStub.boom.notFound).toBeCalledWith('User not found');
     });
     it('should fail when Product does not exist', async () => {
-      Product.findById.mockReturnValueOnce({ exec: execMock });
+      Product.findById.mockReturnValueOnce(null);
       User.findById.mockReturnValueOnce({ exec: execMock });
       execMock.mockReturnValueOnce({
         cart: [
@@ -403,7 +401,9 @@ describe('Users service tests', function () {
       );
     });
     it('should fail when Product not available in given Size', async () => {
-      Product.findById.mockReturnValueOnce({ exec: execMock });
+      Product.findById.mockReturnValueOnce({
+        sizes: ['2', '3']
+      });
       User.findById.mockReturnValueOnce({ exec: execMock });
       execMock.mockReturnValueOnce({
         cart: [
@@ -413,9 +413,6 @@ describe('Users service tests', function () {
             quantity: 3
           }
         ]
-      });
-      execMock.mockReturnValueOnce({
-        sizes: ['2', '3']
       });
       await usersService.addProducts(requestStub, responseStub);
       expect(responseStub.boom.badRequest).toBeCalledWith(
