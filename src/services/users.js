@@ -7,21 +7,21 @@ class UsersService {
   async createUser (req, res) {
     const user = await this.createBaseUser(req, 'User');
 
-    return user === false
-      ? res.boom.badRequest('user already exists')
-      : user === null
-        ? res.boom.badImplementation()
-        : res.json(true);
+    if (user === false) return res.boom.badRequest('user already exists');
+
+    if (user === null) return res.boom.badImplementation();
+
+    return res.json(true);
   }
 
   async createAdmin (req, res) {
     const admin = await this.createBaseUser(req, 'Admin');
 
-    return admin === false
-      ? res.boom.badRequest('admin already exists')
-      : admin === null
-        ? res.boom.badImplementation()
-        : res.json(true);
+    if (admin === false) return res.boom.badRequest('admin already exists');
+
+    if (admin === null) return res.boom.badImplementation();
+
+    return res.json(true);
   }
 
   async getUsers (req, res) {
