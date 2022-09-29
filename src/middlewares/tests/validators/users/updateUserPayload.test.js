@@ -1,10 +1,13 @@
-const { updateUserPasswordPayloadValidator } = require('../../validators');
+const { updateUserPayloadValidator } = require('../../../validators');
 
-describe('updateUserPasswordPayloadValidator tests', () => {
+describe('updateUserPayloadValidator tests', () => {
   const requestStub = {
     body: {
-      oldPassword: 'oldPassword123',
-      newPassword: 'newPassword12345'
+      name: 'Name',
+      surname: 'Surname',
+      middleName: 'Middlename',
+      phoneNumber: '0898123456',
+      address: 'Address 15'
     }
   };
   const nextFunctionMock = jest.fn();
@@ -15,23 +18,15 @@ describe('updateUserPasswordPayloadValidator tests', () => {
   };
 
   it('should call next function on valid payload', () => {
-    updateUserPasswordPayloadValidator(
-      requestStub,
-      responseStub,
-      nextFunctionMock
-    );
+    updateUserPayloadValidator(requestStub, responseStub, nextFunctionMock);
 
     expect(nextFunctionMock).toHaveBeenCalled();
     expect(responseStub.boom.badRequest).not.toHaveBeenCalled();
   });
 
   it('should call badRequest function on invalid payload', () => {
-    requestStub.body.oldPassword = 'p';
-    updateUserPasswordPayloadValidator(
-      requestStub,
-      responseStub,
-      nextFunctionMock
-    );
+    requestStub.body.name = 'N';
+    updateUserPayloadValidator(requestStub, responseStub, nextFunctionMock);
 
     expect(responseStub.boom.badRequest).toHaveBeenCalled();
   });
