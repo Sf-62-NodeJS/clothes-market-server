@@ -33,17 +33,31 @@ class OrdersService {
   }
 
   async updateOrder (req, res) {
-    const order = await Orders.findOne({ _id: req.params.id }).exec();
-    if (!order) return res.boom.notFound('order not found');
-
     const statuses = await orderStatusesService.getStatuses();
-    const statusResolved = statuses.find(({ name }) => name === 'Resolved');
-    const statusRejected = statuses.find(({ name }) => name === 'Rejected');
-    const newStatus = req.body.orderStatus;
+    const order = await Orders.findOne({
+      _id: req.params.id,
+      status: statuses.find(({ name }) => name === 'In progress')._id
+    }).exec();
+
+    if (!order) {
+      return res.boom.notFound(
+        'Order not found or it is already resolved or rejected'
+      );
+    }
+
+    const newStatus = statuses.find(
+      ({ _id }) => _id.toString() === req.body.orderStatus
+    );
+    const statusInBody = req.body.orderStatus;
+
+    if (statusInBody && !newStatus) {
+      return res.boom.notFound('status does not exist');
+    }
+
     const productsToAdd = req.body.productsToAdd;
     const productsToDelete = req.body.productsToDelete;
 
-    if (newStatus && (productsToAdd || productsToDelete)) {
+    if (statusInBody && (productsToAdd || productsToDelete)) {
       return res.boom.badRequest(
         'cannot add/remove products and change status at the same time'
       );
@@ -65,18 +79,6 @@ class OrdersService {
       }
     }
 
-    if (
-      newStatus &&
-      (newStatus === statusResolved._id.toString() ||
-        newStatus === statusRejected._id.toString())
-    ) {
-      const updatedOrder = await this.#updateStatus(req, res, order);
-      if (updatedOrder) order.status = updatedOrder.status;
-      else {
-        return res.boom.badRequest('order already resolved/rejected');
-      }
-    }
-
     await Orders.findByIdAndUpdate(
       req.params.id,
       {
@@ -86,7 +88,7 @@ class OrdersService {
         phoneNumber: req.body.phoneNumber,
         address: req.body.address,
         products: order.products,
-        status: order.status
+        status: req.body.orderStatus
       },
       { new: true }
     ).exec();
@@ -100,54 +102,26 @@ class OrdersService {
   }
 
   async #addProductsToOrder (req, res, order) {
-    const statusInProgress = await orderStatusesService.getStatusInProgress();
-
-    if (order.status.toString() === statusInProgress._id.toString()) {
-      const allProducts = await Product.find().exec();
-      for (const product of req.body.productsToAdd) {
-        const productFound = allProducts.find(
-          ({ _id }) => _id.toString() === product
-        );
-        if (!productFound) return false;
-      }
-      order.products.push(...req.body.productsToAdd);
-      return order;
-    } else {
-      res.boom.badRequest('cannot add products to resolved/rejected orders');
+    const allProducts = await Product.find().exec();
+    for (const product of req.body.productsToAdd) {
+      const productFound = allProducts.find(
+        ({ _id }) => _id.toString() === product
+      );
+      if (!productFound) return false;
     }
+    order.products.push(...req.body.productsToAdd);
+    return order;
   }
 
   async #deleteProductsFromOrder (req, res, order) {
-    const statusInProgress = await orderStatusesService.getStatusInProgress();
     const productsToDelete = req.body.productsToDelete;
-    if (order.status.toString() === statusInProgress._id.toString()) {
-      for (const product of req.body.productsToDelete) {
-        const found = productsToDelete.find((p) => p === product);
-        const index = order.products.indexOf(found);
-        if (index > -1) order.products.splice(index, 1);
-        else return false;
-      }
-      return order;
-    } else {
-      res.boom.badRequest('cannot remove products to resolved/rejected orders');
+    for (const product of req.body.productsToDelete) {
+      const found = productsToDelete.find((p) => p === product);
+      const index = order.products.indexOf(found);
+      if (index > -1) order.products.splice(index, 1);
+      else return false;
     }
-  }
-
-  async #updateStatus (req, res, order) {
-    const statuses = await orderStatusesService.getStatuses();
-    const statusToUpdate = statuses.find(
-      ({ _id }) => _id.toString() === req.body.orderStatus
-    );
-    const statusInProgress = statuses.find(
-      ({ name }) => name === 'In progress'
-    );
-    const currentStatus = order.status;
-    if (statusInProgress._id.toString() === currentStatus.toString()) {
-      order.status = statusToUpdate;
-      return order;
-    } else {
-      return false;
-    }
+    return order;
   }
 }
 
