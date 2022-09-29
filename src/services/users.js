@@ -5,15 +5,23 @@ const bcrypt = require('bcryptjs');
 
 class UsersService {
   async createUser (req, res) {
-    const user = await this.createBaseUser(req, res, 'User');
+    const user = await this.createBaseUser(req, 'User');
 
-    return user ? res.json(true) : res.boom.badRequest('user already exists');
+    return user === false
+      ? res.boom.badRequest('user already exists')
+      : user === null
+        ? res.boom.badImplementation()
+        : res.json(true);
   }
 
   async createAdmin (req, res) {
-    const admin = await this.createBaseUser(req, res, 'Admin');
+    const admin = await this.createBaseUser(req, 'Admin');
 
-    return admin ? res.json(true) : res.boom.badRequest('admin already exists');
+    return admin === false
+      ? res.boom.badRequest('admin already exists')
+      : admin === null
+        ? res.boom.badImplementation()
+        : res.json(true);
   }
 
   async getUsers (req, res) {
@@ -156,7 +164,7 @@ class UsersService {
     }
   }
 
-  async createBaseUser (req, res, userRole) {
+  async createBaseUser (req, userRole) {
     try {
       const statuses = await UserStatuses.find().exec();
       const statusActive = statuses.find(({ name }) => name === 'Active');
@@ -183,7 +191,7 @@ class UsersService {
         return false;
       }
     } catch (err) {
-      res.boom.badImplementation();
+      return null;
     }
   }
 }

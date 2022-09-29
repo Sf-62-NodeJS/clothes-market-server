@@ -69,8 +69,7 @@ const verifyGoogle = async (
     }
   };
 
-  const res = null;
-  const newUser = await usersService.createBaseUser(newUserData, res, 'User');
+  const newUser = await usersService.createBaseUser(newUserData, 'User');
 
   if (newUser) {
     const user = await checkUser({ email: profile.email });
