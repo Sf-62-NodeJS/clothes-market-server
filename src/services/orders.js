@@ -67,9 +67,7 @@ class OrdersService {
       const updatedOrder = await this.#addProductsToOrder(req, res, order);
       if (updatedOrder) order.products = updatedOrder.products;
       else {
-        return res.boom.notFound(
-          'cannot add a product that does not exist or is with status non available'
-        );
+        return res.boom.notFound('cannot add a product that does not exist');
       }
     }
 

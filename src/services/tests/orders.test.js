@@ -85,6 +85,24 @@ jest.mock('../../models', () => ({
         ]
       };
     }
+  },
+
+  Product: class Product {
+    static find () {
+      return {
+        exec: () => [
+          {
+            _id: '632883492f58e39923fe1ac5'
+          },
+          {
+            _id: '632883492f58e39923fe1ac6'
+          },
+          {
+            _id: '632883492f58e39923fe1ac7'
+          }
+        ]
+      };
+    }
   }
 }));
 
@@ -103,6 +121,7 @@ describe('Orders service tests', function () {
       status: '63287edae38cbcaa5879227e'
     }
   };
+
   const responseStub = {
     boom: {
       badRequest: jest.fn(),
