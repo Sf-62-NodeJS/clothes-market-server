@@ -41,17 +41,17 @@ usersRouter.post(
   '/cart',
   userAuthentication('User', 'Admin', 'Super admin'),
   addProductToCartPayloadValidator,
-  usersController.addProducts
+  usersController.addProductsToCart
 );
 usersRouter.delete(
   '/cart/:id',
   userAuthentication('User', 'Admin', 'Super admin'),
-  usersController.deleteProducts
+  usersController.deleteProductsFromCart
 );
 usersRouter.get(
   '/cart/',
   userAuthentication('User', 'Admin', 'Super admin'),
-  usersController.getProducts
+  usersController.getProductsFromCart
 );
 
 module.exports = usersRouter;

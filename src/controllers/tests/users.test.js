@@ -281,7 +281,7 @@ describe('usersController tests', () => {
       });
       User.updateOne.mockReturnValueOnce({ exec: execMock });
 
-      const response = await usersController.addProducts(
+      const response = await usersController.addProductsToCart(
         requestStub,
         responseStub
       );
@@ -302,7 +302,7 @@ describe('usersController tests', () => {
           }
         ]
       });
-      const response = await usersController.addProducts(
+      const response = await usersController.addProductsToCart(
         requestStub,
         responseStub
       );
@@ -312,7 +312,7 @@ describe('usersController tests', () => {
       User.findById.mockReturnValueOnce({ exec: execMock });
 
       execMock.mockReturnValueOnce(null);
-      await usersController.addProducts(requestStub, responseStub);
+      await usersController.addProductsToCart(requestStub, responseStub);
       expect(responseStub.boom.notFound).toBeCalledWith('User not found');
     });
 
@@ -333,7 +333,7 @@ describe('usersController tests', () => {
         sizeId: '1',
         quantity: 1
       };
-      await usersController.addProducts(requestStub, responseStub);
+      await usersController.addProductsToCart(requestStub, responseStub);
       expect(responseStub.boom.badRequest).toBeCalledWith(
         'Product does not exist'
       );
@@ -352,7 +352,7 @@ describe('usersController tests', () => {
           }
         ]
       });
-      await usersController.addProducts(requestStub, responseStub);
+      await usersController.addProductsToCart(requestStub, responseStub);
       expect(responseStub.boom.badRequest).toBeCalledWith(
         'Product not available in this size'
       );
@@ -361,7 +361,7 @@ describe('usersController tests', () => {
       User.findById.mockImplementationOnce(() => {
         throw Error('some error');
       });
-      await usersController.addProducts(requestStub, responseStub);
+      await usersController.addProductsToCart(requestStub, responseStub);
       expect(responseStub.boom.badImplementation).toBeCalled();
     });
   });
@@ -387,7 +387,7 @@ describe('usersController tests', () => {
         sizeId: '1',
         quantity: 1
       };
-      const response = await usersController.deleteProducts(
+      const response = await usersController.deleteProductsFromCart(
         requestStub,
         responseStub
       );
@@ -396,7 +396,7 @@ describe('usersController tests', () => {
     it('should fail when user does not exist', async () => {
       User.findById.mockReturnValueOnce({ exec: execMock });
       execMock.mockReturnValueOnce(null);
-      await usersController.deleteProducts(requestStub, responseStub);
+      await usersController.deleteProductsFromCart(requestStub, responseStub);
       expect(responseStub.boom.notFound).toBeCalledWith('User not found');
     });
 
@@ -416,7 +416,7 @@ describe('usersController tests', () => {
         sizeId: '1',
         quantity: 1
       };
-      await usersController.deleteProducts(requestStub, responseStub);
+      await usersController.deleteProductsFromCart(requestStub, responseStub);
       expect(responseStub.boom.notFound).toBeCalledWith(
         'No items with these parameters found.'
       );
@@ -442,7 +442,7 @@ describe('usersController tests', () => {
         quantity: 1
       };
 
-      await usersController.deleteProducts(requestStub, responseStub);
+      await usersController.deleteProductsFromCart(requestStub, responseStub);
       expect(responseStub.boom.badRequest).toBeCalledWith(
         'An error occured while deleting product'
       );
@@ -451,7 +451,7 @@ describe('usersController tests', () => {
       User.findById.mockImplementationOnce(() => {
         throw Error('some error');
       });
-      await usersController.deleteProducts(requestStub, responseStub);
+      await usersController.deleteProductsFromCart(requestStub, responseStub);
       expect(responseStub.boom.badImplementation).toBeCalled();
     });
   });
@@ -469,12 +469,11 @@ describe('usersController tests', () => {
         ]
       });
       requestStub.query = {
-        userId: '1',
         productId: '1',
         sizeId: '1',
         quantity: 1
       };
-      const response = await usersController.getProducts(
+      const response = await usersController.getProductsFromCart(
         requestStub,
         responseStub
       );
@@ -485,7 +484,7 @@ describe('usersController tests', () => {
     it('should fail when user not found', async () => {
       User.findById.mockReturnValueOnce({ exec: execMock });
       execMock.mockReturnValueOnce(null);
-      await usersController.getProducts(requestStub, responseStub);
+      await usersController.getProductsFromCart(requestStub, responseStub);
       expect(responseStub.boom.notFound).toBeCalledWith('User not found');
     });
     it('should fail when no items found', async () => {
@@ -499,14 +498,14 @@ describe('usersController tests', () => {
           }
         ]
       });
-      await usersController.getProducts(requestStub, responseStub);
+      await usersController.getProductsFromCart(requestStub, responseStub);
       expect(responseStub.boom.notFound).toBeCalledWith('No card items found');
     });
     it('should fail when error thrown', async () => {
       User.findById.mockImplementationOnce(() => {
         throw Error('some error');
       });
-      await usersController.getProducts(requestStub, responseStub);
+      await usersController.getProductsFromCart(requestStub, responseStub);
       expect(responseStub.boom.badImplementation).toBeCalled();
     });
   });

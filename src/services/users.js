@@ -189,7 +189,7 @@ class UsersService {
     }
   }
 
-  async addProducts (req, res) {
+  async addProductsToCart (req, res) {
     try {
       const user = await User.findById(req.session.passport.user.id).exec();
       if (!user) {
@@ -243,15 +243,12 @@ class UsersService {
   async #findProductsByQuery (reqQuery, user) {
     const cart = user.cart;
 
-    const query = {};
-    if (reqQuery.id) query._id = reqQuery.id;
-    if (reqQuery.productId) query.productId = reqQuery.productId;
-    if (reqQuery.sizeId) query.sizeId = reqQuery.sizeId;
-    if (reqQuery.quantity) query.quantity = reqQuery.quantity;
-
+    Object.keys(reqQuery).forEach(
+      (key) => !reqQuery[key] && delete reqQuery[key]
+    );
     const results = cart.filter((product) => {
-      for (const prop in query) {
-        if (String(product[prop]) !== String(query[prop])) {
+      for (const prop in reqQuery) {
+        if (String(product[prop]) !== String(reqQuery[prop])) {
           return false;
         }
       }
@@ -260,7 +257,7 @@ class UsersService {
     return results;
   }
 
-  async deleteProducts (req, res) {
+  async deleteProductsFromCart (req, res) {
     try {
       const user = await User.findById(req.session.passport.user.id).exec();
       if (!user) {
@@ -286,7 +283,7 @@ class UsersService {
     }
   }
 
-  async getProducts (req, res) {
+  async getProductsFromCart (req, res) {
     try {
       const user = await User.findById(req.session.passport.user.id).exec();
       if (!user) {
