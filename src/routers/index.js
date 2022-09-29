@@ -5,3 +5,4 @@ module.exports.categoriesRouter = require('./categories');
 module.exports.commentsRouter = require('./comments');
 module.exports.replyCommentsRouter = require('./replyComments');
 module.exports.authRouter = require('./auth');
+module.exports.ordersRouter = require('./orders');

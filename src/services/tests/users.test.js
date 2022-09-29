@@ -33,7 +33,7 @@ jest.mock('../../models', () => ({
           skip: () => ({
             limit: () => ({
               exec: () => ({
-                id: '12ad122xa7e',
+                id: '630f51a601db34bca1f8b19f',
                 name: 'Nameabc',
                 middleName: 'middlename',
                 surname: 'surname',
@@ -125,7 +125,7 @@ describe('Users service tests', function () {
       id: '12ad172xa9e'
     },
     query: {
-      _id: '32423rsf3xv',
+      _id: '630f51a601db34bca1f8b19f',
       name: 'name',
       email: 'email@gmail.com',
       status: '341taffjafa',
@@ -137,7 +137,9 @@ describe('Users service tests', function () {
 
   const responseStub = {
     boom: {
-      badRequest: jest.fn()
+      badRequest: jest.fn(),
+      notFound: jest.fn(),
+      badImplementation: jest.fn()
     },
     json: (payload) => payload
   };
@@ -148,7 +150,7 @@ describe('Users service tests', function () {
     expect(response).toEqual({
       total_size: 1,
       list: {
-        id: '12ad122xa7e',
+        id: '630f51a601db34bca1f8b19f',
         name: 'Nameabc',
         middleName: 'middlename',
         surname: 'surname',
@@ -242,5 +244,62 @@ describe('Users service tests', function () {
     const response = await usersService.deleteUser(requestStub, responseStub);
 
     expect(response).toEqual(true);
+  });
+
+  it('should return an empty array of users', async () => {
+    User.find = () => ({
+      countDocuments: () => ({
+        exec: () => 0
+      }),
+      select: () => ({
+        skip: () => ({
+          limit: () => ({
+            exec: () => null
+          })
+        })
+      })
+    });
+    const response = await usersService.getUsers(requestStub, responseStub);
+
+    expect(response).toEqual({ list: [], total_size: 0 });
+  });
+
+  it('should return that user is not found on update', async () => {
+    User.findOne = () => ({
+      exec: () => null
+    });
+    const response = await usersService.updateUser(requestStub, responseStub);
+
+    expect(response).toBeFalsy();
+  });
+
+  it('should return that user is not found on update password', async () => {
+    User.findOne = () => ({
+      exec: () => null
+    });
+    const response = await usersService.updateUserPassword(
+      requestStub,
+      responseStub
+    );
+
+    expect(response).toBeFalsy();
+  });
+
+  it('should return that user is not found on block', async () => {
+    User.findOne = () => ({
+      exec: () => null
+    });
+    const response = await usersService.blockUser(requestStub, responseStub);
+
+    expect(response).toBeFalsy();
+  });
+
+  it('should return that user is not found on delete', async () => {
+    User.findOne = () => ({
+      exec: () => null
+    });
+    const response = await usersService.deleteUser(requestStub, responseStub);
+
+    expect(response).toBeFalsy();
   });
 });

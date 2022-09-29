@@ -1,15 +1,14 @@
-const { createUserPayloadValidator } = require('../../validators');
+const { createOrderPayloadValidator } = require('../../../validators');
 
-describe('createUserPayloadValidator tests', () => {
+describe('createOrderPayloadValidator tests', () => {
   const requestStub = {
     body: {
       name: 'Name',
       surname: 'Surname',
       middleName: 'Middlename',
-      password: 'asd32rr4tsdf',
       phoneNumber: '0898123456',
       address: 'Address 15',
-      email: 'email@gmail.com'
+      products: ['632883492f58e39923fe1ac1']
     }
   };
   const nextFunctionMock = jest.fn();
@@ -20,15 +19,15 @@ describe('createUserPayloadValidator tests', () => {
   };
 
   it('should call next function on valid payload', () => {
-    createUserPayloadValidator(requestStub, responseStub, nextFunctionMock);
+    createOrderPayloadValidator(requestStub, responseStub, nextFunctionMock);
 
     expect(nextFunctionMock).toHaveBeenCalled();
     expect(responseStub.boom.badRequest).not.toHaveBeenCalled();
   });
 
   it('should call badRequest function on invalid payload', () => {
-    requestStub.body.name = 'N';
-    createUserPayloadValidator(requestStub, responseStub, nextFunctionMock);
+    requestStub.body.products = ['632883492f5'];
+    createOrderPayloadValidator(requestStub, responseStub, nextFunctionMock);
 
     expect(responseStub.boom.badRequest).toHaveBeenCalled();
   });

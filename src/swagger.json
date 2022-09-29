@@ -188,14 +188,14 @@
             "name": "skip",
             "in": "query",
             "required": false,
-            "type": "string",
+            "type": "number",
             "x-oad-type": "parameter"
           },
           {
             "name": "take",
             "in": "query",
             "required": false,
-            "type": "string",
+            "type": "number",
             "x-oad-type": "parameter"
           }
         ],
@@ -281,12 +281,6 @@
                   "type": "string"
                 },
                 "phoneNumber": {
-                  "type": "string"
-                },
-                "role": {
-                  "type": "string"
-                },
-                "status": {
                   "type": "string"
                 }
               }
@@ -1616,6 +1610,267 @@
           },
           "404": {
             "description": "Reply Comment not found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/orders": {
+      "post": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Creates order",
+        "description": "",
+        "operationId": "createOrder",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "payload",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "surname": {
+                  "type": "string"
+                },
+                "middleName": {
+                  "type": "string"
+                },
+                "phoneNumber": {
+                  "type": "string"
+                },
+                "address": {
+                  "type": "string"
+                },
+                "products": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order created",
+            "schema": {
+              "type": "boolean"
+            },
+            "examples": {
+              "application/json": true
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Retrieves orders",
+        "description": "",
+        "operationId": "getOrders",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "_id",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "type": "number",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "required": false,
+            "type": "number",
+            "x-oad-type": "parameter"
+          }
+        ],
+        "x-hapi-options": {
+          "auth": {
+            "access": {
+              "scope": []
+            }
+          }
+        },
+        "x-oad-type": "operation",
+        "responses": {
+          "200": {
+            "description": "Returns orders",
+            "schema": {
+              "x-oad-type": "object",
+              "type": "object"
+            },
+            "examples": {
+              "application/json": {
+                "id": "123423425235",
+                "date": "2022-09-12",
+                "status": "3252345s5sd5sds",
+                "products": ["2543sdg434525"]
+              }
+            }
+          },
+          "404": {
+            "description": "Orders not found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/orders/{id}": {
+      "patch": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Update order",
+        "description": "",
+        "operationId": "updateOrder",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "payload",
+            "in": "body",
+            "required": false,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "surname": {
+                  "type": "string"
+                },
+                "middleName": {
+                  "type": "string"
+                },
+                "phoneNumber": {
+                  "type": "string"
+                },
+                "address": {
+                  "type": "string"
+                },
+                "orderStatus": {
+                  "type": "string"
+                },
+                "productsToAdd": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "productsToDelete": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order updated",
+            "schema": {
+              "type": "boolean"
+            },
+            "examples": {
+              "application/json": true
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Deletes order",
+        "description": "",
+        "operationId": "deleteOrder",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order deleted",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          "404": {
+            "description": "Order not found"
           },
           "500": {
             "description": "Internal Server Error"
