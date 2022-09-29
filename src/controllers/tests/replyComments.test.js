@@ -13,6 +13,16 @@ jest.mock('../../models', () => ({
       };
     }
 
+    static findById () {
+      return {
+        exec: () => ({
+          _id: '6335bbbf6d1e4900eff990af',
+          userId: '06335760adbe069d28c1ed8bd',
+          comment: 'comment 2'
+        })
+      };
+    }
+
     static findOne () {
       return {
         exec: () => null
@@ -59,34 +69,54 @@ jest.mock('../../models', () => ({
         exec: () => true
       };
     }
+  },
+  UserRoles: class UserRoles {
+    static find () {
+      return {
+        exec: () => [
+          {
+            _id: '13ad122xa2ae',
+            name: 'Admin'
+          },
+          {
+            _id: '13ad122xa3ae',
+            name: 'Super admin'
+          }
+        ]
+      };
+    }
   }
 }));
 
-describe('ReplyComments service tests', function () {
+describe('ReplyComments controller tests', function () {
   const replyCommentsController = new ReplyCommentsController();
   const requestStub = {
-    headers: {
-      authorization: 'some token'
-    },
-    userInfo: {
-      role: 'Admin'
-    },
     body: {
-      name: 'Name'
+      userId: '06335760adbe069d28c1ed8bd',
+      comment: 'comment',
+      productId: '12354fiajs12345asdsd1234'
     },
     query: {
-      commentId: '12354fiajs12345asdsd1234',
-      name: 'Name'
+      productId: '12354fiajs12345asdsd1234'
     },
     params: {
       id: '13ad122xa2ae'
+    },
+    session: {
+      passport: {
+        user: {
+          id: '06335760adbe069d28c1ed8bd',
+          role: '13ad122xa2ae'
+        }
+      }
     }
   };
 
   const responseStub = {
     boom: {
       badRequest: jest.fn(),
-      notFound: () => false
+      notFound: () => false,
+      unauthorized: jest.fn()
     },
     json: (payload) => payload
   };

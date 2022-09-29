@@ -13,6 +13,16 @@ jest.mock('../../models', () => ({
       };
     }
 
+    static findById () {
+      return {
+        exec: () => ({
+          _id: '6335bbbf6d1e4900eff990af',
+          userId: '06335760adbe069d28c1ed8bd',
+          comment: 'comment 2'
+        })
+      };
+    }
+
     static findOne () {
       return {
         exec: () => null
