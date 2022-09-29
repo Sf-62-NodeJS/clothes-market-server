@@ -5,23 +5,11 @@ const bcrypt = require('bcryptjs');
 
 class UsersService {
   async createUser (req, res) {
-    const user = await this.createBaseUser(req, 'User');
-
-    if (user === false) return res.boom.badRequest('user already exists');
-
-    if (user === null) return res.boom.badImplementation();
-
-    return res.json(true);
+    await this.#createBaseUser(req, res, 'User');
   }
 
   async createAdmin (req, res) {
-    const admin = await this.createBaseUser(req, 'Admin');
-
-    if (admin === false) return res.boom.badRequest('admin already exists');
-
-    if (admin === null) return res.boom.badImplementation();
-
-    return res.json(true);
+    await this.#createBaseUser(req, res, 'Admin');
   }
 
   async getUsers (req, res) {
@@ -164,7 +152,7 @@ class UsersService {
     }
   }
 
-  async createBaseUser (req, userRole) {
+  async #createBaseUser (req, res, userRole) {
     try {
       const statuses = await UserStatuses.find().exec();
       const statusActive = statuses.find(({ name }) => name === 'Active');
@@ -185,13 +173,19 @@ class UsersService {
         newUser.password = await bcrypt.hash(newUser.password, salt);
         const roleUser = await UserRoles.findOne({ name: userRole }).exec();
         newUser.role = roleUser._id;
-
-        return await newUser.save();
+        await newUser.save();
+        return newUser
+          ? req.isGoogleUser
+            ? true
+            : res.json(true)
+          : res.boom.notFound();
       } else {
-        return false;
+        return req.isGoogleUser
+          ? false
+          : res.boom.badRequest('user already exists');
       }
     } catch (err) {
-      return null;
+      res.boom.badImplementation();
     }
   }
 }

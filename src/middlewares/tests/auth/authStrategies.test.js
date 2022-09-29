@@ -1,5 +1,4 @@
 const { User, UserStatuses } = require('../../../models');
-const { UsersService } = require('../../../services');
 const { authStrategies } = require('../../auth');
 const bcrypt = require('bcryptjs');
 
@@ -37,7 +36,7 @@ jest.mock('bcryptjs');
 
 jest.mock('../../../services', () => ({
   UsersService: class UsersService {
-    async createBaseUser () {
+    async createUser () {
       return true;
     }
   }
@@ -64,20 +63,16 @@ describe('userAuthentication verifyCustom tests', () => {
   const accessTokenGoogleStub = jest.fn();
   const refreshTokenGoogleStub = jest.fn();
 
-  it('Google should return done on successfully created user', async () => {
-    await authStrategies.verifyGoogle(
-      requestGoogleStub,
-      accessTokenGoogleStub,
-      refreshTokenGoogleStub,
-      profileStub,
-      doneStub
-    );
+  it('Custom should return done on successful check', async () => {
+    bcrypt.compare.mockResolvedValue(true);
+
+    await authStrategies.verifyCustom(requestStub, doneStub);
 
     expect(doneStub).toHaveBeenCalled();
   });
 
-  it('Custom should return done on successful check', async () => {
-    bcrypt.compare.mockResolvedValue(true);
+  it('Custom should return done on unsuccessful password check', async () => {
+    bcrypt.compare.mockResolvedValue(false);
 
     await authStrategies.verifyCustom(requestStub, doneStub);
 
@@ -96,14 +91,6 @@ describe('userAuthentication verifyCustom tests', () => {
     expect(doneStub).toHaveBeenCalled();
   });
 
-  it('Custom should return done on unsuccessful password check', async () => {
-    bcrypt.compare.mockResolvedValue(false);
-
-    await authStrategies.verifyCustom(requestStub, doneStub);
-
-    expect(doneStub).toHaveBeenCalled();
-  });
-
   it('Custom should return done on unsuccessful user status check', async () => {
     UserStatuses.findOne = () => {
       return {
@@ -116,7 +103,13 @@ describe('userAuthentication verifyCustom tests', () => {
     expect(doneStub).toHaveBeenCalled();
   });
 
-  it('Google should return done on unsuccessful user status check', async () => {
+  it('Google should return done on unsuccessful user check', async () => {
+    User.findOne = () => {
+      return {
+        exec: () => null
+      };
+    };
+
     await authStrategies.verifyGoogle(
       requestGoogleStub,
       accessTokenGoogleStub,
@@ -129,39 +122,13 @@ describe('userAuthentication verifyCustom tests', () => {
   });
 
   it('Custom should return done on unsuccessful user check', async () => {
-    User.findOne = () => {
+    User.find = () => {
       return {
-        exec: () => null
+        exec: () => false
       };
     };
 
     await authStrategies.verifyCustom(requestStub, doneStub);
-
-    expect(doneStub).toHaveBeenCalled();
-  });
-
-  it('Google should return done on unsuccessful user check', async () => {
-    await authStrategies.verifyGoogle(
-      requestGoogleStub,
-      accessTokenGoogleStub,
-      refreshTokenGoogleStub,
-      profileStub,
-      doneStub
-    );
-
-    expect(doneStub).toHaveBeenCalled();
-  });
-
-  it('Google should return done on unsuccessful user check', async () => {
-    UsersService.prototype.createBaseUser = () => false;
-
-    await authStrategies.verifyGoogle(
-      requestGoogleStub,
-      accessTokenGoogleStub,
-      refreshTokenGoogleStub,
-      profileStub,
-      doneStub
-    );
 
     expect(doneStub).toHaveBeenCalled();
   });
