@@ -1,5 +1,9 @@
 const { Comments, ReplyComments, UserRoles } = require('../models');
 
+const userRoles = await UserRoles.find({
+  name: { $in: ['Admin', 'Super admin'] }
+}).exec();
+
 class ReplyCommentsService {
   async checkComment (commentId) {
     const comment = await Comments.findById(commentId).exec();
@@ -13,22 +17,19 @@ class ReplyCommentsService {
     if (!checkComment) return res.boom.notFound('Comment not found.');
 
     req.body.userId = req.session.passport.user.id;
-    const comment = await new ReplyComments(req.body).save();
+    const replyComment = await new ReplyComments(req.body).save();
 
-    if (comment) {
+    if (replyComment) {
       await Comments.updateOne(
         { _id: req.body.commentId },
-        { $push: { replyComments: comment._id } }
+        { $push: { replyComments: replyComment._id } }
       ).exec();
     }
 
-    return comment ? res.json(true) : res.json(false);
+    return replyComment ? res.json(true) : res.json(false);
   }
 
   async updateReplyComment (req, res) {
-    const userRoles = await UserRoles.find({
-      name: { $in: ['Admin', 'Super admin'] }
-    }).exec();
     const comment = await ReplyComments.findById(req.params.id).exec();
 
     if (!comment) return res.boom.notFound();
@@ -68,20 +69,17 @@ class ReplyCommentsService {
   }
 
   async deleteReplyComment (req, res) {
-    const userRoles = await UserRoles.find({
-      name: { $in: ['Admin', 'Super admin'] }
-    }).exec();
-    const comment = await ReplyComments.findById(req.params.id).exec();
+    const replyComment = await ReplyComments.findById(req.params.id).exec();
 
-    if (!comment) return res.boom.notFound();
+    if (!replyComment) return res.boom.notFound();
 
     if (
-      comment.userId + '' === req.session.passport.user.id ||
+      replyComment.userId + '' === req.session.passport.user.id ||
       userRoles.some(
         (el) => el._id.toString() === req.session.passport.user.role
       )
     ) {
-      const deleteComment = await ReplyComments.findByIdAndDelete(
+      const deleteReplyComment = await ReplyComments.findByIdAndDelete(
         req.params.id
       ).exec();
 
@@ -90,7 +88,7 @@ class ReplyCommentsService {
         { $pull: { replyComments: req.params.id } }
       ).exec();
 
-      return deleteComment ? res.json(true) : res.boom.notFound();
+      return deleteReplyComment ? res.json(true) : res.boom.notFound();
     }
 
     return res.boom.unauthorized();
