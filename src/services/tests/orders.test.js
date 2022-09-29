@@ -149,4 +149,13 @@ describe('Orders service tests', function () {
 
     expect(response).toBeFalsy();
   });
+
+  it('should return that order is not found on update', async () => {
+    Orders.findOne = () => ({
+      exec: () => null
+    });
+    const response = await ordersService.updateOrder(requestStub, responseStub);
+
+    expect(response).toBeFalsy();
+  });
 });
