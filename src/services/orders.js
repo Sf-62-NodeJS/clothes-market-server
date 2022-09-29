@@ -1,4 +1,4 @@
-const { Orders, Product } = require('../models');
+const { Orders, Product, ProductStatuses } = require('../models');
 const { OrderStatusesService } = require('../services');
 
 const orderStatusesService = new OrderStatusesService();
@@ -102,10 +102,13 @@ class OrdersService {
   }
 
   async #addProductsToOrder (req, res, order) {
-    const allProducts = await Product.find({
-      _id: { $in: req.body.productsToAdd }
+    const statusAvailable = await ProductStatuses.findOne({
+      name: 'Available'
     }).exec();
-    console.log('allProducts: ' + allProducts);
+    const allProducts = await Product.find({
+      _id: { $in: req.body.productsToAdd },
+      status: { $in: statusAvailable._id }
+    }).exec();
     for (const product of req.body.productsToAdd) {
       const productFound = allProducts.find(
         ({ _id }) => _id.toString() === product
@@ -113,7 +116,6 @@ class OrdersService {
       if (!productFound) return false;
     }
     order.products.push(...req.body.productsToAdd);
-    console.log('order.products: ' + order.products);
     return order;
   }
 
