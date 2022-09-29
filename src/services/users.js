@@ -174,11 +174,10 @@ class UsersService {
         const roleUser = await UserRoles.findOne({ name: userRole }).exec();
         newUser.role = roleUser._id;
         await newUser.save();
-        return newUser
-          ? req.isGoogleUser
-            ? true
-            : res.json(true)
-          : res.boom.notFound();
+
+        if (newUser && req.isGoogleUser) return true;
+
+        return newUser ? res.json(true) : res.boom.notFound();
       } else {
         return req.isGoogleUser
           ? false
