@@ -1,12 +1,25 @@
-const { User, UserStatuses, UserRoles } = require('../../models');
+const { User, UserStatuses } = require('../../models');
+const { UsersService } = require('../../services');
 const bcrypt = require('bcryptjs');
+
 require('dotenv').config();
 
-const verifyCustom = async (req, done) => {
-  const user = await User.findOne({ email: req.body.email }).exec();
-  const status = await UserStatuses.findOne({ name: 'Active' }).exec();
+const usersService = new UsersService();
 
-  if (!user || user.status.toString() !== status._id.toString()) {
+const checkUser = async (req) => {
+  const status = await UserStatuses.findOne({ name: 'Active' }).exec();
+  const user = await User.findOne({
+    email: req.email,
+    status: { $in: status }
+  }).exec();
+
+  return user ?? false;
+};
+
+const verifyCustom = async (req, done) => {
+  const user = await checkUser(req.body);
+
+  if (!user) {
     return done(null, false);
   }
 
@@ -18,7 +31,8 @@ const verifyCustom = async (req, done) => {
 
   return done(null, {
     role: user.role,
-    name: user.name.concat(` ${user.surname}`)
+    name: user.name.concat(` ${user.surname}`),
+    id: user._id
   });
 };
 
@@ -29,12 +43,41 @@ const verifyGoogle = async (
   profile,
   done
 ) => {
-  const role = await UserRoles.findOne({ name: 'User' }).exec();
+  const user = await checkUser(profile);
 
-  profile.role = role._id.toString();
-  profile.name = profile.displayName;
+  if (user) {
+    return done(null, {
+      role: user.role,
+      name: `${user.name} ${user.surname}`,
+      id: user._id
+    });
+  }
 
-  return done(null, profile);
+  request.body = {
+    name: profile.given_name,
+    middleName: 'Not provided',
+    surname: profile.family_name,
+    password: profile.id,
+    phoneNumber: 'Not provided',
+    address: 'Not provided',
+    email: profile.email
+  };
+
+  request.isGoogleUser = true;
+
+  await usersService.createUser(request, request.res);
+
+  const newUser = await checkUser({ email: profile.email });
+
+  if (newUser) {
+    return done(null, {
+      role: newUser.role,
+      name: `${newUser.name} ${newUser.surname}`,
+      id: newUser._id
+    });
+  }
+
+  return done(null, false);
 };
 
 const googleSettings = {

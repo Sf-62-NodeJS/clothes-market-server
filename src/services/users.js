@@ -172,9 +172,14 @@ class UsersService {
         const roleUser = await UserRoles.findOne({ name: userRole }).exec();
         newUser.role = roleUser._id;
         await newUser.save();
+
+        if (newUser && req.isGoogleUser) return true;
+
         return newUser ? res.json(true) : res.boom.notFound();
       } else {
-        res.boom.badRequest('user already exists');
+        return req.isGoogleUser
+          ? false
+          : res.boom.badRequest('user already exists');
       }
     } catch (err) {
       res.boom.badImplementation();
