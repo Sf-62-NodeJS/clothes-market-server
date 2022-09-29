@@ -102,7 +102,10 @@ class OrdersService {
   }
 
   async #addProductsToOrder (req, res, order) {
-    const allProducts = await Product.find().exec();
+    const allProducts = await Product.find({
+      _id: { $in: req.body.productsToAdd }
+    }).exec();
+    console.log('allProducts: ' + allProducts);
     for (const product of req.body.productsToAdd) {
       const productFound = allProducts.find(
         ({ _id }) => _id.toString() === product
@@ -110,6 +113,7 @@ class OrdersService {
       if (!productFound) return false;
     }
     order.products.push(...req.body.productsToAdd);
+    console.log('order.products: ' + order.products);
     return order;
   }
 
