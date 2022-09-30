@@ -1,6 +1,16 @@
 const { Comments, Product, ReplyComments, UserRoles } = require('../models');
 
 class CommentsService {
+  async checkAuth (roleId) {
+    const userRoles = await UserRoles.find({
+      name: { $in: ['Admin', 'Super admin'] }
+    }).exec();
+
+    const result = userRoles.some((el) => el._id.toString() === roleId);
+
+    return result;
+  }
+
   async checkProduct (productId) {
     const product = await Product.findById(productId).exec();
 
@@ -26,20 +36,13 @@ class CommentsService {
   }
 
   async updateComment (req, res) {
-    const userRoles = await UserRoles.find({
-      name: { $in: ['Admin', 'Super admin'] }
-    }).exec();
-
     const comment = await Comments.findById(req.params.id).exec();
 
     if (!comment) return res.boom.notFound();
 
-    if (
-      comment.userId + '' === req.session.passport.user.id ||
-      userRoles.some(
-        (el) => el._id.toString() === req.session.passport.user.role
-      )
-    ) {
+    const checkAuth = await this.checkAuth(req.session.passport.user.role);
+
+    if (comment.userId + '' === req.session.passport.user.id || checkAuth) {
       const update = await Comments.findByIdAndUpdate(req.params.id, {
         comment: req.body.comment
       }).exec();
@@ -67,20 +70,13 @@ class CommentsService {
   }
 
   async deleteComment (req, res) {
-    const userRoles = await UserRoles.find({
-      name: { $in: ['Admin', 'Super admin'] }
-    }).exec();
-
     const comment = await Comments.findById(req.params.id).exec();
 
     if (!comment) return res.boom.notFound();
 
-    if (
-      comment.userId + '' === req.session.passport.user.id ||
-      userRoles.some(
-        (el) => el._id.toString() === req.session.passport.user.role
-      )
-    ) {
+    const checkAuth = await this.checkAuth(req.session.passport.user.role);
+
+    if (comment.userId + '' === req.session.passport.user.id || checkAuth) {
       const deleteComment = await Comments.findByIdAndDelete(
         req.params.id
       ).exec();
