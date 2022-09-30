@@ -1,16 +1,9 @@
-const { Comments, ReplyComments, UserRoles } = require('../models');
+const { Comments, ReplyComments } = require('../models');
+const { CommentsService } = require('../services');
+
+const commentsService = new CommentsService();
 
 class ReplyCommentsService {
-  async checkAuth (roleId) {
-    const userRoles = await UserRoles.find({
-      name: { $in: ['Admin', 'Super admin'] }
-    }).exec();
-
-    const result = userRoles.some((el) => el._id.toString() === roleId);
-
-    return result;
-  }
-
   async checkComment (commentId) {
     const comment = await Comments.findById(commentId).exec();
 
@@ -40,7 +33,9 @@ class ReplyCommentsService {
 
     if (!replyComment) return res.boom.notFound();
 
-    const checkAuth = await this.checkAuth(req.session.passport.user.role);
+    const checkAuth = await commentsService.checkAuth(
+      req.session.passport.user.role
+    );
 
     if (
       replyComment.userId + '' === req.session.passport.user.id ||
@@ -82,7 +77,9 @@ class ReplyCommentsService {
 
     if (!replyComment) return res.boom.notFound();
 
-    const checkAuth = await this.checkAuth(req.session.passport.user.role);
+    const checkAuth = await commentsService.checkAuth(
+      req.session.passport.user.role
+    );
 
     if (
       replyComment.userId + '' === req.session.passport.user.id ||
