@@ -33,13 +33,13 @@ class ReplyCommentsService {
 
     if (!replyComment) return res.boom.notFound();
 
-    const checkAuth = await commentsService.checkAuth(
+    const isAdmin = await commentsService.checkAuth(
       req.session.passport.user.role
     );
 
     if (
-      replyComment.userId + '' === req.session.passport.user.id ||
-      checkAuth
+      replyComment.userId.toString() === req.session.passport.user.id ||
+      isAdmin
     ) {
       const updateReplyComment = await ReplyComments.findByIdAndUpdate(
         req.params.id,
@@ -77,13 +77,13 @@ class ReplyCommentsService {
 
     if (!replyComment) return res.boom.notFound();
 
-    const checkAuth = await commentsService.checkAuth(
+    const isAdmin = await commentsService.checkAuth(
       req.session.passport.user.role
     );
 
     if (
-      replyComment.userId + '' === req.session.passport.user.id ||
-      checkAuth
+      replyComment.userId.toString() === req.session.passport.user.id ||
+      isAdmin
     ) {
       const deleteReplyComment = await ReplyComments.findByIdAndDelete(
         req.params.id

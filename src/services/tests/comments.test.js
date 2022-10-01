@@ -23,7 +23,8 @@ jest.mock('../../models', () => ({
             '06335760adbe069d28c1ed8bd',
             '6335bbbf6d1e4900eff990af'
           ]
-        })
+        }),
+        toString: () => '6335bbbf6d1e4900eff990af'
       };
     }
 

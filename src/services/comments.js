@@ -40,9 +40,9 @@ class CommentsService {
 
     if (!comment) return res.boom.notFound();
 
-    const checkAuth = await this.checkAuth(req.session.passport.user.role);
+    const isAdmin = await this.checkAuth(req.session.passport.user.role);
 
-    if (comment.userId + '' === req.session.passport.user.id || checkAuth) {
+    if (comment.userId.toString() === req.session.passport.user.id || isAdmin) {
       const update = await Comments.findByIdAndUpdate(req.params.id, {
         comment: req.body.comment
       }).exec();
@@ -74,9 +74,9 @@ class CommentsService {
 
     if (!comment) return res.boom.notFound();
 
-    const checkAuth = await this.checkAuth(req.session.passport.user.role);
+    const isAdmin = await this.checkAuth(req.session.passport.user.role);
 
-    if (comment.userId + '' === req.session.passport.user.id || checkAuth) {
+    if (comment.userId.toString() === req.session.passport.user.id || isAdmin) {
       const deleteComment = await Comments.findByIdAndDelete(
         req.params.id
       ).exec();
