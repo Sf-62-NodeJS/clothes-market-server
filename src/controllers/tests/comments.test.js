@@ -13,6 +13,20 @@ jest.mock('../../models', () => ({
       };
     }
 
+    static findById () {
+      return {
+        exec: () => ({
+          _id: '6335bbbf6d1e4900eff990af',
+          userId: '06335760adbe069d28c1ed8bd',
+          comment: 'comment 2',
+          replyComments: [
+            '06335760adbe069d28c1ed8bd',
+            '6335bbbf6d1e4900eff990af'
+          ]
+        })
+      };
+    }
+
     static findOne () {
       return {
         exec: () => null
@@ -66,19 +80,30 @@ jest.mock('../../models', () => ({
         exec: () => true
       };
     }
+  },
+  UserRoles: class UserRoles {
+    static find () {
+      return {
+        exec: () => [
+          {
+            _id: '13ad122xa2ae',
+            name: 'Admin'
+          },
+          {
+            _id: '13ad122xa3ae',
+            name: 'Super admin'
+          }
+        ]
+      };
+    }
   }
 }));
 
-describe('Comments service tests', function () {
+describe('Comments controller tests', function () {
   const commentsController = new CommentsController();
   const requestStub = {
-    headers: {
-      authorization: 'some token'
-    },
-    userInfo: {
-      role: 'Admin'
-    },
     body: {
+      userId: '06335760adbe069d28c1ed8bd',
       comment: 'comment',
       productId: '12354fiajs12345asdsd1234'
     },
@@ -87,13 +112,22 @@ describe('Comments service tests', function () {
     },
     params: {
       id: '13ad122xa2ae'
+    },
+    session: {
+      passport: {
+        user: {
+          id: '06335760adbe069d28c1ed8bd',
+          role: '13ad122xa2ae'
+        }
+      }
     }
   };
 
   const responseStub = {
     boom: {
       badRequest: jest.fn(),
-      notFound: () => false
+      notFound: () => false,
+      unauthorized: jest.fn()
     },
     json: (payload) => payload
   };
@@ -167,7 +201,7 @@ describe('Comments service tests', function () {
   });
 
   it('should not find comment to delete', async () => {
-    Comments.findByIdAndDelete = () => ({ exec: () => false });
+    Comments.findById = () => ({ exec: () => false });
     const response = await commentsController.deleteComment(
       requestStub,
       responseStub
