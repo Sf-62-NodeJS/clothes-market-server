@@ -370,36 +370,6 @@ describe('Users service tests', function () {
       );
       expect(response).toBe(true);
     });
-    it('should fail when User is not found', async () => {
-      User.findById.mockReturnValueOnce({ exec: execMock });
-
-      execMock.mockReturnValueOnce(null);
-      await usersService.addProductsToCart(requestStub, responseStub);
-      expect(responseStub.boom.notFound).toBeCalledWith('User not found');
-    });
-    it('should fail when Product does not exist', async () => {
-      Product.findById.mockReturnValueOnce(null);
-      User.findById.mockReturnValueOnce({ exec: execMock });
-      execMock.mockReturnValueOnce({
-        cart: [
-          {
-            productId: '2',
-            sizeId: '1',
-            quantity: 3
-          }
-        ]
-      });
-      execMock.mockReturnValueOnce(null);
-      requestStub.body = {
-        productId: '1',
-        sizeId: '1',
-        quantity: 1
-      };
-      await usersService.addProductsToCart(requestStub, responseStub);
-      expect(responseStub.boom.badRequest).toBeCalledWith(
-        'Product does not exist'
-      );
-    });
     it('should fail when Product not available in given Size', async () => {
       Product.findById.mockReturnValueOnce({
         sizes: ['2', '3']
@@ -454,12 +424,6 @@ describe('Users service tests', function () {
         responseStub
       );
       expect(response).toBe(true);
-    });
-    it('should fail when user does not exist', async () => {
-      User.findById.mockReturnValueOnce({ exec: execMock });
-      execMock.mockReturnValueOnce(null);
-      await usersService.deleteProductsFromCart(requestStub, responseStub);
-      expect(responseStub.boom.notFound).toBeCalledWith('User not found');
     });
     it('should fail when no card items found with given filter', async () => {
       User.findById.mockReturnValueOnce({ exec: execMock });
@@ -542,12 +506,6 @@ describe('Users service tests', function () {
         { productId: '1', sizeId: '1', quantity: 1 }
       ]);
     });
-    it('should fail when user not found', async () => {
-      User.findById.mockReturnValueOnce({ exec: execMock });
-      execMock.mockReturnValueOnce(null);
-      await usersService.getProductsFromCart(requestStub, responseStub);
-      expect(responseStub.boom.notFound).toBeCalledWith('User not found');
-    });
     it('should fail when no items found', async () => {
       User.findById.mockReturnValueOnce({ exec: execMock });
       execMock.mockReturnValueOnce({
@@ -560,7 +518,9 @@ describe('Users service tests', function () {
         ]
       });
       await usersService.getProductsFromCart(requestStub, responseStub);
-      expect(responseStub.boom.notFound).toBeCalledWith('No card items found');
+      expect(responseStub.boom.notFound).toBeCalledWith(
+        'No cart items with these parameters found'
+      );
     });
     it('should fail when error thrown', async () => {
       User.findById.mockImplementationOnce(() => {

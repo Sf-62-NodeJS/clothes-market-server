@@ -192,15 +192,11 @@ class UsersService {
   async addProductsToCart (req, res) {
     try {
       const user = await User.findById(req.session.passport.user.id).exec();
-      if (!user) {
-        return res.boom.notFound('User not found');
-      }
-
       const reqProduct = await this.#productService.findById(
         req.body.productId
       );
       if (!reqProduct) {
-        return res.boom.badRequest('Product does not exist');
+        return res.boom.notFound('Product not found');
       }
       if (
         !reqProduct.sizes.some(
@@ -260,9 +256,6 @@ class UsersService {
   async deleteProductsFromCart (req, res) {
     try {
       const user = await User.findById(req.session.passport.user.id).exec();
-      if (!user) {
-        return res.boom.notFound('User not found');
-      }
       const cardItems = await this.#findProductsByQuery(req.body, user);
       if (!cardItems.length) {
         return res.boom.notFound('No items with these parameters found.');
@@ -286,12 +279,9 @@ class UsersService {
   async getProductsFromCart (req, res) {
     try {
       const user = await User.findById(req.session.passport.user.id).exec();
-      if (!user) {
-        return res.boom.notFound('User not found');
-      }
       const cartItems = await this.#findProductsByQuery(req.query, user);
       if (!cartItems.length) {
-        return res.boom.notFound('No card items found');
+        return res.boom.notFound('No cart items with these parameters found');
       }
       return res.json(cartItems);
     } catch (err) {
