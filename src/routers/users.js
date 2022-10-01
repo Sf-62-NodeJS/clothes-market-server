@@ -4,7 +4,8 @@ const { createUserPayloadValidator } = require('../middlewares/validators');
 const { updateUserPayloadValidator } = require('../middlewares/validators');
 const {
   updateUserPasswordPayloadValidator,
-  addProductToCartPayloadValidator
+  addProductToCartPayloadValidator,
+  deleteProductFromCartPayloadValidator
 } = require('../middlewares/validators');
 const { userAuthentication } = require('../middlewares/auth');
 const { idParamValidator } = require('../middlewares/validators');
@@ -19,7 +20,12 @@ usersRouter.put(
   updateUserPayloadValidator,
   usersController.updateUser
 );
-usersRouter.get('/', userAuthentication('Admin', 'Super admin'), getUsersQueryValidator, usersController.getUsers);
+usersRouter.get(
+  '/',
+  userAuthentication('Admin', 'Super admin'),
+  getUsersQueryValidator,
+  usersController.getUsers
+);
 
 usersRouter.patch(
   '/password/:id',
@@ -34,8 +40,18 @@ usersRouter.post(
   createUserPayloadValidator,
   usersController.createAdmin
 );
-usersRouter.patch('/block/:id', userAuthentication('Admin', 'Super admin'), idParamValidator, usersController.blockUser);
-usersRouter.patch('/delete/:id', userAuthentication('Admin', 'Super admin'), idParamValidator, usersController.deleteUser);
+usersRouter.patch(
+  '/block/:id',
+  userAuthentication('Admin', 'Super admin'),
+  idParamValidator,
+  usersController.blockUser
+);
+usersRouter.patch(
+  '/delete/:id',
+  userAuthentication('Admin', 'Super admin'),
+  idParamValidator,
+  usersController.deleteUser
+);
 
 usersRouter.post(
   '/cart',
@@ -46,6 +62,7 @@ usersRouter.post(
 usersRouter.delete(
   '/cart/:id',
   userAuthentication('User', 'Admin', 'Super admin'),
+  deleteProductFromCartPayloadValidator,
   usersController.deleteProductsFromCart
 );
 usersRouter.get(
