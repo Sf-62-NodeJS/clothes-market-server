@@ -185,6 +185,10 @@ class ProductsService {
 
     return Comments.deleteMany({ _id: { $in: comments } }).exec();
   }
+
+  async findById (id) {
+    return Product.findById(id);
+  }
 }
 
 module.exports = ProductsService;

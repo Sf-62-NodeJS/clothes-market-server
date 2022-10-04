@@ -324,4 +324,11 @@ describe('Products service tests', function () {
 
     expect(response).toBeFalsy();
   });
+
+  it('should find document by id', async () => {
+    const id = 'someId';
+    Product.findById = jest.fn();
+    await productsService.findById(id);
+    expect(Product.findById).toHaveBeenCalled();
+  });
 });

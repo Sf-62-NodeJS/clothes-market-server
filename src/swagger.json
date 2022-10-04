@@ -394,13 +394,13 @@
           "application/json"
         ],
         "parameters": [
-        {
-          "name": "id",
-          "in": "path",
-          "required": true,
-          "type": "string",
-          "x-oad-type": "parameter"
-        }
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          }
         ],
         "x-hapi-options": {
           "auth": {
@@ -441,13 +441,13 @@
           "application/json"
         ],
         "parameters": [
-        {
-          "name": "id",
-          "in": "path",
-          "required": true,
-          "type": "string",
-          "x-oad-type": "parameter"
-        }
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          }
         ],
         "x-hapi-options": {
           "auth": {
@@ -488,29 +488,29 @@
           "application/json"
         ],
         "parameters": [
-        {
-          "name": "id",
-          "in": "path",
-          "required": true,
-          "type": "string",
-          "x-oad-type": "parameter"
-        },
-        {
-          "name": "payload",
-          "in": "body",
-          "required": true,
-          "schema": {
-            "type": "object",
-            "properties": {
-              "oldPassword": {
-                "type": "string"
-              },
-              "newPassword": {
-                "type": "string"
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "payload",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "oldPassword": {
+                  "type": "string"
+                },
+                "newPassword": {
+                  "type": "string"
+                }
               }
             }
           }
-        }
         ],
         "x-hapi-options": {
           "auth": {
@@ -528,6 +528,304 @@
             },
             "examples": {
               "application/json": true
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/users/cart/": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Adds product to cart",
+        "description": "Adds productId, sizeId and quantity of product to the User cart",
+        "operationId": "addProducts",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "Product info",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "productId": {
+                  "type": "string"
+                },
+                "sizeId": {
+                  "type": "string"
+                },
+                "quantity": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product added to cart",
+            "schema": {
+              "type": "boolean"
+            },
+            "examples": true
+          },
+          "400": {
+            "description": "Product not available in this size",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "statusCode": {
+                  "type": "integer"
+                },
+                "error": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "statusCode": 400,
+                "error": "Bad Request",
+                "message": "Product not available in this size"
+              }
+            }
+          },
+          "404": {
+            "description": "Product not found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "statusCode": {
+                  "type": "integer"
+                },
+                "error": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "statusCode": 404,
+                "error": "Not Found",
+                "message": "Product not found"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Retrieves products in cart",
+        "description": "Returns products from cart filtered by given query from request body",
+        "operationId": "getProducts",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sizeId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "quantity",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return objects containing productId, sizeId, quantity and _id",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "productId": {
+                  "type": "string"
+                },
+                "sizeId": {
+                  "type": "string"
+                },
+                "quantity": {
+                  "type": "number"
+                },
+                "_id": {
+                  "type": "string"
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "productId": "63283ed8579974b036b68cf2",
+                "sizeId": "632319af4ea1d92daa4081bd",
+                "quantity": 4,
+                "_id": "631f3211ff74298e711db04c"
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "statusCode": {
+                  "type": "integer"
+                },
+                "error": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "statusCode": 404,
+                "error": "Not Found",
+                "message": "No cart items with these parameters found"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/users/cart/{id}": {
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Deletes product from cart",
+        "description": "Deletes a product from cart by given query from request body",
+        "operationId": "deleteProducts",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "Product info",
+            "required": false,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "productId": {
+                  "type": "string"
+                },
+                "sizeId": {
+                  "type": "string"
+                },
+                "quantity": {
+                  "type": "number"
+                },
+                "_id": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product deleted from cart",
+            "schema": {
+              "type": "boolean"
+            },
+            "examples": true
+          },
+          "400": {
+            "description": "Request body cannot be empty, because it deletes all products in cart",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "statusCode": {
+                  "type": "integer"
+                },
+                "error": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "statusCode": 400,
+                "error": "Bad Request",
+                "message": "Request body cannot be empty"
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "statusCode": {
+                  "type": "integer"
+                },
+                "error": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "statusCode": 404,
+                "error": "Not Found",
+                "message": "No items with these parameters found."
+              }
             }
           },
           "500": {
@@ -934,7 +1232,7 @@
               }
             }
           }
-          ],
+        ],
         "responses": {
           "200": {
             "description": "Category updated",
@@ -992,12 +1290,18 @@
     },
     "/sizes/": {
       "post": {
-        "tags": ["Sizes"],
+        "tags": [
+          "Sizes"
+        ],
         "summary": "Creates Size",
         "description": "Creates Size by given name in request body",
         "operationId": "createSize",
-        "consumes": ["application/json"],
-        "produces": ["application/json"],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
         "parameters": [
           {
             "in": "body",
@@ -1051,12 +1355,18 @@
         }
       },
       "get": {
-        "tags": ["Sizes"],
+        "tags": [
+          "Sizes"
+        ],
         "summary": "Get Sizes by filter",
         "description": "Returns sizes matching the filter or all sizes when no filter is given",
         "operationId": "getSize",
-        "consumes": ["application/json"],
-        "produces": ["application/json"],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
         "parameters": [
           {
             "name": "_id",
@@ -1130,12 +1440,18 @@
     },
     "/sizes/{id}": {
       "put": {
-        "tags": ["Sizes"],
+        "tags": [
+          "Sizes"
+        ],
         "summary": "Update Size",
         "description": "Updates a Size by given id with a value given in the request body",
         "operationId": "updateSize",
-        "consumes": ["application/json"],
-        "produces": ["application/json"],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
         "parameters": [
           {
             "in": "path",
@@ -1195,12 +1511,18 @@
         }
       },
       "delete": {
-        "tags": ["Sizes"],
+        "tags": [
+          "Sizes"
+        ],
         "summary": "Delete Size",
         "description": "Deletes a size by given id",
         "operationId": "deleteSize",
-        "consumes": ["application/json"],
-        "produces": ["application/json"],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
         "parameters": [
           {
             "in": "path",
@@ -1376,7 +1698,7 @@
               }
             }
           }
-          ],
+        ],
         "responses": {
           "200": {
             "description": "Comment updated",
@@ -1561,7 +1883,7 @@
               }
             }
           }
-          ],
+        ],
         "responses": {
           "200": {
             "description": "Reply Comment updated",
@@ -1749,7 +2071,9 @@
                 "id": "123423425235",
                 "date": "2022-09-12",
                 "status": "3252345s5sd5sds",
-                "products": ["2543sdg434525"]
+                "products": [
+                  "2543sdg434525"
+                ]
               }
             }
           },

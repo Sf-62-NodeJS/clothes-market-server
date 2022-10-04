@@ -12,3 +12,5 @@ module.exports.updateOrderPayloadValidator = require('./orders/updateOrderPayloa
 module.exports.idParamValidator = require('./idParam');
 module.exports.getUsersQueryValidator = require('./users/getUsersQuery');
 module.exports.getOrdersQueryValidator = require('./orders/getOrdersQuery');
+module.exports.addProductToCartPayloadValidator = require('./addProductToCartPayload');
+module.exports.deleteProductFromCartPayloadValidator = require('./deleteProductFromCartPayload');

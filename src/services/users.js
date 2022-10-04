@@ -2,8 +2,11 @@ const { User } = require('../models');
 const { UserRoles } = require('../models');
 const { UserStatuses } = require('../models');
 const bcrypt = require('bcryptjs');
+const { ProductsService } = require('../services');
 
 class UsersService {
+  #productService = new ProductsService();
+
   async createUser (req, res) {
     await this.#createBaseUser(req, res, 'User');
   }
@@ -183,6 +186,106 @@ class UsersService {
       }
     } catch (err) {
       res.boom.badImplementation();
+    }
+  }
+
+  async addProductsToCart (req, res) {
+    try {
+      const user = await User.findById(req.session.passport.user.id).exec();
+      const reqProduct = await this.#productService.findById(
+        req.body.productId
+      );
+      if (!reqProduct) {
+        return res.boom.notFound('Product not found');
+      }
+      if (
+        !reqProduct.sizes.some(
+          (sizeId) => String(sizeId) === String(req.body.sizeId)
+        )
+      ) {
+        return res.boom.badRequest('Product not available in this size');
+      }
+      const userCart = user.cart;
+      const productInCart = userCart.find(
+        (element) =>
+          String(element.productId) === String(req.body.productId) &&
+          String(element.sizeId) === String(req.body.sizeId)
+      );
+      if (productInCart) {
+        await User.updateOne(
+          {
+            _id: req.session.passport.user.id,
+            'cart.productId': req.body.productId,
+            'cart.sizeId': req.body.sizeId
+          },
+          {
+            $set: {
+              'cart.$.quantity': productInCart.quantity + req.body.quantity
+            }
+          }
+        ).exec();
+      } else {
+        await User.updateOne(
+          { _id: req.session.passport.user.id },
+          { $push: { cart: req.body } }
+        ).exec();
+      }
+      return res.json(true);
+    } catch (err) {
+      return res.boom.badImplementation(err);
+    }
+  }
+
+  async #findProductsByQuery (reqQuery, user) {
+    const cart = user.cart;
+
+    Object.keys(reqQuery).forEach(
+      (key) => !reqQuery[key] && delete reqQuery[key]
+    );
+    const results = cart.filter((product) => {
+      for (const prop in reqQuery) {
+        if (String(product[prop]) !== String(reqQuery[prop])) {
+          return false;
+        }
+      }
+      return true;
+    });
+    return results;
+  }
+
+  async deleteProductsFromCart (req, res) {
+    try {
+      const user = await User.findById(req.session.passport.user.id).exec();
+      const cardItems = await this.#findProductsByQuery(req.body, user);
+      if (!cardItems.length) {
+        return res.boom.notFound('No items with these parameters found.');
+      }
+      const product = await User.findByIdAndUpdate(
+        req.session.passport.user.id,
+        {
+          $pull: {
+            cart: req.body
+          }
+        }
+      ).exec();
+      return product
+        ? res.json(true)
+        : res.boom.badRequest('An error occured while deleting product');
+    } catch (err) {
+      return res.boom.badImplementation(err);
+    }
+  }
+
+  async getProductsFromCart (req, res) {
+    try {
+      const user = await User.findById(req.session.passport.user.id).exec();
+      const cartItems = await this.#findProductsByQuery(req.query, user);
+      if (!cartItems.length) {
+        return res.boom.notFound('No cart items with these parameters found');
+      }
+      return res.json(cartItems);
+    } catch (err) {
+      return res.boom.badImplementation(err);
     }
   }
 }

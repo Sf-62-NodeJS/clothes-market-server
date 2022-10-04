@@ -1,6 +1,7 @@
 const UsersController = require('../users');
 const { User } = require('../../models');
 const { UserStatuses } = require('../../models');
+const { Product } = require('../../models');
 
 jest.mock('../../models', () => ({
   User: class User {
@@ -99,6 +100,11 @@ jest.mock('../../models', () => ({
         })
       };
     }
+  },
+  Product: class Product {
+    static findById () {
+      return { sizes: ['1', '2', '3'] };
+    }
   }
 }));
 
@@ -129,7 +135,9 @@ describe('usersController tests', () => {
 
   const responseStub = {
     boom: {
-      badRequest: jest.fn()
+      badRequest: jest.fn(),
+      badImplementation: jest.fn(),
+      notFound: jest.fn()
     },
     json: (payload) => payload
   };
@@ -237,5 +245,227 @@ describe('usersController tests', () => {
     const user = await usersController.deleteUser(requestStub, responseStub);
 
     expect(user).toEqual(true);
+  });
+  describe('Add product to User cart test', () => {
+    User.findById = jest.fn();
+    Product.findById = jest.fn();
+    User.updateOne = jest.fn();
+    const execMock = jest.fn().mockReturnValue(true);
+
+    requestStub.body = {
+      productId: '1',
+      sizeId: '1',
+      quantity: 3
+    };
+    requestStub.session = {
+      passport: {
+        user: {
+          id: 'someid'
+        }
+      }
+    };
+
+    it('should add product to cart when product in cart', async () => {
+      User.findById.mockReturnValueOnce({ exec: execMock });
+      execMock.mockReturnValueOnce({
+        cart: [
+          {
+            productId: '1',
+            sizeId: '1',
+            quantity: 3
+          }
+        ]
+      });
+      Product.findById.mockReturnValueOnce({
+        sizes: ['1', '2', '3']
+      });
+      User.updateOne.mockReturnValueOnce({ exec: execMock });
+
+      const response = await usersController.addProductsToCart(
+        requestStub,
+        responseStub
+      );
+      expect(response).toBe(true);
+    });
+    it('should add product when product not in cart', async () => {
+      Product.findById.mockReturnValueOnce({
+        sizes: ['1', '2', '3']
+      });
+      User.findById.mockReturnValueOnce({ exec: execMock });
+      User.updateOne.mockReturnValueOnce({ exec: execMock });
+      execMock.mockReturnValueOnce({
+        cart: [
+          {
+            productId: '2',
+            sizeId: '1',
+            quantity: 3
+          }
+        ]
+      });
+      const response = await usersController.addProductsToCart(
+        requestStub,
+        responseStub
+      );
+      expect(response).toBe(true);
+    });
+    it('should fail when Product not available in given Size', async () => {
+      Product.findById.mockReturnValueOnce({
+        sizes: ['2', '3']
+      });
+      User.findById.mockReturnValueOnce({ exec: execMock });
+      execMock.mockReturnValueOnce({
+        cart: [
+          {
+            productId: '2',
+            sizeId: '2',
+            quantity: 3
+          }
+        ]
+      });
+      await usersController.addProductsToCart(requestStub, responseStub);
+      expect(responseStub.boom.badRequest).toBeCalledWith(
+        'Product not available in this size'
+      );
+    });
+    it('should fail when error thrown', async () => {
+      User.findById.mockImplementationOnce(() => {
+        throw Error('some error');
+      });
+      await usersController.addProductsToCart(requestStub, responseStub);
+      expect(responseStub.boom.badImplementation).toBeCalled();
+    });
+  });
+  describe('Delete product from User cart', () => {
+    const execMock = jest.fn().mockReturnValue(true);
+    it('should delete product', async () => {
+      User.findById.mockReturnValueOnce({ exec: execMock });
+      User.findByIdAndUpdate = jest
+        .fn()
+        .mockReturnValueOnce({ exec: execMock });
+      execMock.mockReturnValueOnce({
+        cart: [
+          {
+            productId: '1',
+            sizeId: '1',
+            quantity: 1
+          }
+        ]
+      });
+      execMock.mockReturnValueOnce({ some: 'object' });
+      requestStub.body = {
+        productId: '1',
+        sizeId: '1',
+        quantity: 1
+      };
+      const response = await usersController.deleteProductsFromCart(
+        requestStub,
+        responseStub
+      );
+      expect(response).toBe(true);
+    });
+    it('should fail when no card items found with given filter', async () => {
+      User.findById.mockReturnValueOnce({ exec: execMock });
+      execMock.mockReturnValueOnce({
+        cart: [
+          {
+            productId: '1',
+            sizeId: '1',
+            quantity: 1
+          }
+        ]
+      });
+      requestStub.body = {
+        productId: '2',
+        sizeId: '1',
+        quantity: 1
+      };
+      await usersController.deleteProductsFromCart(requestStub, responseStub);
+      expect(responseStub.boom.notFound).toBeCalledWith(
+        'No items with these parameters found.'
+      );
+    });
+    it('should fail when an error occurs while pulling items', async () => {
+      User.findById.mockReturnValueOnce({ exec: execMock });
+      User.findByIdAndUpdate = jest
+        .fn()
+        .mockReturnValueOnce({ exec: execMock });
+      execMock.mockReturnValueOnce({
+        cart: [
+          {
+            productId: '1',
+            sizeId: '1',
+            quantity: 1
+          }
+        ]
+      });
+      execMock.mockReturnValueOnce(null);
+      requestStub.body = {
+        productId: '1',
+        sizeId: '1',
+        quantity: 1
+      };
+
+      await usersController.deleteProductsFromCart(requestStub, responseStub);
+      expect(responseStub.boom.badRequest).toBeCalledWith(
+        'An error occured while deleting product'
+      );
+    });
+    it('should fail when an error is thrown', async () => {
+      User.findById.mockImplementationOnce(() => {
+        throw Error('some error');
+      });
+      await usersController.deleteProductsFromCart(requestStub, responseStub);
+      expect(responseStub.boom.badImplementation).toBeCalled();
+    });
+  });
+  describe('Retrieves products from User cart', () => {
+    const execMock = jest.fn().mockReturnValue(true);
+    it('should retrieve products', async () => {
+      User.findById.mockReturnValueOnce({ exec: execMock });
+      execMock.mockReturnValueOnce({
+        cart: [
+          {
+            productId: '1',
+            sizeId: '1',
+            quantity: 1
+          }
+        ]
+      });
+      requestStub.query = {
+        productId: '1',
+        sizeId: '1',
+        quantity: 1
+      };
+      const response = await usersController.getProductsFromCart(
+        requestStub,
+        responseStub
+      );
+      expect(response).toMatchObject([
+        { productId: '1', sizeId: '1', quantity: 1 }
+      ]);
+    });
+    it('should fail when no items found', async () => {
+      User.findById.mockReturnValueOnce({ exec: execMock });
+      execMock.mockReturnValueOnce({
+        cart: [
+          {
+            productId: '2',
+            sizeId: '1',
+            quantity: 1
+          }
+        ]
+      });
+      await usersController.getProductsFromCart(requestStub, responseStub);
+      expect(responseStub.boom.notFound).toBeCalledWith(
+        'No cart items with these parameters found'
+      );
+    });
+    it('should fail when error thrown', async () => {
+      User.findById.mockImplementationOnce(() => {
+        throw Error('some error');
+      });
+      await usersController.getProductsFromCart(requestStub, responseStub);
+      expect(responseStub.boom.badImplementation).toBeCalled();
+    });
   });
 });

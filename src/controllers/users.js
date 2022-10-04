@@ -17,6 +17,15 @@ class UsersController {
   blockUser = (req, res) => this.#usersService.blockUser(req, res);
 
   deleteUser = (req, res) => this.#usersService.deleteUser(req, res);
+
+  addProductsToCart = (req, res) =>
+    this.#usersService.addProductsToCart(req, res);
+
+  deleteProductsFromCart = (req, res) =>
+    this.#usersService.deleteProductsFromCart(req, res);
+
+  getProductsFromCart = (req, res) =>
+    this.#usersService.getProductsFromCart(req, res);
 }
 
 module.exports = UsersController;
